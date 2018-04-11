@@ -56,6 +56,24 @@ RSpec.describe Qo do
           expect(Qo[/Rob/, :*] === matched_array).to eq(true)
         end
 
+        it 'can be used for select with triple equals respondant values' do
+          expect(
+            ['foo', 'bar', 'foobar'].select(&Qo[/foo/])
+          ).to eq(
+            ["foo", "foobar"]
+          )
+        end
+
+        # I know this case is slightly confounded, but it does enable quite a bit
+        # of fun with case statements later.
+        it 'can be used for select with callable methods' do
+          expect(
+            [1,2,3].select(&Qo[:even?])
+          ).to eq(
+            [2]
+          )
+        end
+
         # These are entirely to give people suitably fun ideas of what to use
         # this with. They do provide some usefulness to testing, but that's not
         # the primary purpose

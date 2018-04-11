@@ -12,9 +12,11 @@ module Qo
     #
     # @return [Proc]
     def to_proc
-      @array_matchers.empty? ?
-        match_against_hash(@keyword_matchers) :
+      if @array_matchers.empty?
+        match_against_hash(@keyword_matchers)
+      else
         match_against_array(@array_matchers)
+      end
     end
 
     # You can directly call a matcher as well, much like a Proc,
@@ -98,7 +100,15 @@ module Qo
     #     String | Symbol -> Bool # Match against wildcard or boolean return of a predicate method
     private def array_matches_object_fn(match_target)
       -> matcher {
-        matcher == WILDCARD_MATCH || match_target.public_send(matcher)
+        matcher == WILDCARD_MATCH ||
+        matcher === match_target || (
+          # Check if the matcher is a symbol / symbolizeable and
+          # if it's on the public interface. This is to give
+          # the ability to avoid using :sym.to_proc for method calls.
+          matcher.respond_to?(:to_sym) &&
+          match_target.respond_to?(matcher.to_sym) &&
+          match_target.public_send(matcher)
+        )
       }
     end
 
