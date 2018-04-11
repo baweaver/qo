@@ -44,8 +44,8 @@ module Qo
     private def match_against_array(matchers)
       -> match_target {
         match_target.is_a?(::Array) ?
-          matchers.each_with_index.public_send(@match_method, &array_matches_array_fn(match_target)) :
-          matchers.public_send(@match_method, &array_matches_object_fn(match_target))
+          match_with(matchers.each_with_index, array_against_array_matcher(match_target)) :
+          match_with(matchers, array_against_object_matcher(match_target))
       }
     end
 
@@ -61,8 +61,8 @@ module Qo
     private def match_against_hash(matchers)
       -> match_target {
         match_target.is_a?(::Hash) ?
-          matchers.public_send(@match_method, &hash_matches_hash_fn(match_target)) :
-          matchers.public_send(@match_method, &hash_matches_object_fn(match_target))
+          match_with(matchers, hash_against_hash_matcher(match_target)) :
+          match_with(matchers, hash_against_object_matcher(match_target))
       }
     end
 
@@ -86,9 +86,11 @@ module Qo
     #
     # @return [Proc]
     #     Any -> Int -> Bool # Match against wildcard or same position in target array
-    private def array_matches_array_fn(match_target)
+    private def array_against_array_matcher(match_target)
       -> matcher, i {
-        matcher == WILDCARD_MATCH || matcher === match_target[i]
+        wildcard_match(matcher) ||
+        case_match(match_target[i], matcher) ||
+        method_matches?(match_target[i], matcher)
       }
     end
 
@@ -98,17 +100,11 @@ module Qo
     #
     # @return [Proc]
     #     String | Symbol -> Bool # Match against wildcard or boolean return of a predicate method
-    private def array_matches_object_fn(match_target)
+    private def array_against_object_matcher(match_target)
       -> matcher {
-        matcher == WILDCARD_MATCH ||
-        matcher === match_target || (
-          # Check if the matcher is a symbol / symbolizeable and
-          # if it's on the public interface. This is to give
-          # the ability to avoid using :sym.to_proc for method calls.
-          matcher.respond_to?(:to_sym) &&
-          match_target.respond_to?(matcher.to_sym) &&
-          match_target.public_send(matcher)
-        )
+        wildcard_match(matcher) ||
+        case_match(match_target, matcher) ||
+        method_matches?(match_target, matcher)
       }
     end
 
@@ -118,14 +114,14 @@ module Qo
     #
     # @return [Proc]
     #     Any -> Any -> Bool # Matches against wildcard or a key and value. Coerces key to_s if no matches for JSON.
-    private def hash_matches_hash_fn(match_target)
+    private def hash_against_hash_matcher(match_target)
       -> match_key, match_value {
-        match_value == WILDCARD_MATCH ||
-        match_value === match_target[match_key] || (
+        wildcard_match(match_value) ||
+        case_match(match_target[match_key], match_value) || (
           # This is done for JSON responses, but as key can be `Any` we don't want to assume it knows how
           # to coerce `to_s` either. It's more of a nicety function.
           match_key.respond_to?(:to_s) &&
-          match_value === match_target[match_key.to_s]
+          case_match(match_target[match_key.to_s], match_value)
         )
       }
     end
@@ -136,10 +132,69 @@ module Qo
     #
     # @return [Proc]
     #     Any -> Any -> Bool # Matches against wildcard or match value versus the public send return of the target
-    private def hash_matches_object_fn(match_target)
+    private def hash_against_object_matcher(match_target)
       -> match_key, match_value {
-        match_value == WILDCARD_MATCH || match_value === match_target.public_send(match_key)
+        wildcard_match(match_value) ||
+        case_match(method_send(match_target, match_key), match_value)
       }
+    end
+
+    # Wrapper around public send to encapsulate the matching method (any, all, none)
+    #
+    # @param collection [Enumerable] Any collection that can be enumerated over
+    # @param fn         [Proc] Function to match with
+    #
+    # @return [Enumerable] Resulting collection
+    private def match_with(collection, fn)
+      collection.public_send(@match_method, &fn)
+    end
+
+    # Predicate variant of `method_send` with the same guard concerns
+    #
+    # @param target  [Any] Object to send to
+    # @param matcher [respond_to?(:to_sym)] Anything that can be coerced into a method name
+    #
+    # @return [Boolean] Success status of predicate
+    private def method_matches?(target, matcher)
+      !!method_send(target, matcher)
+    end
+
+    # Guarded version of `public_send` meant to stamp out more
+    # obscure errors when running against non-matching types.
+    #
+    # @param target  [Any] Object to send to
+    # @param matcher [respond_to?(:to_sym)] Anything that can be coerced into a method name
+    #
+    # @return [Any] Response of sending to the method, or false if failed
+    private def method_send(target, matcher)
+      matcher.respond_to?(:to_sym) &&
+      target.respond_to?(matcher.to_sym) &&
+      target.public_send(matcher)
+    end
+
+    # Wraps wildcard in case we want to do anything fun with it later
+    #
+    # @param value [Any] Value to test against the wild card
+    #
+    # @note The rescue is because some classes override `==` to do silly things,
+    #       like IPAddr, and I kinda want to use that.
+    #
+    # @return [Boolean]
+    private def wildcard_match(value)
+      value == WILDCARD_MATCH rescue false
+    end
+
+    # Wraps a case equality statement to make it a bit easier to read. The
+    # typical left bias of `===` can be confusing reading down a page, so
+    # more of a clarity thing than anything.
+    #
+    # @param target [Any] Target to match against
+    # @param value [respond_to?(:===)]
+    #   Anything that responds to ===, preferably in a unique and entertaining way.
+    #
+    # @return [Boolean]
+    private def case_match(target, value)
+      value === target
     end
   end
 end

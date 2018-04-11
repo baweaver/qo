@@ -61,6 +61,31 @@ else 'who knows'
 end
 ```
 
+It's even nice enough to work on types, as they respond to `===` too:
+
+```ruby
+case ['Robert', 22]
+when Qo[String, Integer] then 'normal person'
+when Qo[String, Float] then 'probably a kid'
+else 'who knows'
+end
+```
+
+Predicate methods given as symbols will also call through:
+
+```ruby
+case [1, 2]
+when Qo[:even?, :odd?], Qo[:odd?, :even?]
+  'balanced'
+when Qo[:even?, :even?]
+  'even better'
+when Qo[:odd?, :odd?]
+  'odd pair, them'
+else
+  'what did ya do!?'
+end
+```
+
 Though chances are you don't have tuple-like code, you have objects. How about we play with those:
 
 ```ruby
@@ -103,7 +128,7 @@ people = [
 people.select(&Qo[name: /Rob/]) # => [Person('Robert', 22), Person('Roberta', 22)]
 ```
 
-Qo tries to be clever though, it assumes Symbol keys first and then String keys:
+Qo tries to be clever though, it assumes Symbol keys first and then String keys, so how about some JSON?:
 
 ```ruby
 require 'json'
@@ -116,6 +141,17 @@ posts.select(&Qo[userId: 1])
 ```
 
 Nifty!
+
+What about NMap for our Opsy friends? Well, simulated, but still fun.
+
+```ruby
+hosts = (`nmap -oG - -sP 192.168.1.* 10.0.0.* | grep Host`).lines.map { |v| v.split[1..2] }
+=> [["192.168.1.1", "(Linksys03384)"], ["192.168.1.2", "(My Computer)"], ["10.0.0.1", "(Gateway)"]]
+
+hosts.select(&Qo[IPAddr.new('192.168.1.1/8')])
+=> [["192.168.1.1", "(Linksys03384)"], ["192.168.1.2", "(My Computer)"]]
+[13] pry(main)>
+```
 
 ## Development
 
