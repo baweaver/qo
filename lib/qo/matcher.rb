@@ -116,11 +116,14 @@ module Qo
     #     Any -> Any -> Bool # Matches against wildcard or a key and value. Coerces key to_s if no matches for JSON.
     private def hash_against_hash_matcher(match_target)
       -> match_key, match_value {
+        match_target.key?(match_key) &&
         wildcard_match(match_value) ||
-        case_match(match_target[match_key], match_value) || (
+        case_match(match_target[match_key], match_value)  ||
+        method_matches?(match_target[match_key], match_value) || (
           # This is done for JSON responses, but as key can be `Any` we don't want to assume it knows how
           # to coerce `to_s` either. It's more of a nicety function.
           match_key.respond_to?(:to_s) &&
+          match_target.key?(match_key.to_s) &&
           case_match(match_target[match_key.to_s], match_value)
         )
       }
@@ -134,8 +137,10 @@ module Qo
     #     Any -> Any -> Bool # Matches against wildcard or match value versus the public send return of the target
     private def hash_against_object_matcher(match_target)
       -> match_key, match_value {
+        match_target.respond_to?(match_key) &&
         wildcard_match(match_value) ||
-        case_match(method_send(match_target, match_key), match_value)
+        case_match(method_send(match_target, match_key), match_value) ||
+        method_matches?(method_send(match_target, match_key), match_value)
       }
     end
 

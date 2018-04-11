@@ -301,10 +301,8 @@ RSpec.describe Qo do
           expect(match_result).to eq(true)
         end
 
-        # Reasons like these are why I say don't use the internal API. Need to figure out a good way
-        # to do this.
         context 'When given a wildcard' do
-          let(:matcher_args) { [:i_do_not_exist, :*] }
+          let(:matcher_args) { [:name, :*] }
 
           it 'will always match' do
             expect(match_result).to eq(true)
@@ -321,10 +319,8 @@ RSpec.describe Qo do
           expect(match_result).to eq(true)
         end
 
-        # Reasons like these are why I say don't use the internal API. Need to figure out a good way
-        # to do this.
         context 'When given a wildcard' do
-          let(:matcher_args) { [:i_do_not_exist, :*] }
+          let(:matcher_args) { [:to_s, :*] }
 
           it 'will always match' do
             expect(match_result).to eq(true)
