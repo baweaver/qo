@@ -14,6 +14,38 @@ Fast forward a few months and I kind of wanted to make it real, so here it is. I
 
 ## Usage
 
+### Quick Start
+
+Qo is used for pattern matching in Ruby. All Qo matchers respond to `===` and `to_proc` meaning they can be used with `case` and Enumerable functions alike:
+
+
+```ruby
+case ['Foo', 42]
+when Qo[:*, 42] then 'Truly the one answer'
+else nil
+end
+
+# Run a select like an AR query, getting the age attribute against a range
+people.select(&Qo[age: 18..30])
+
+# How about some "right-hand assignment" pattern matching
+name_longer_than_three      = -> person { person.name.size > 3 }
+people_with_truncated_names = people.map(&Qo.match_fn(
+  Qo.m(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) },
+  Qo.m(:*) # Identity function, catch-all
+))
+
+# And standalone like a case:
+Qo.match(people.first,
+  Qo.m(age: 10..19) { |person| "#{person.name} is a teen that's #{person.age} years old" },
+  Qo.m(:*) { |person| "#{person.name} is #{person.age} years old" }
+)
+```
+
+Get a lot more expressiveness in your queries and transformations. Read on for the full details.
+
+### Qo'isms
+
 Qo supports three main types of queries: `and`, `or`, and `not`.
 
 Most examples are written in terms of `and` and its alias `[]`. `[]` is mostly used for portable syntax:
@@ -96,7 +128,7 @@ case ['Roberta', 22]
 when Qo[:*, :*] then 'it matched'
 else 'will not ever be reached'
 end
-# => 'adult'
+# => 'it matched'
 
 # Select
 
@@ -140,7 +172,7 @@ dirty_values = [nil, '', true]
 # Standalone
 
 Qo[:nil?] === [nil]
-# => true
+# => true, though you could also just use Qo[nil]
 
 # Case statement
 
@@ -148,7 +180,7 @@ case ['Roberta', nil]
 when Qo[:*, :nil?] then 'no age'
 else 'not sure'
 end
-# => 'adult'
+# => 'no age'
 
 # Select
 
@@ -212,7 +244,7 @@ end
 
 # Reject
 
-[nil, '', 10, 'string'].reject(&Qo.or(/str/, 10..20))
+[nil, '', 10, 'string'].reject(&Qo.or(:nil?, :empty?))
 # => [10, "string"]
 ```
 
@@ -259,7 +291,7 @@ end
 
 # Select
 
-people_hashes = people_arrays.map { |(n,a)| {name: n, age: a} }
+people_hashes = people_arrays.map { |n, a| {name: n, age: a} }
 people_hashes.select(&Qo[age: 15..25])
 # => [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}, {:name=>"Bar", :age=>18}]
 ```
@@ -282,10 +314,10 @@ else 'nope'
 end
 # => "No age provided!"
 
-# Select
+# Reject
 
 people_hashes = people_arrays.map { |(n,a)| {name: n, age: a} } << {name: 'Ghost', age: nil}
-people_hashes.select(&Qo[age: :nil?])
+people_hashes.reject(&Qo[age: :nil?])
 # => [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}, {:name=>"Bar", :age=>18}]
 ```
 
@@ -308,7 +340,7 @@ If it doesn't know how to deal with it, false out.
 
 ##### 3.2.2 - Wildcard provided
 
-Same as other wildcards
+Same as other wildcards, but if the object doesn't respond to the method you specify it'll have false'd out before it reaches here.
 
 ##### 3.2.3 - Case match present
 
@@ -408,6 +440,10 @@ These examples will grow over the next few weeks as I think of more fun things t
 
 #### 5.1 - JSON
 
+> Note that Qo does not support deep querying of hashes (yet)
+
+##### 5.1.1 - JSON Placeholder
+
 Qo tries to be clever though, it assumes Symbol keys first and then String keys, so how about some JSON?:
 
 ```ruby
@@ -434,6 +470,21 @@ hosts = (`nmap -oG - -sP 192.168.1.* 10.0.0.* | grep Host`).lines.map { |v| v.sp
 
 hosts.select(&Qo[IPAddr.new('192.168.1.1/8')])
 => [["192.168.1.1", "(Router)"], ["192.168.1.2", "(My Computer)"]]
+```
+
+##### 5.2.2 - `du`
+
+The nice thing about Unix style commands is that they use headers, which means CSV can get a hold of them for some good formatting. It's also smart enough to deal with space seperators that may vary in length:
+
+```ruby
+rows = CSV.new(`df -h`, col_sep: " ", headers: true).read.map(&:to_h)
+
+rows.map(&Qo.match_fn(
+  Qo.m(Avail: /Gi$/) { |row|
+    "#{row['Filesystem']} mounted on #{row['Mounted']} [#{row['Avail']} / #{row['Size']}]"
+  }
+)).compact
+# => ["/dev/***** mounted on / [186Gi / 466Gi]"]
 ```
 
 ## Installation
