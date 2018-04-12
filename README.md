@@ -384,6 +384,24 @@ In this case it's trying to do a few things:
 
 If no block function is provided, it assumes an identity function (`-> v { v }`) instead. If no match is found, `nil` will be returned.
 
+Now you _can_ also use a reversed version, `match_fn` (name pending better ideas), to run with map:
+
+```ruby
+name_longer_than_three = -> person { person.name.size > 3 }
+
+people_objects.map(&Qo.match_fn(
+  Qo.m(name_longer_than_three) { |person|
+    person.name = person.name[0..2]
+    person
+  },
+  Qo.m(:*)
+))
+
+# => [Person(age: 22, name: "Rob"), Person(age: 22, name: "Rob"), Person(age: 42, name: "Foo"), Person(age: 17, name: "Bar")]
+```
+
+So we just truncated everyone's name that was longer than three characters.
+
 ### 5 - Hacky Fun Time
 
 These examples will grow over the next few weeks as I think of more fun things to do with Qo. PRs welcome if you find fun uses!

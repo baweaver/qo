@@ -20,6 +20,10 @@ module Qo
       }
     end
 
+    def match_fn(*qo_matchers)
+      -> data { match(data, *qo_matchers) }
+    end
+
     def and(*array_matchers, **keyword_matchers)
       Qo::Matcher.new('and', *array_matchers, **keyword_matchers)
     end
