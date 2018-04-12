@@ -356,11 +356,39 @@ people_hashes.select(&Qo[age: :nil?])
 # => []
 ```
 
-### 4 - Hacky Fun Time
+### 4 - Right Hand Pattern Matching
+
+> ALPHA - This feature is alpha, currently testing. Considering whether or not to add `or` and `not` as `m_or` and `m_not`.
+
+This is where I start going a bit off into the weeds. We're going to try and get RHA style pattern matching in Ruby.
+
+```ruby
+Qo.match(['Robert', 22],
+  Qo.m(:*, 20..99) { |n, a| "#{n} is an adult that is #{a} years old" },
+  Qo.m(:*)
+)
+# => "Robert is an adult that is 22 years old"
+```
+
+```ruby
+Qo.match(people_objects.first,
+  Qo.m(name: :*, age: 20..99) { |person| "#{person.name} is an adult that is #{person.age} years old" },
+  Qo.m(:*)
+)
+```
+
+In this case it's trying to do a few things:
+
+1. Iterate over every matcher until it finds a match
+2. Execute its block function
+
+If no block function is provided, it assumes an identity function (`-> v { v }`) instead. If no match is found, `nil` will be returned.
+
+### 5 - Hacky Fun Time
 
 These examples will grow over the next few weeks as I think of more fun things to do with Qo. PRs welcome if you find fun uses!
 
-#### 4.1 - JSON
+#### 5.1 - JSON
 
 Qo tries to be clever though, it assumes Symbol keys first and then String keys, so how about some JSON?:
 
@@ -376,9 +404,9 @@ posts.select(&Qo[userId: 1])
 
 Nifty!
 
-#### 4.2 - Opsy Stuff
+#### 5.2 - Opsy Stuff
 
-##### 4.2.1 - NMap
+##### 5.2.1 - NMap
 
 What about NMap for our Opsy friends? Well, simulated, but still fun.
 
