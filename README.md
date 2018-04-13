@@ -2,6 +2,8 @@
 
 Short for Query Object, my play at Ruby pattern matching and fluent querying
 
+![Qo Lemur logo](img/qo_logo.png)
+
 ## How does it work?
 
 Triple equals black magic, mostly.
