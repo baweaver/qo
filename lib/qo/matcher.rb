@@ -116,7 +116,13 @@ module Qo
     #     Any -> Any -> Bool # Matches against wildcard or a key and value. Coerces key to_s if no matches for JSON.
     private def hash_against_hash_matcher(match_target)
       -> match_key, match_value {
-        match_target.key?(match_key) &&
+        return false unless match_target.key?(match_key)
+
+        # If both the match value and target are hashes, descend if the key exists
+        if match_value.is_a?(Hash) && match_target.is_a?(Hash)
+          return match_against_hash(match_value)[match_target[match_key]]
+        end
+
         wildcard_match(match_value) ||
         case_match(match_target[match_key], match_value)  ||
         method_matches?(match_target[match_key], match_value) || (
@@ -137,7 +143,8 @@ module Qo
     #     Any -> Any -> Bool # Matches against wildcard or match value versus the public send return of the target
     private def hash_against_object_matcher(match_target)
       -> match_key, match_value {
-        match_target.respond_to?(match_key) &&
+        return false unless match_target.respond_to?(match_key)
+
         wildcard_match(match_value) ||
         case_match(method_send(match_target, match_key), match_value) ||
         method_matches?(method_send(match_target, match_key), match_value)
@@ -191,7 +198,7 @@ module Qo
 
     # Wraps a case equality statement to make it a bit easier to read. The
     # typical left bias of `===` can be confusing reading down a page, so
-    # more of a clarity thing than anything.
+    # more of a clarity thing than anything. Also makes for nicer stack traces.
     #
     # @param target [Any] Target to match against
     # @param value [respond_to?(:===)]

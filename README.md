@@ -94,6 +94,12 @@ Qo has a concept of a Wildcard, `:*`, which will match against any value
 Qo[:*, :*] === ['Robert', 22] # true
 ```
 
+A single wildcard will match anything, and can frequently be used as an always true:
+
+```ruby
+Qo[:*] === :literally_anything_here
+```
+
 ### 2 - Array Matching
 
 The first way a Qo matcher can be defined is by using `*varargs`:
@@ -253,16 +259,58 @@ end
 #### 3.1 - Hash matched against a Hash
 
 1. Does the key exist on the other hash?
-2. Was a wildcard value provided?
-3. Does the target object's value case match against the match value?
-4. Does the target object's value predicate match against the match value?
-5. What about the String version of the match key? Abort if it can't coerce.
+2. Are the match value and match target hashes?
+3. Was a wildcard value provided?
+4. Does the target object's value case match against the match value?
+5. Does the target object's value predicate match against the match value?
+6. What about the String version of the match key? Abort if it can't coerce.
 
 ##### 3.1.1 - Key present
 
 Checks to see if the key is even present on the other object, false if not.
 
-##### 3.1.2 - Wildcard provided
+##### 3.1.2 - Match value and target are hashes
+
+If both the match value (`match_key: match_value`) and the match target are hashes, Qo will begin a recursive descent starting at the match key until it finds a matcher to try out:
+
+```ruby
+Qo[a: {b: {c: 5..15}}] === {a: {b: {c: 10}}}
+# => true
+
+# Na, no fun. Deeper!
+Qo.and(a: {
+  f: 5..15,
+  b: {
+    c: /foo/,
+    d: 10..30
+  }
+}).call(a: {
+  f: 10,
+  b: {
+    c: 'foobar',
+    d: 20
+  }
+})
+# => true
+
+# It can get chaotic with `or` though. Anything anywhere in there matches and
+# it'll pass.
+Qo.or(a: {
+  f: false,
+  b: {
+    c: /nope/,
+    d: 10..30
+  }
+}).call(a: {
+  f: 10,
+  b: {
+    c: 'foobar',
+    d: 20
+  }
+})
+```
+
+##### 3.1.3 - Wildcard provided
 
 As with other wildcards, if the value matched against is a wildcard it'll always get through:
 
@@ -271,7 +319,7 @@ Qo[name: :*] === {name: 'Foo'}
 # => true
 ```
 
-##### 3.1.3 - Case match present
+##### 3.1.4 - Case match present
 
 If a case match is present for the key, it'll try and compare:
 
@@ -296,7 +344,7 @@ people_hashes.select(&Qo[age: 15..25])
 # => [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}, {:name=>"Bar", :age=>18}]
 ```
 
-##### 3.1.4 - Predicate match present
+##### 3.1.5 - Predicate match present
 
 Much like our array friend above, if a predicate style method is present see if it'll work
 
@@ -323,7 +371,7 @@ people_hashes.reject(&Qo[age: :nil?])
 
 Careful though, if the key doesn't exist that won't match. I'll have to consider this one later.
 
-##### 3.1.5 - String variant present
+##### 3.1.6 - String variant present
 
 Coerces the key into a string if possible, and sees if that can provide a valid case match
 
@@ -434,6 +482,45 @@ people_objects.map(&Qo.match_fn(
 
 So we just truncated everyone's name that was longer than three characters.
 
+### 6 - Helper functions
+
+There are a few functions added for convenience, and it should be noted that because all Qo matchers respond to `===` that they can be used as helpers as well.
+
+#### 6.1 - Dig
+
+Dig is used to get in deep at a nested hash value. It takes a dot-path and a `===` respondant matcher:
+
+```ruby
+Qo.dig('a.b.c', Qo.or(1..5, 15..25)) === {a: {b: {c: 1}}}
+# => true
+
+Qo.dig('a.b.c', Qo.or(1..5, 15..25)) === {a: {b: {c: 20}}}
+# => true
+```
+
+To be fair that means anything that can respond to `===`, including classes and other such things.
+
+#### 6.2 - Count By
+
+This ends up coming up a lot, especially around querying, so let's get a way to count by!
+
+```ruby
+Qo.count_by([1,2,3,2,2,2,1]
+
+# => {
+#   1 => 2,
+#   2 => 4,
+#   3 => 1
+# }
+
+Qo.count_by([1,2,3,2,2,2,1], &:even?)
+
+# => {
+#   false => 3,
+#   true  => 4
+# }
+```
+
 ### 5 - Hacky Fun Time
 
 These examples will grow over the next few weeks as I think of more fun things to do with Qo. PRs welcome if you find fun uses!
@@ -449,11 +536,35 @@ Qo tries to be clever though, it assumes Symbol keys first and then String keys,
 ```ruby
 require 'json'
 require 'net/http'
+
 posts = JSON.parse(
-  Net::HTTP.get(URI("https://jsonplaceholder.typicode.com/posts")),symbolize_names: true
+  Net::HTTP.get(URI("https://jsonplaceholder.typicode.com/posts")), symbolize_names: true
 )
 
+users = JSON.parse(
+  Net::HTTP.get(URI("https://jsonplaceholder.typicode.com/users")), symbolize_names: true
+)
+
+# Get all posts where the userId is 1.
 posts.select(&Qo[userId: 1])
+
+# Get users named Nicholas or have two names and an address somewhere with a zipcode
+# that starts with 9 or 4.
+#
+# Qo matchers return a `===` respondant object, remember, so we can totally nest them.
+users.select(&Qo.and(
+  name: Qo.or(/^Nicholas/, /^\w+ \w+$/),
+  address: {
+    zipcode: Qo.or(/^9/, /^4/)
+  }
+))
+
+# We could even use dig to get at some of the same information. This and the above will
+# return the same results even.
+users.select(&Qo.and(
+  Qo.dig('address.zipcode', Qo.or(/^9/, /^4/)),
+  name: Qo.or(/^Nicholas/, /^\w+ \w+$/)
+))
 ```
 
 Nifty!

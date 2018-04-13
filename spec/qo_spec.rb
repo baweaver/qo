@@ -210,6 +210,32 @@ RSpec.describe Qo do
     end
   end
 
+  describe '#dig' do
+    it 'can get at deep data' do
+      matcher = Qo.dig('a.b.c', Qo.or(1..5, 15..25))
+      target  = {a: {b: {c: 1}}}
+
+      expect(matcher.call(target)).to eq(true)
+    end
+  end
+
+  describe '#count_by' do
+    it 'counts without a block using an identity function' do
+      expect(Qo.count_by([1,2,3,2,2,2,1])).to eq({
+        1 => 2,
+        2 => 4,
+        3 => 1
+      })
+    end
+
+    it 'counts with a block' do
+      expect(Qo.count_by([1,2,3,2,2,2,1], &:even?)).to eq({
+        false => 3,
+        true  => 4
+      })
+    end
+  end
+
   # Test the inner workings we don't want to expose. The interface for Qo should stay the same, I
   # just _really_ don't want developers relying on internal behavior I may change over the next few
   # months.
@@ -357,6 +383,15 @@ RSpec.describe Qo do
           let(:matcher_args) { [:name, :*] }
 
           it 'will always match' do
+            expect(match_result).to eq(true)
+          end
+        end
+
+        context 'When given a deep match' do
+          let(:method_args) { {a: {b: {c: 1}}} }
+          let(:matcher_args) { [:a, {b: {c: 1..10}}] }
+
+          it 'will match' do
             expect(match_result).to eq(true)
           end
         end
