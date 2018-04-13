@@ -505,7 +505,7 @@ To be fair that means anything that can respond to `===`, including classes and 
 This ends up coming up a lot, especially around querying, so let's get a way to count by!
 
 ```ruby
-Qo.count_by([1,2,3,2,2,2,1]
+Qo.count_by([1,2,3,2,2,2,1])
 
 # => {
 #   1 => 2,
