@@ -585,7 +585,7 @@ hosts.select(&Qo[IPAddr.new('192.168.1.1/8')])
 => [["192.168.1.1", "(Router)"], ["192.168.1.2", "(My Computer)"]]
 ```
 
-##### 5.2.2 - `du`
+##### 5.2.2 - `df`
 
 The nice thing about Unix style commands is that they use headers, which means CSV can get a hold of them for some good formatting. It's also smart enough to deal with space separators that may vary in length:
 

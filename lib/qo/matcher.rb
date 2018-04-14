@@ -42,8 +42,8 @@ module Qo
     #     Array  -> Bool # Tuple match against targets index
     #     Object -> Bool # Boolean public send
     private def match_against_array(matchers)
-      -> match_target {
-        return true if matchers == match_target
+      Proc.new { |match_target|
+        next true if matchers == match_target
 
         match_target.is_a?(::Array) ?
           match_with(matchers.each_with_index, array_against_array_matcher(match_target)) :
@@ -61,8 +61,8 @@ module Qo
     #     Hash   -> Bool # Value matching against similar keys, will attempt to coerce to_s because JSON
     #     Object -> Bool # Uses keys as methods with public send to `===` match against the value
     private def match_against_hash(matchers)
-      -> match_target {
-        return true if matchers == match_target
+      Proc.new { |match_target|
+        next true if matchers == match_target
 
         match_target.is_a?(::Hash) ?
           match_with(matchers, hash_against_hash_matcher(match_target)) :
@@ -91,7 +91,7 @@ module Qo
     # @return [Proc]
     #     Any -> Int -> Bool # Match against wildcard or same position in target array
     private def array_against_array_matcher(match_target)
-      -> matcher, i {
+      Proc.new { |matcher, i|
         wildcard_match(matcher) ||
         case_match(match_target[i], matcher) ||
         method_matches?(match_target[i], matcher)
@@ -105,7 +105,7 @@ module Qo
     # @return [Proc]
     #     String | Symbol -> Bool # Match against wildcard or boolean return of a predicate method
     private def array_against_object_matcher(match_target)
-      -> matcher {
+      Proc.new { |matcher|
         wildcard_match(matcher) ||
         case_match(match_target, matcher) ||
         method_matches?(match_target, matcher)
@@ -119,12 +119,12 @@ module Qo
     # @return [Proc]
     #     Any -> Any -> Bool # Matches against wildcard or a key and value. Coerces key to_s if no matches for JSON.
     private def hash_against_hash_matcher(match_target)
-      -> match_key, match_value {
-        return false unless match_target.key?(match_key)
+      Proc.new { |(match_key, match_value)|
+        next false unless match_target.key?(match_key)
 
         # If both the match value and target are hashes, descend if the key exists
         if match_value.is_a?(Hash) && match_target.is_a?(Hash)
-          return match_against_hash(match_value)[match_target[match_key]]
+          next match_against_hash(match_value)[match_target[match_key]]
         end
 
         wildcard_match(match_value) ||
@@ -146,8 +146,8 @@ module Qo
     # @return [Proc]
     #     Any -> Any -> Bool # Matches against wildcard or match value versus the public send return of the target
     private def hash_against_object_matcher(match_target)
-      -> match_key, match_value {
-        return false unless match_target.respond_to?(match_key)
+      Proc.new { |(match_key, match_value)|
+        next false unless match_target.respond_to?(match_key)
 
         wildcard_match(match_value) ||
         case_match(method_send(match_target, match_key), match_value) ||

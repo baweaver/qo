@@ -13,3 +13,4 @@
 
 # built gems
 *.gem
+repro_cases/*.rb

@@ -251,166 +251,120 @@ RSpec.describe Qo do
     let(:result) { qo_matcher.send(method_name, *method_args) }
 
     describe '#case_match' do
-      let(:method_name) { :case_match }
-      let(:method_args) { ['Foo', /^F/] }
-
       it 'basically wraps `===`' do
-        expect(result).to eq(true)
+        expect(qo_matcher.send(:case_match, 'Foo', /^F/)).to eq(true)
       end
     end
 
     describe '#wildcard_match' do
-      let(:method_name) { :wildcard_match }
-      let(:method_args) { [:*] }
-
       it 'can match against a wildcard' do
-        expect(result).to eq(true)
+        expect(qo_matcher.send(:wildcard_match, :*)).to eq(true)
       end
 
       context 'When provided a value not matching the wildcard' do
-        let(:method_args) { [nil] }
-
         it 'will not match' do
-          expect(result).to eq(false)
+          expect(qo_matcher.send(:wildcard_match, nil)).to eq(false)
         end
       end
     end
 
     describe '#method_send' do
-      let(:method_name) { :method_send }
-      let(:method_args) { [1, :odd?] }
-
       it 'will return the result of sending a method' do
-        expect(result).to eq(true)
+        expect(qo_matcher.send(:method_send, 1, :odd?)).to eq(true)
       end
 
       context 'When the target does not respond to the matcher' do
-        let(:method_args) { [1, :i_do_not_exist] }
-
         it 'returns false' do
-          expect(result).to eq(false)
+          expect(qo_matcher.send(:method_send, 1, :i_do_not_exist)).to eq(false)
         end
       end
 
       context 'When the matcher does not respond to to_sym' do
-        let(:method_args) { [1, /i don't symbolize well/] }
-
         it 'returns false' do
-          expect(result).to eq(false)
+          expect(qo_matcher.send(:method_send, 1, /i don't symbolize well/)).to eq(false)
         end
       end
     end
 
     describe '#method_matches?' do
-      let(:method_name) { :method_matches? }
-      let(:method_args) { [1, :succ] }
-
       it 'just wraps #method_send with a boolean coercion' do
-        expect(result).to eq(true)
+        expect(qo_matcher.send(:method_matches?, 1, :succ)).to eq(true)
       end
     end
 
     describe '#match_with' do
-      let(:method_name) { :match_with }
-      let(:method_args) { [[1,2,3], :even?.to_proc] }
-
       it 'wraps the collection match' do
-        expect(result).to eq(false)
+        expect(qo_matcher.send(:match_with, [1,2,3], :even?.to_proc)).to eq(false)
       end
     end
 
     describe 'Matcher functions' do
-      let(:matcher_fn) { result }
-      let(:match_result) { matcher_fn[*matcher_args] }
-
       describe '#array_against_array_matcher' do
-        let(:method_name) { :array_against_array_matcher }
-        let(:method_args) { [1] }
-        let(:matcher_args) { [Integer, 1] }
-
         it 'generates a function to match an array against matchers at the same index' do
-          expect(match_result).to eq(true)
+          matcher_fn = qo_matcher.send(:array_against_array_matcher, [1, 1])
+          expect(matcher_fn.call(Integer, 1)).to eq(true)
         end
 
         context 'When given a wildcard' do
-          let(:matcher_args) { [:*, 1] }
-
           it 'will always match' do
-            expect(match_result).to eq(true)
+            matcher_fn = qo_matcher.send(:array_against_array_matcher, [1, 1])
+            expect(matcher_fn.call(:*, 1)).to eq(true)
           end
         end
       end
 
       describe '#array_against_object_matcher' do
-        let(:method_name) { :array_against_object_matcher }
-        let(:method_args) { [1] }
-        let(:matcher_args) { [Integer] }
-
         it 'generates a function to match an array against a collection of matchers' do
-          expect(match_result).to eq(true)
+          matcher_fn = qo_matcher.send(:array_against_object_matcher, 1)
+          expect(matcher_fn.call(Integer)).to eq(true)
         end
 
         context 'When given a wildcard' do
-          let(:matcher_args) { [:*] }
-
           it 'will always match' do
-            expect(match_result).to eq(true)
+            matcher_fn = qo_matcher.send(:array_against_object_matcher, 1)
+            expect(matcher_fn.call(:*)).to eq(true)
           end
         end
 
         context 'When given a predicate method' do
-          let(:matcher_args) { [:even?] }
-
           it 'will call that method on the target' do
-            expect(match_result).to eq(false)
+            matcher_fn = qo_matcher.send(:array_against_object_matcher, 1)
+            expect(matcher_fn.call(:even?)).to eq(false)
           end
         end
       end
 
       describe '#hash_against_hash_matcher' do
-        # Don't splat a hash
-        let(:result) { qo_matcher.send(method_name, method_args) }
-
-        let(:method_name) { :hash_against_hash_matcher }
-        let(:method_args) { {name: 'Foobar'} }
-        let(:matcher_args) { [:name, /Foo/] }
-
         it 'generates a function to match a hash pair against another hash' do
-          expect(match_result).to eq(true)
+          matcher_fn = qo_matcher.send(:hash_against_hash_matcher, {name: 'Foobar'})
+          expect(matcher_fn.call([:name, /Foo/])).to eq(true)
         end
 
         context 'When given a wildcard' do
-          let(:matcher_args) { [:name, :*] }
-
           it 'will always match' do
-            expect(match_result).to eq(true)
+            matcher_fn = qo_matcher.send(:hash_against_hash_matcher, {name: 'Foobar'})
+            expect(matcher_fn.call([:name, :*])).to eq(true)
           end
         end
 
         context 'When given a deep match' do
-          let(:method_args) { {a: {b: {c: 1}}} }
-          let(:matcher_args) { [:a, {b: {c: 1..10}}] }
-
           it 'will match' do
-            expect(match_result).to eq(true)
+            matcher_fn = qo_matcher.send(:hash_against_hash_matcher, {a: {b: {c: 1}}})
+            expect(matcher_fn.call([:a, {b: {c: 1..10}}])).to eq(true)
           end
         end
       end
 
       describe '#hash_against_object_matcher' do
-        let(:method_name) { :hash_against_object_matcher }
-        let(:method_args) { [1] }
-        let(:matcher_args) { [:to_s, '1'] }
-
         it 'generates a function to match a hash pair against an object using the key as a method and a value as a matcher' do
-          expect(match_result).to eq(true)
+          matcher_fn = qo_matcher.send(:hash_against_object_matcher, 1)
+          expect(matcher_fn.call([:to_s, '1'])).to eq(true)
         end
 
         context 'When given a wildcard' do
-          let(:matcher_args) { [:to_s, :*] }
-
           it 'will always match' do
-            expect(match_result).to eq(true)
+            matcher_fn = qo_matcher.send(:hash_against_object_matcher, 1)
+            expect(matcher_fn.call([:to_s, :*])).to eq(true)
           end
         end
       end
