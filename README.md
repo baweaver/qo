@@ -490,7 +490,7 @@ There are a few functions added for convenience, and it should be noted that bec
 
 #### 6.1 - Dig
 
-Dig is used to get in deep at a nested hash value. It takes a dot-path and a `===` respondant matcher:
+Dig is used to get in deep at a nested hash value. It takes a dot-path and a `===` respondent matcher:
 
 ```ruby
 Qo.dig('a.b.c', Qo.or(1..5, 15..25)) === {a: {b: {c: 1}}}
@@ -587,7 +587,7 @@ hosts.select(&Qo[IPAddr.new('192.168.1.1/8')])
 
 ##### 5.2.2 - `du`
 
-The nice thing about Unix style commands is that they use headers, which means CSV can get a hold of them for some good formatting. It's also smart enough to deal with space seperators that may vary in length:
+The nice thing about Unix style commands is that they use headers, which means CSV can get a hold of them for some good formatting. It's also smart enough to deal with space separators that may vary in length:
 
 ```ruby
 rows = CSV.new(`df -h`, col_sep: " ", headers: true).read.map(&:to_h)
