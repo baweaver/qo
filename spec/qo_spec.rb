@@ -250,20 +250,20 @@ RSpec.describe Qo do
 
     let(:result) { qo_matcher.send(method_name, *method_args) }
 
-    describe '#case_match' do
+    describe '#case_match?' do
       it 'basically wraps `===`' do
-        expect(qo_matcher.send(:case_match, 'Foo', /^F/)).to eq(true)
+        expect(qo_matcher.send(:case_match?, 'Foo', /^F/)).to eq(true)
       end
     end
 
-    describe '#wildcard_match' do
+    describe '#wildcard_match?' do
       it 'can match against a wildcard' do
-        expect(qo_matcher.send(:wildcard_match, :*)).to eq(true)
+        expect(qo_matcher.send(:wildcard_match?, :*)).to eq(true)
       end
 
       context 'When provided a value not matching the wildcard' do
         it 'will not match' do
-          expect(qo_matcher.send(:wildcard_match, nil)).to eq(false)
+          expect(qo_matcher.send(:wildcard_match?, nil)).to eq(false)
         end
       end
     end

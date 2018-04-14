@@ -45,9 +45,15 @@ module Qo
       Proc.new { |match_target|
         next true if matchers == match_target
 
-        match_target.is_a?(::Array) ?
-          match_with(matchers.each_with_index, array_against_array_matcher(match_target)) :
-          match_with(matchers, array_against_object_matcher(match_target))
+        if match_target.is_a?(::Array)
+          match_collection = matchers.each_with_index
+          match_fn         = array_against_array_matcher(match_target)
+        else
+          match_collection = matchers
+          match_fn         = array_against_object_matcher(match_target)
+        end
+
+        match_with(match_collection, match_fn)
       }
     end
 
@@ -64,9 +70,11 @@ module Qo
       Proc.new { |match_target|
         next true if matchers == match_target
 
-        match_target.is_a?(::Hash) ?
-          match_with(matchers, hash_against_hash_matcher(match_target)) :
-          match_with(matchers, hash_against_object_matcher(match_target))
+        match_fn = match_target.is_a?(::Hash) ?
+          hash_against_hash_matcher(match_target) :
+          hash_against_object_matcher(match_target)
+
+        match_with(matchers, match_fn)
       }
     end
 
@@ -92,8 +100,8 @@ module Qo
     #     Any -> Int -> Bool # Match against wildcard or same position in target array
     private def array_against_array_matcher(match_target)
       Proc.new { |matcher, i|
-        wildcard_match(matcher) ||
-        case_match(match_target[i], matcher) ||
+        wildcard_match?(matcher) ||
+        case_match?(match_target[i], matcher) ||
         method_matches?(match_target[i], matcher)
       }
     end
@@ -106,8 +114,8 @@ module Qo
     #     String | Symbol -> Bool # Match against wildcard or boolean return of a predicate method
     private def array_against_object_matcher(match_target)
       Proc.new { |matcher|
-        wildcard_match(matcher) ||
-        case_match(match_target, matcher) ||
+        wildcard_match?(matcher) ||
+        case_match?(match_target, matcher) ||
         method_matches?(match_target, matcher)
       }
     end
@@ -120,22 +128,12 @@ module Qo
     #     Any -> Any -> Bool # Matches against wildcard or a key and value. Coerces key to_s if no matches for JSON.
     private def hash_against_hash_matcher(match_target)
       Proc.new { |(match_key, match_value)|
-        next false unless match_target.key?(match_key)
+        next true if hash_wildcard_match?(match_target, match_key, match_value)
 
-        # If both the match value and target are hashes, descend if the key exists
-        if match_value.is_a?(Hash) && match_target.is_a?(Hash)
-          next match_against_hash(match_value)[match_target[match_key]]
-        end
+        next hash_recurse(match_target[match_key], match_value) if hash_should_recurse?(match_target, match_value)
 
-        wildcard_match(match_value) ||
-        case_match(match_target[match_key], match_value)  ||
-        method_matches?(match_target[match_key], match_value) || (
-          # This is done for JSON responses, but as key can be `Any` we don't want to assume it knows how
-          # to coerce `to_s` either. It's more of a nicety function.
-          match_key.respond_to?(:to_s) &&
-          match_target.key?(match_key.to_s) &&
-          case_match(match_target[match_key.to_s], match_value)
-        )
+        hash_case_match?(match_target, match_key, match_value) ||
+        hash_method_case_match?(match_target, match_key, match_value)
       }
     end
 
@@ -147,11 +145,8 @@ module Qo
     #     Any -> Any -> Bool # Matches against wildcard or match value versus the public send return of the target
     private def hash_against_object_matcher(match_target)
       Proc.new { |(match_key, match_value)|
-        next false unless match_target.respond_to?(match_key)
-
-        wildcard_match(match_value) ||
-        case_match(method_send(match_target, match_key), match_value) ||
-        method_matches?(method_send(match_target, match_key), match_value)
+        object_wildcard_match?(match_target, match_key, match_value) ||
+        hash_method_case_match?(match_target, match_key, match_value)
       }
     end
 
@@ -196,21 +191,96 @@ module Qo
     #       like IPAddr, and I kinda want to use that.
     #
     # @return [Boolean]
-    private def wildcard_match(value)
+    private def wildcard_match?(value)
       value == WILDCARD_MATCH rescue false
+    end
+
+    # Wraps strict checks on keys with a wildcard match
+    #
+    # @param match_target [Hash]
+    # @param match_key    [Symbol]
+    # @param match_value  [Any]
+    #
+    # @return [Boolean]
+    private def hash_wildcard_match?(match_target, match_key, match_value)
+      return false unless match_target.key?(match_key)
+
+      wildcard_match?(match_value)
+    end
+
+    # Wraps strict checks for methods existing on objects with a wildcard match
+    #
+    # @param match_target [Hash]
+    # @param match_key    [Symbol]
+    # @param match_value  [Any]
+    #
+    # @return [Boolean]
+    private def object_wildcard_match?(match_target, match_key, match_value)
+      return false unless match_target.respond_to?(match_key)
+
+      wildcard_match?(match_value)
     end
 
     # Wraps a case equality statement to make it a bit easier to read. The
     # typical left bias of `===` can be confusing reading down a page, so
     # more of a clarity thing than anything. Also makes for nicer stack traces.
     #
-    # @param target [Any] Target to match against
-    # @param value [respond_to?(:===)]
+    # @param match_target [Any] Target to match against
+    # @param match_value  [respond_to?(:===)]
     #   Anything that responds to ===, preferably in a unique and entertaining way.
     #
     # @return [Boolean]
-    private def case_match(target, value)
-      value === target
+    private def case_match?(match_target, match_value)
+      match_value === match_target
+    end
+
+    # Double wraps case match in order to ensure that we try against both Symbol
+    # and String variants of the keys, as this is a very common mixup in Ruby.
+    #
+    # @param match_target [Hash]              Target of the match
+    # @param match_key    [Symbol]            Key to match against
+    # @param match_value  [respond_to?(:===)] Matcher
+    #
+    # @return [Boolean]
+    private def hash_case_match?(match_target, match_key, match_value)
+      return true if case_match?(match_target[match_key], match_value)
+
+      match_key.respond_to?(:to_s) &&
+      match_target.key?(match_key.to_s) &&
+      case_match?(match_target[match_key.to_s], match_value)
+    end
+
+    # Attempts to run a case match against a method call derived from a hash
+    # key, and checks the result.
+    #
+    # @param match_target [Hash]              Target of the match
+    # @param match_key    [Symbol]            Method to call
+    # @param match_value  [respond_to?(:===)] Matcher
+    #
+    # @return [Boolean]
+    private def hash_method_case_match?(match_target, match_key, match_value)
+      case_match?(method_send(match_target, match_key), match_value)
+    end
+
+    # Defines preconditions for Hash recursion in matching. Currently it's
+    # only Hash and Hash, but may expand later to Arrays and other Enums.
+    #
+    # @param match_target [Any]
+    # @param match_value  [Any]
+    #
+    # @return [Boolean]
+    private def hash_should_recurse?(match_target, match_value)
+      match_target.is_a?(Hash) && match_value.is_a?(Hash)
+    end
+
+    # Recurses on nested hashes.
+    #
+    # @param match_target [Hash]
+    # @param match_value  [Hash]
+    #
+    # @return [Boolean]
+    private def hash_recurse(match_target, match_value)
+      match_against_hash(match_value).call(match_target)
     end
   end
 end
