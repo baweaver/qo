@@ -43,6 +43,8 @@ module Qo
     #     Object -> Bool # Boolean public send
     private def match_against_array(matchers)
       -> match_target {
+        return true if matchers == match_target
+
         match_target.is_a?(::Array) ?
           match_with(matchers.each_with_index, array_against_array_matcher(match_target)) :
           match_with(matchers, array_against_object_matcher(match_target))
@@ -60,6 +62,8 @@ module Qo
     #     Object -> Bool # Uses keys as methods with public send to `===` match against the value
     private def match_against_hash(matchers)
       -> match_target {
+        return true if matchers == match_target
+
         match_target.is_a?(::Hash) ?
           match_with(matchers, hash_against_hash_matcher(match_target)) :
           match_with(matchers, hash_against_object_matcher(match_target))
