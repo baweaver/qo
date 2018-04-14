@@ -3,58 +3,58 @@ Array * Array - Literal
 =======================
 
 Warming up --------------------------------------
-             Vanilla   255.131k i/100ms
-              Qo.and    36.805k i/100ms
+             Vanilla   290.029k i/100ms
+              Qo.and    37.778k i/100ms
 Calculating -------------------------------------
-             Vanilla      8.462M (± 2.6%) i/s -     42.352M in   5.008310s
-              Qo.and    454.565k (± 1.8%) i/s -      2.282M in   5.021661s
+             Vanilla      9.559M (± 2.3%) i/s -     47.855M in   5.009272s
+              Qo.and    468.514k (± 2.5%) i/s -      2.342M in   5.002419s
 
 Comparison:
-             Vanilla:  8462330.9 i/s
-              Qo.and:   454565.2 i/s - 18.62x  slower
+             Vanilla:  9558516.6 i/s
+              Qo.and:   468514.2 i/s - 20.40x  slower
 
 
 Array * Array - Index pattern match
 ===================================
 
 Warming up --------------------------------------
-             Vanilla    46.834k i/100ms
-              Qo.and    13.827k i/100ms
+             Vanilla    47.088k i/100ms
+              Qo.and    14.227k i/100ms
 Calculating -------------------------------------
-             Vanilla    551.426k (± 1.6%) i/s -      2.763M in   5.012355s
-              Qo.and    146.762k (± 2.3%) i/s -    746.658k in   5.090187s
+             Vanilla    540.415k (± 3.3%) i/s -      2.731M in   5.059509s
+              Qo.and    149.040k (± 4.2%) i/s -    754.031k in   5.068772s
 
 Comparison:
-             Vanilla:   551426.2 i/s
-              Qo.and:   146762.1 i/s - 3.76x  slower
+             Vanilla:   540414.9 i/s
+              Qo.and:   149040.0 i/s - 3.63x  slower
 
 
 Array * Object - Predicate match
 ================================
 
 Warming up --------------------------------------
-             Vanilla   133.668k i/100ms
-              Qo.and    18.746k i/100ms
+             Vanilla   139.244k i/100ms
+              Qo.and    20.096k i/100ms
 Calculating -------------------------------------
-             Vanilla      2.198M (± 3.1%) i/s -     11.094M in   5.053049s
-              Qo.and    208.117k (± 5.4%) i/s -      1.050M in   5.059694s
+             Vanilla      2.356M (± 3.4%) i/s -     11.836M in   5.030228s
+              Qo.and    218.039k (± 2.9%) i/s -      1.105M in   5.073725s
 
 Comparison:
-             Vanilla:  2197719.6 i/s
-              Qo.and:   208116.8 i/s - 10.56x  slower
+             Vanilla:  2355717.5 i/s
+              Qo.and:   218038.9 i/s - 10.80x  slower
 
 
 Array * Array - Select index pattern match
 ==========================================
 
 Warming up --------------------------------------
-             Vanilla    13.222k i/100ms
-              Qo.and    20.029k i/100ms
+             Vanilla    14.015k i/100ms
+              Qo.and    20.325k i/100ms
 Calculating -------------------------------------
-             Vanilla    140.225k (± 3.0%) i/s -    700.766k in   5.002204s
-              Qo.and    217.401k (± 8.2%) i/s -      1.082M in   5.036013s
+             Vanilla    140.673k (± 3.6%) i/s -    714.765k in   5.087715s
+              Qo.and    219.533k (± 3.8%) i/s -      1.098M in   5.006844s
 
 Comparison:
-              Qo.and:   217401.0 i/s
-             Vanilla:   140224.8 i/s - 1.55x  slower
+              Qo.and:   219533.2 i/s
+             Vanilla:   140672.7 i/s - 1.56x  slower
 

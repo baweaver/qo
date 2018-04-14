@@ -9,8 +9,8 @@ module Qo
     end
 
     def to_proc
-      -> match_target {
-        return [false, false] unless super[match_target]
+      Proc.new { |match_target|
+        next [false, false] unless super[match_target]
 
         [true, @fn.call(match_target)]
       }
