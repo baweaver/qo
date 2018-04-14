@@ -1,5 +1,9 @@
 # Qo
 
+[![Build Status](https://travis-ci.org/baweaver/qo.svg?branch=master)](https://travis-ci.org/baweaver/qo)
+[![Maintainability](https://api.codeclimate.com/v1/badges/186e9cbb7003842acaf0/maintainability)](https://codeclimate.com/github/baweaver/qo/maintainability)
+[![Gem Version](https://badge.fury.io/rb/qo.svg)](https://badge.fury.io/rb/qo)
+
 Short for Query Object, my play at Ruby pattern matching and fluent querying
 
 ![Qo Lemur logo](img/qo_logo.png)
