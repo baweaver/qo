@@ -10,11 +10,19 @@ Short for Query Object, my play at Ruby pattern matching and fluent querying
 
 ## How does it work?
 
-Triple equals black magic, mostly.
+Mostly by using Ruby language features like `to_proc` and `===`.
 
-Want to understand more of how that works? Check out this post: https://medium.com/rubyinside/triple-equals-black-magic-d934936a6379
+There's an article explaining most of the base mechanics behind Qo:
 
-The original inspiration was from a chat I'd had with a few other Rubyists about pattern matching, which led to this experiment: https://gist.github.com/baweaver/611389c41c9005d025fb8e55448bf5f5
+[For Want of Pattern Matching in Ruby - The Creation of Qo](https://medium.com/@baweaver/for-want-of-pattern-matching-in-ruby-the-creation-of-qo-c3b267109b25)
+
+Most of it, though, utilizes Triple Equals. If you're not familiar with what all you can do with it in Ruby, I would encourage you to read this article as well:
+
+[Triple Equals Black Magic](https://medium.com/rubyinside/triple-equals-black-magic-d934936a6379)
+
+The original inspiration was from a chat I'd had with a few other Rubyists about pattern matching, which led to this experiment:
+
+[Having fun with M and Q](https://gist.github.com/baweaver/611389c41c9005d025fb8e55448bf5f5)
 
 Fast forward a few months and I kind of wanted to make it real, so here it is. Introducing Qo!
 
