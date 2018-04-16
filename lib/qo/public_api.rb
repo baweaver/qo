@@ -75,6 +75,12 @@ module Qo
     # Might be a tinge fond of shorthand
     alias_method :m, :matcher
 
+    def case_class(**keyword_matchers, &fn)
+      Qo::Matchers::CaseClassMatcher.new(**keyword_matchers, &fn)
+    end
+
+    alias_method :cc, :case_class
+
     # "Curried" function that waits for a target, or evaluates immediately if given
     # one.
     #

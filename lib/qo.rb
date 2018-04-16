@@ -5,6 +5,7 @@ require 'qo/matchers/base_matcher'
 require 'qo/matchers/array_matcher'
 require 'qo/matchers/hash_matcher'
 require 'qo/matchers/guard_block_matcher'
+require 'qo/matchers/case_class_matcher'
 
 # Meta Matchers
 require 'qo/matchers/pattern_match'
