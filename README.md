@@ -539,7 +539,7 @@ Qo.count_by([1,2,3,2,2,2,1], &:even?)
 
 These examples will grow over the next few weeks as I think of more fun things to do with Qo. PRs welcome if you find fun uses!
 
-#### 5.1 - JSON
+#### 5.1 - JSON and HTTP
 
 > Note that Qo does not support deep querying of hashes (yet)
 
@@ -582,6 +582,37 @@ users.select(&Qo.and(
 ```
 
 Nifty!
+
+##### Yield Self HTTP status matching
+
+You can even use `#yield_self` to pipe values into a pattern matching block. In
+this particular case it'll let you check against the type signatures of the
+HTTP responses.
+
+```ruby
+def get_url(url)
+  Net::HTTP.get_response(URI(url)).yield_self(&Qo.match(
+    Qo.m(Net::HTTPSuccess) { |response| response.body.size },
+    Qo.m(:*)               { |response| raise response.message }
+  ))
+end
+
+get_url('https://github.com/baweaver/qo')
+# => 142387
+get_url('https://github.com/baweaver/qo/does_not_exist')
+# => RuntimeError: Not Found
+```
+
+The difference between this and case? Well, the first is you can pass this to
+`yield_self` for a more inline solution. The second is that any Qo matcher can
+be used in there, including predicate and content checks on the body:
+
+```ruby
+Qo.m(Net::HTTPSuccess, body: /Qo/)
+```
+
+You could put as many checks as you want in there, or use different Qo matchers
+nested to get even further in.
 
 #### 5.2 - Opsy Stuff
 
