@@ -105,3 +105,75 @@ task :perf do
     }
   )
 end
+
+# Below this mark are mostly my experiments to see what features perform a bit better
+# than others, and are mostly left to check different versions of Ruby against eachother.
+#
+# Feel free to use them in development, but the general consensus of them is that
+# `send` type methods are barely slower. One _could_ write an IIFE to get around
+# that and maintain the flexibility but it's a net loss of clarity.
+#
+# Proc wise, they're all within margin of error. We just need to be really careful
+# of the 2.4+ bug of lambdas not destructuring automatically, which will wreak
+# havoc on hash matchers.
+
+task :perf_predicates do
+  array = (1..1000).to_a
+
+  run_benchmark('Predicates any?',
+    'block_any?':      -> { array.any? { |v| v.even? } },
+    'proc_any?':       -> { array.any?(&:even?) },
+    'send_proc_any?':  -> { array.public_send(:any?, &:even?) }
+  )
+
+  run_benchmark('Predicates all?',
+    'block_all?':      -> { array.all? { |v| v.even? } },
+    'proc_all?':       -> { array.all?(&:even?) },
+    'send_proc_all?':  -> { array.public_send(:all?, &:even?) }
+  )
+
+  run_benchmark('Predicates none?',
+    'block_none?':     -> { array.none? { |v| v.even? } },
+    'proc_none?':      -> { array.none?(&:even?) },
+    'send_proc_none?': -> { array.public_send(:none?, &:even?) },
+  )
+
+  even_stabby_lambda = -> n { n % 2 == 0 }
+  even_lambda        = lambda { |n| n % 2 == 0 }
+  even_proc_new      = Proc.new { |n|  n % 2 == 0 }
+  even_proc_short    = proc { |n|  n % 2 == 0 }
+  even_to_proc       = :even?.to_proc
+
+  run_benchmark('Types of Functions in Ruby',
+    even_stabby_lambda: -> { array.all?(&even_stabby_lambda) },
+    even_lambda:        -> { array.all?(&even_lambda) },
+    even_proc_new:      -> { array.all?(&even_proc_new) },
+    even_proc_short:    -> { array.all?(&even_proc_short) },
+    even_to_proc:       -> { array.all?(&even_to_proc) },
+  )
+end
+
+task :perf_random do
+  # run_benchmark('Empty on blank array',
+  #   'empty?':     -> { [].empty?     },
+  #   'size == 0':  -> { [].size == 0  },
+  #   'size.zero?': -> { [].size.zero? },
+  # )
+
+  array = (1..1000).to_a
+  # run_benchmark('Empty on several elements array',
+  #   'empty?':     -> { array.empty?     },
+  #   'size == 0':  -> { array.size == 0  },
+  #   'size.zero?': -> { array.size.zero? },
+  # )
+
+  hash = array.map { |v| [v, v] }.to_h
+
+  run_benchmark('Empty on blank hash vs array',
+    'hash empty?':  -> { {}.empty? },
+    'array empty?': -> { [].empty? },
+
+    'full hash empty?':  -> { hash.empty? },
+    'full array empty?': -> { array.empty? },
+  )
+end

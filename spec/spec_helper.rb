@@ -12,3 +12,24 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+class Person
+  attr_reader :name, :age
+
+  def initialize(name, age)
+    @name = name
+    @age = age
+  end
+
+  def adult?
+    @age > 17
+  end
+
+  def cool?
+    @name.include?('Rob')
+  end
+
+  def to_h
+    {name: @name, age: @age}
+  end
+end

@@ -44,7 +44,7 @@ people.select(&Qo[age: 18..30])
 
 # How about some "right-hand assignment" pattern matching
 name_longer_than_three      = -> person { person.name.size > 3 }
-people_with_truncated_names = people.map(&Qo.match_fn(
+people_with_truncated_names = people.map(&Qo.match(
   Qo.m(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) },
   Qo.m(:*) # Identity function, catch-all
 ))
@@ -71,7 +71,7 @@ Qo[/Rob/, 22]
 Qo.and(/Rob/, 22)
 
 # This is shorthand for
-Qo::Matcher.new('and', /Rob/, 22)
+Qo::Matchers::BaseMatcher.new('and', /Rob/, 22)
 
 # An `or` matcher uses the same shorthand as `and` but uses `any?` behind the scenes instead:
 Qo.or(/Rob/, 22)
@@ -119,7 +119,7 @@ Qo[:*] === :literally_anything_here
 The first way a Qo matcher can be defined is by using `*varargs`:
 
 ```ruby
-# Qo::Matcher(type, *varargs, **kwargs)
+Qo::Matchers::BaseMatcher(type, *varargs, **kwargs)
 ```
 
 This gives us the `and` matcher shorthand for array matchers.
@@ -285,7 +285,7 @@ Checks to see if the key is even present on the other object, false if not.
 
 ##### 3.1.2 - Match value and target are hashes
 
-If both the match value (`match_key: match_value`) and the match target are hashes, Qo will begin a recursive descent starting at the match key until it finds a matcher to try out:
+If both the match value (`match_key: matcher`) and the match target are hashes, Qo will begin a recursive descent starting at the match key until it finds a matcher to try out:
 
 ```ruby
 Qo[a: {b: {c: 5..15}}] === {a: {b: {c: 10}}}
@@ -452,8 +452,6 @@ people_hashes.select(&Qo[age: :nil?])
 
 ### 4 - Right Hand Pattern Matching
 
-> ALPHA - This feature is alpha, currently testing. Considering whether or not to add `or` and `not` as `m_or` and `m_not`.
-
 This is where I start going a bit off into the weeds. We're going to try and get RHA style pattern matching in Ruby.
 
 ```ruby
@@ -478,12 +476,12 @@ In this case it's trying to do a few things:
 
 If no block function is provided, it assumes an identity function (`-> v { v }`) instead. If no match is found, `nil` will be returned.
 
-Now you _can_ also use a reversed version, `match_fn` (name pending better ideas), to run with map:
+If an initial target is not furnished, the matcher will become a curried proc awaiting a target. In more simple terms it just wants a target to run against, so let's give it a few with map:
 
 ```ruby
 name_longer_than_three = -> person { person.name.size > 3 }
 
-people_objects.map(&Qo.match_fn(
+people_objects.map(&Qo.match(
   Qo.m(name_longer_than_three) { |person|
     person.name = person.name[0..2]
     person
@@ -604,7 +602,7 @@ The nice thing about Unix style commands is that they use headers, which means C
 ```ruby
 rows = CSV.new(`df -h`, col_sep: " ", headers: true).read.map(&:to_h)
 
-rows.map(&Qo.match_fn(
+rows.map(&Qo.match(
   Qo.m(Avail: /Gi$/) { |row|
     "#{row['Filesystem']} mounted on #{row['Mounted']} [#{row['Avail']} / #{row['Size']}]"
   }
