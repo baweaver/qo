@@ -8,6 +8,8 @@ Short for Query Object, my play at Ruby pattern matching and fluent querying
 
 ![Qo Lemur logo](img/qo_logo.png)
 
+[Read the Docs for more detailed information](https://baweaver.github.io/qo/)
+
 ## How does it work?
 
 Mostly by using Ruby language features like `to_proc` and `===`.
