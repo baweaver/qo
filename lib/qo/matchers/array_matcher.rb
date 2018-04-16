@@ -1,38 +1,60 @@
 module Qo
   module Matchers
-    # An Array Matcher is a matcher that uses only varargs to define a sequence
+    # An Array Matcher is a matcher that uses only `*varargs` to define a sequence
     # of matches to perform against either an object or another Array.
     #
     # In the case of an Array matching against an Array it will compare via index.
     #
+    # ```ruby
+    # # Shorthand
+    # Qo[1..10, 1..10].call([1, 2])
+    # # => true
+    #
+    # Qo::Matchers::ArrayMatcher.new([1..10, 1..10]).call([1, 2])
+    # # => true
+    # ```
+    #
     # In the case of an Array matching against an Object, it will match each provided
     # matcher against the object.
+    #
+    # ```ruby
+    # # Shorthand
+    # Qo[Integer, 1..10].call(1)
+    # # => true
+    #
+    # Qo::Matchers::ArrayMatcher.new([1..10, 1..10]).call(1)
+    # # => true
+    # ```
     #
     # All variants present in the BaseMatcher are present here, including 'and',
     # 'not', and 'or'.
     #
-    # @author [baweaver]
+    # @author baweaver
+    # @since 0.2.0
     #
     class ArrayMatcher < BaseMatcher
-      # Used to match against a matcher made from an Array, like:
+      # Wrapper around call to allow for invocation in an Enumerable function,
+      # such as:
       #
-      #     Qo['Foo', 'Bar']
-      #
-      # @param matchers [Array[respond_to?(===)]] indexed tuple to match the target object against
+      # ```ruby
+      # people.select(&Qo[/Foo/, 20..40])
+      # ```
       #
       # @return [Proc[Any]]
-      #     Array  -> Bool # Tuple match against targets index
-      #     Object -> Bool # Boolean public send
+      #   Proc awaiting a target to match against
       def to_proc
         Proc.new { |target| self.call(target) }
       end
 
-      # Invocation for the match sequence. Will determine the target and applicable
-      # matchers to run against it.
+      # Runs the matcher directly.
       #
-      # @param target [Any]
+      # If the target is an Array, it will be matched via index
       #
-      # @return [Boolean] Match status
+      # If the target is an Object, it will be matched via public send
+      #
+      # @param target [Any] Target to match against
+      #
+      # @return [Boolean] Result of the match
       def call(target)
         return true if @array_matchers == target
 

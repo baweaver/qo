@@ -1,4 +1,16 @@
 module Qo
+  # A Qo Matcher is a class that acts like a Proc. It takes in a set of match
+  # values or key value pairs and a target value to evaluate against, and returns
+  # the status of that match.
+  #
+  # It is possible to override this behavior via `to_proc` overloading and
+  # utilization of `super` as noted in `GuardBlockMatcher`.
+  #
+  # @see Qo::Matchers::GuardBlockMatcher
+  #
+  # @author baweaver
+  # @since 0.2.0
+  #
   module Matchers
     # Base instance of matcher which is meant to take in either Array style or
     # Keyword style arguments to run a match against various datatypes.
@@ -6,7 +18,8 @@ module Qo
     # Will delegate responsibilities to either Array or Hash style matchers if
     # invoked directly.
     #
-    # @author [baweaver]
+    # @author baweaver
+    # @since 0.2.0
     #
     class BaseMatcher
       def initialize(type, *array_matchers, **keyword_matchers)
@@ -19,7 +32,7 @@ module Qo
       #
       #     data.select(&Qo[...])
       #
-      # @return [Proc]
+      # @return [Proc[Any]]
       def to_proc
         @array_matchers.empty? ?
           Qo::Matchers::HashMatcher.new(@type, **@keyword_matchers).to_proc :
@@ -31,7 +44,7 @@ module Qo
       #
       # @param target [Any] Object to match against
       #
-      # @return [type] [description]
+      # @return [Boolean] Result of the match
       def call(target)
         self.to_proc.call(target)
       end
@@ -39,12 +52,13 @@ module Qo
       alias_method :===, :call
       alias_method :[],  :call
 
-      # Wrapper around public send to encapsulate the matching method (any, all, none)
+      # Runs the relevant match method against the given collection with the
+      # given matcher function.
       #
       # @param collection [Enumerable] Any collection that can be enumerated over
-      # @param fn         [Proc] Function to match with
+      # @param fn         [Proc]       Function to match with
       #
-      # @return [Enumerable] Resulting collection
+      # @return [Boolean] Result of the match
       private def match_with(collection, &fn)
         return collection.any?(&fn)  if @type == 'or'
         return collection.none?(&fn) if @type == 'not'
@@ -68,8 +82,9 @@ module Qo
       # typical left bias of `===` can be confusing reading down a page, so
       # more of a clarity thing than anything. Also makes for nicer stack traces.
       #
-      # @param target [Any] Target to match against
-      # @param matcher  [respond_to?(:===)]
+      # @param target  [Any]
+      #   Target to match against
+      # @param matcher [#===]
       #   Anything that responds to ===, preferably in a unique and entertaining way.
       #
       # @return [Boolean]
@@ -81,7 +96,7 @@ module Qo
       # obscure errors when running against non-matching types.
       #
       # @param target  [Any] Object to send to
-      # @param matcher [respond_to?(:to_sym)] Anything that can be coerced into a method name
+      # @param matcher [#to_sym] Anything that can be coerced into a method name
       #
       # @return [Any] Response of sending to the method, or false if failed
       private def method_send(target, matcher)
@@ -92,8 +107,8 @@ module Qo
 
       # Predicate variant of `method_send` with the same guard concerns
       #
-      # @param target  [Any] Object to send to
-      # @param matcher [respond_to?(:to_sym)] Anything that can be coerced into a method name
+      # @param target  [Any]     Object to send to
+      # @param matcher [#to_sym] Anything that can be coerced into a method name
       #
       # @return [Boolean] Success status of predicate
       private def method_matches?(target, matcher)

@@ -1,12 +1,14 @@
 module Qo
   # Defines common exception classes for use throughout the library
   #
-  # @author [baweaver]
+  # @author baweaver
+  # @since 0.2.0
   #
   module Exceptions
     # If no matchers in either Array or Hash style are provided.
     #
-    # @author [lemur]
+    # @author baweaver
+    # @since 0.2.0
     #
     class NoMatchersProvided < ArgumentError
       def to_s
@@ -16,7 +18,8 @@ module Qo
 
     # If both Array and Hash style matchers are provided.
     #
-    # @author [lemur]
+    # @author baweaver
+    # @since 0.2.0
     #
     class MultipleMatchersProvided < ArgumentError
       def to_s
@@ -27,7 +30,8 @@ module Qo
     # In the case of a Pattern Match, we need to ensure all arguments are
     # GuardBlockMatchers.
     #
-    # @author [lemur]
+    # @author baweaver
+    # @since 0.2.0
     #
     class NotAllGuardMatchersProvided < ArgumentError
       def to_s

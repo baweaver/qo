@@ -1,0 +1,3 @@
+--markup=markdown
+--asset img:img
+--output-dir docs

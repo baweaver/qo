@@ -5,7 +5,8 @@ module Qo
   # externally facing methods renamed or moved under pain of a look of profound
   # disappointment from the creator.
   #
-  # @author [baweaver]
+  # @author baweaver
+  # @since 0.2.0
   #
   module PublicApi
     include Qo::Exceptions

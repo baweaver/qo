@@ -54,7 +54,8 @@ module Qo
     #
     # We'll evaluate those options in a few experiments later.
     #
-    # @author [baweaver]
+    # @author baweaver
+    # @since 0.2.0
     #
     class PatternMatch
       def initialize(*matchers)

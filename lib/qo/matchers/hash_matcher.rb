@@ -6,37 +6,46 @@ module Qo
     # In the case of a Hash matching against a Hash, it will compare the intersection
     # of keys and match the values against eachother.
     #
+    # ```ruby
+    # Qo[name: /Foo/, age: 30..50].call({name: 'Foo', age: 42})
+    # # => true
+    # ```
+    #
     # In the case of a Hash matching against an Object, it will treat the keys as
     # method property invocations to be matched against the provided values.
+    #
+    # # ```ruby
+    # Qo[name: /Foo/, age: 30..50].call(Person.new('Foo', 42))
+    # # => true
+    # ```
     #
     # All variants present in the BaseMatcher are present here, including 'and',
     # 'not', and 'or'.
     #
-    # @author [baweaver]
+    # @author baweaver
+    # @since 0.2.0
     #
     class HashMatcher < BaseMatcher
-      # Used to match against a matcher made from an Array, like:
+      # Wrapper around call to allow for invocation in an Enumerable function,
+      # such as:
       #
-      #     Qo['Foo', 'Bar']
-      #
-      # @param matchers [Array[respond_to?(===)]] indexed tuple to match the target object against
+      # ```ruby
+      # people.select(&Qo[name: /Foo/, age: 20..40])
+      # ```
       #
       # @return [Proc[Any]]
-      #     Array  -> Bool # Tuple match against targets index
-      #     Object -> Bool # Boolean public send
+      #   Proc awaiting a target to match against
       def to_proc
         Proc.new { |target| self.call(target) }
       end
 
       # Used to match against a matcher made from Keyword Arguments (a Hash)
       #
-      # @param matchers [Hash[Any, respond_to?(:===)]]
+      # @param matchers [Hash[Any, #===]]
       #     Any key mapping to any value that responds to `===`. Notedly more
       #     satisfying when `===` does something fun.
       #
-      # @return [Proc[Any]]
-      #     Hash   -> Bool # Value matching against similar keys, will attempt to coerce to_s because JSON
-      #     Object -> Bool # Uses keys as methods with public send to `===` match against the value
+      # @return [Boolean] Result of the match
       def call(target)
         return true if @keyword_matchers == target
 
@@ -49,9 +58,9 @@ module Qo
 
       # Checks if a hash value matches a given matcher
       #
-      # @param target    [Any]               Target of the match
-      # @param match_key [Symbol]            Key of the hash to reference
-      # @param matcher   [respond_to?(:===)] Any matcher responding to ===
+      # @param target    [Any]    Target of the match
+      # @param match_key [Symbol] Key of the hash to reference
+      # @param matcher   [#===]   Any matcher responding to ===
       #
       # @return [Boolean] Match status
       private def match_hash_value?(target, match_key, matcher)
@@ -66,9 +75,9 @@ module Qo
 
       # Checks if an object property matches a given matcher
       #
-      # @param target         [Any]               Target of the match
-      # @param match_property [Symbol]            Property of the object to reference
-      # @param matcher        [respond_to?(:===)] Any matcher responding to ===
+      # @param target         [Any]    Target of the match
+      # @param match_property [Symbol] Property of the object to reference
+      # @param matcher        [#===]   Any matcher responding to ===
       #
       # @return [Boolean] Match status
       private def match_object_value?(target, match_property, matcher)
@@ -81,9 +90,9 @@ module Qo
       # Double wraps case match in order to ensure that we try against both Symbol
       # and String variants of the keys, as this is a very common mixup in Ruby.
       #
-      # @param target    [Hash]              Target of the match
-      # @param match_key [Symbol]            Key to match against
-      # @param matcher   [respond_to?(:===)] Matcher
+      # @param target    [Hash]   Target of the match
+      # @param match_key [Symbol] Key to match against
+      # @param matcher   [#===]   Matcher
       #
       # @return [Boolean]
       private def hash_case_match?(target, match_key, matcher)
@@ -108,9 +117,9 @@ module Qo
       # Attempts to run a case match against a method call derived from a hash
       # key, and checks the result.
       #
-      # @param target         [Hash]              Target of the match
-      # @param match_property [Symbol]            Method to call
-      # @param matcher        [respond_to?(:===)] Matcher
+      # @param target         [Hash]   Target of the match
+      # @param match_property [Symbol] Method to call
+      # @param matcher        [#===]   Matcher
       #
       # @return [Boolean]
       private def hash_method_case_match?(target, match_property, matcher)
