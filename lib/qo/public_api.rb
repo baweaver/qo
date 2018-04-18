@@ -21,7 +21,7 @@ module Qo
     # @return [Proc[Any]]
     #     Any -> Bool # Given a target, will return if it "matches"
     def and(*array_matchers, **keyword_matchers)
-      create_matcher('and', *array_matchers, **keyword_matchers)
+      create_matcher('and', array_matchers, keyword_matchers)
     end
 
     # The magic that lets you use `Qo[...]` instead of `Qo.and(...)`. Use wisely
@@ -37,7 +37,7 @@ module Qo
     # @return [Proc[Any]]
     #     Any -> Bool # Given a target, will return if it "matches"
     def or(*array_matchers, **keyword_matchers)
-      create_matcher('or', *array_matchers, **keyword_matchers)
+      create_matcher('or', array_matchers, keyword_matchers)
     end
 
     # Creates a `not` type query matcher. No conditions in this type of matcher
@@ -50,7 +50,7 @@ module Qo
     # @return [Proc[Any]]
     #     Any -> Bool # Given a target, will return if it "matches"
     def not(*array_matchers, **keyword_matchers)
-      create_matcher('not', *array_matchers, **keyword_matchers)
+      create_matcher('not', array_matchers, keyword_matchers)
     end
 
     # Creates a Guard Block matcher.
@@ -106,7 +106,7 @@ module Qo
     # @raises Qo::Exceptions::MultipleMatchersProvided
     #
     # @return [Qo::Matcher]
-    private def create_matcher(type, *array_matchers, **keyword_matchers)
+    private def create_matcher(type, array_matchers, keyword_matchers)
       array_empty, hash_empty = array_matchers.empty?, keyword_matchers.empty?
 
       raise Qo::NoMatchersProvided       if array_empty && hash_empty
