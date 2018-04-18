@@ -22,6 +22,13 @@ task :default => :spec
 def run_benchmark(title, **benchmarks)
   puts '', title, '=' * title.size, ''
 
+  # Validation
+  benchmarks.each do |benchmark_name, benchmark_fn|
+    puts "#{benchmark_name} result: #{benchmark_fn.call()}"
+  end
+
+  puts
+
   Benchmark.ips do |bm|
     benchmarks.each do |benchmark_name, benchmark_fn|
       bm.report(benchmark_name, &benchmark_fn)
@@ -31,10 +38,14 @@ def run_benchmark(title, **benchmarks)
   end
 end
 
+def xrun_benchmark(title, **benchmarks) end
+
 # Note that the current development of Qo is NOT to be performance first, it's to
 # be readability first with performance coming later. That means that early iterations
 # may well be slower, but the net expressiveness we get is worth it in the short run.
 task :perf do
+  puts "Running on Qo v#{Qo::VERSION} at commit #{`git rev-parse HEAD`}"
+
   # Compare simple array equality. I almost think this isn't fair to Qo considering
   # no sane dev should use it for literal 1 to 1 matches like this.
 
@@ -45,7 +56,7 @@ task :perf do
     },
 
     'Qo.and':  -> {
-      Qo.and(*simple_array).call(simple_array)
+      Qo.and(1, 1).call(simple_array)
     }
   )
 
@@ -61,7 +72,7 @@ task :perf do
     },
 
     'Qo.and':  -> {
-      Qo.and(*range_match_set).call(range_match_target)
+      Qo.and(1..10, 1..10, 1..10, 1..10).call(range_match_target)
     }
   )
 
@@ -101,7 +112,37 @@ task :perf do
     },
 
     'Qo.and':  -> {
-      Qo.and(*people_array_query).call(people_array_target)
+      people_array_target.select(&Qo.and(/Rob/, 15..25))
+    }
+  )
+
+  people_hashes = people_array_target.map { |(name, age)| {name: name, age: age} }
+
+  run_benchmark('Hash * Hash - Hash intersection',
+    'Vanilla': -> {
+      people_hashes.select { |person| (15..25).include?(person[:age]) && /Rob/ =~ person[:name] }
+    },
+
+    'Qo.and':  -> {
+      people_hashes.select(&Qo.and(name: /Rob/, age: 15..25))
+    }
+  )
+
+  Person = Struct.new(:name, :age)
+  people = [
+    Person.new('Robert', 22),
+    Person.new('Roberta', 22),
+    Person.new('Foo', 42),
+    Person.new('Bar', 17)
+  ]
+
+  run_benchmark('Hash * Object - Property match',
+    'Vanilla': -> {
+      people.select { |person| (15..25).include?(person.age) && /Rob/ =~ person.name }
+    },
+
+    'Qo.and':  -> {
+      people.select(&Qo.and(name: /Rob/, age: 15..25))
     }
   )
 end
@@ -116,6 +157,17 @@ end
 # Proc wise, they're all within margin of error. We just need to be really careful
 # of the 2.4+ bug of lambdas not destructuring automatically, which will wreak
 # havoc on hash matchers.
+
+task :kwargs_vs_positional do
+  def add_kw(a:, b:, c:, d:) a + b + c + d end
+
+  def add_pos(a,b,c,d) a + b + c + d end
+
+  run_benchmark('Positional vs KW Args',
+    'keyword':      -> { add_kw(a: 1, b: 2, c: 3, d: 4) },
+    'positional':   -> { add_pos(1,2,3,4) }
+  )
+end
 
 task :perf_predicates do
   array = (1..1000).to_a
@@ -154,18 +206,18 @@ task :perf_predicates do
 end
 
 task :perf_random do
-  # run_benchmark('Empty on blank array',
-  #   'empty?':     -> { [].empty?     },
-  #   'size == 0':  -> { [].size == 0  },
-  #   'size.zero?': -> { [].size.zero? },
-  # )
+  run_benchmark('Empty on blank array',
+    'empty?':     -> { [].empty?     },
+    'size == 0':  -> { [].size == 0  },
+    'size.zero?': -> { [].size.zero? },
+  )
 
   array = (1..1000).to_a
-  # run_benchmark('Empty on several elements array',
-  #   'empty?':     -> { array.empty?     },
-  #   'size == 0':  -> { array.size == 0  },
-  #   'size.zero?': -> { array.size.zero? },
-  # )
+  run_benchmark('Empty on several elements array',
+    'empty?':     -> { array.empty?     },
+    'size == 0':  -> { array.size == 0  },
+    'size.zero?': -> { array.size.zero? },
+  )
 
   hash = array.map { |v| [v, v] }.to_h
 
