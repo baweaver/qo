@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["keystonelemur@gmail.com"]
 
   spec.summary       = %q{Qo is a querying library for Ruby pattern matching}
-  spec.homepage      = "https://www.github.com/baweaver/q"
+  spec.homepage      = "https://www.github.com/baweaver/qo"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
