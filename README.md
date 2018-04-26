@@ -51,7 +51,7 @@ How about some pattern matching? There are two styles:
 
 The original style
 
-```
+```ruby
 # How about some "right-hand assignment" pattern matching
 name_longer_than_three      = -> person { person.name.size > 3 }
 people_with_truncated_names = people.map(&Qo.match(
