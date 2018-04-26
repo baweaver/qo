@@ -39,5 +39,16 @@ module Qo
         "defined with `Qo.matcher` or `Qo.m` instead of regular matchers."
       end
     end
+
+    # In the case of a Pattern Match, we should only have one "else" clause
+    #
+    # @author baweaver
+    # @since 0.3.0
+    #
+    class MultipleElseClauses < ArgumentError
+      def to_s
+        "Cannot have more than one `else` clause in a Pattern Match."
+      end
+    end
   end
 end

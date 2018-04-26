@@ -82,12 +82,32 @@ module Qo
     # it finds one that "matches". Once found, it will pass the target into the
     # associated matcher's block function.
     #
+    # @param fn [Proc]
+    #   If provided, the pattern match will become block-style, utilizing
+    #   PatternMatchBlock instead. If any args are provided, the first
+    #   will be treated as the target.
+    #
     # @param *args [Array[Any, *GuardBlockMatcher]]
     #   Collection of matchers to run, potentially prefixed by a target object
     #
-    # @return [Qo::PatternMatch | Any]
-    #   Returns a PatternMatch waiting for a target, or an evaluated PatternMatch response
-    def match(*args)
+    # @return [Qo::PatternMatchBlock]
+    #   If a value is not provided, a block style pattern match will be returned
+    #   that responds to proc coercion. It can be used for functions like `map`.
+    #
+    # @return [Qo::PatternMatch]
+    #   If a value is not provided and no function is present, a PatternMatch
+    #   will be returned, awaiting a value to match against.
+    #
+    # @return [Any]
+    #   If a value is provided, matchers will attempt to call through on it,
+    #   returning the result of the function.
+    def match(*args, &fn)
+      if block_given?
+        return args.empty? ?
+          Qo::Matchers::PatternMatchBlock.new(&fn) :
+          Qo::Matchers::PatternMatchBlock.new(&fn).call(args.first)
+      end
+
       if args.first.is_a?(Qo::Matchers::GuardBlockMatcher)
         Qo::Matchers::PatternMatch.new(*args)
       else

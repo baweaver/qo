@@ -1,4 +1,5 @@
-Running on Qo v0.2.0 at commit ba999659acb51beec215fab4240a34298794a5bf
+Running on Qo v0.3.0 at rev 77eb2544c41b33361a561178b145d33fa2409bde
+ - Ruby ruby 2.5.1p57 (2018-03-29 revision 63029) [x86_64-darwin17]
 
 Array * Array - Literal
 =======================
@@ -7,15 +8,15 @@ Vanilla result: true
 Qo.and result: true
 
 Warming up --------------------------------------
-             Vanilla   278.882k i/100ms
-              Qo.and    83.044k i/100ms
+             Vanilla   275.791k i/100ms
+              Qo.and    77.679k i/100ms
 Calculating -------------------------------------
-             Vanilla      8.950M (± 1.7%) i/s -     44.900M in   5.018406s
-              Qo.and      1.062M (± 1.2%) i/s -      5.315M in   5.003728s
+             Vanilla      8.805M (± 1.6%) i/s -     44.127M in   5.012793s
+              Qo.and    987.041k (± 2.8%) i/s -      4.971M in   5.040741s
 
 Comparison:
-             Vanilla:  8949563.3 i/s
-              Qo.and:  1062331.4 i/s - 8.42x  slower
+             Vanilla:  8805260.8 i/s
+              Qo.and:   987041.0 i/s - 8.92x  slower
 
 
 Array * Array - Index pattern match
@@ -25,15 +26,15 @@ Vanilla result: true
 Qo.and result: true
 
 Warming up --------------------------------------
-             Vanilla    49.757k i/100ms
-              Qo.and    22.362k i/100ms
+             Vanilla    45.347k i/100ms
+              Qo.and    21.225k i/100ms
 Calculating -------------------------------------
-             Vanilla    562.718k (± 4.0%) i/s -      2.836M in   5.048960s
-              Qo.and    238.217k (± 1.7%) i/s -      1.208M in   5.070540s
+             Vanilla    550.096k (± 2.4%) i/s -      2.766M in   5.031463s
+              Qo.and    226.391k (± 4.2%) i/s -      1.146M in   5.072495s
 
 Comparison:
-             Vanilla:   562718.0 i/s
-              Qo.and:   238216.8 i/s - 2.36x  slower
+             Vanilla:   550096.4 i/s
+              Qo.and:   226391.4 i/s - 2.43x  slower
 
 
 Array * Object - Predicate match
@@ -43,15 +44,15 @@ Vanilla result: false
 Qo.and result: false
 
 Warming up --------------------------------------
-             Vanilla   145.056k i/100ms
-              Qo.and    27.888k i/100ms
+             Vanilla   139.508k i/100ms
+              Qo.and    27.451k i/100ms
 Calculating -------------------------------------
-             Vanilla      2.204M (± 4.4%) i/s -     11.024M in   5.011429s
-              Qo.and    323.232k (± 2.4%) i/s -      1.618M in   5.007142s
+             Vanilla      2.148M (± 3.3%) i/s -     10.742M in   5.007009s
+              Qo.and    303.118k (± 2.0%) i/s -      1.537M in   5.073596s
 
 Comparison:
-             Vanilla:  2204056.6 i/s
-              Qo.and:   323232.5 i/s - 6.82x  slower
+             Vanilla:  2147916.4 i/s
+              Qo.and:   303118.1 i/s - 7.09x  slower
 
 
 Array * Array - Select index pattern match
@@ -61,15 +62,15 @@ Vanilla result: [["Robert", 22], ["Roberta", 22]]
 Qo.and result: [["Robert", 22], ["Roberta", 22]]
 
 Warming up --------------------------------------
-             Vanilla    14.343k i/100ms
-              Qo.and     7.454k i/100ms
+             Vanilla    12.651k i/100ms
+              Qo.and     7.024k i/100ms
 Calculating -------------------------------------
-             Vanilla    149.518k (± 2.9%) i/s -    760.179k in   5.088601s
-              Qo.and     77.519k (± 2.8%) i/s -    387.608k in   5.004058s
+             Vanilla    141.337k (± 8.3%) i/s -    708.456k in   5.067441s
+              Qo.and     73.799k (± 2.9%) i/s -    372.272k in   5.048946s
 
 Comparison:
-             Vanilla:   149517.6 i/s
-              Qo.and:    77519.5 i/s - 1.93x  slower
+             Vanilla:   141336.5 i/s
+              Qo.and:    73799.3 i/s - 1.92x  slower
 
 
 Hash * Hash - Hash intersection
@@ -79,15 +80,15 @@ Vanilla result: [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}]
 Qo.and result: [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}]
 
 Warming up --------------------------------------
-             Vanilla    36.214k i/100ms
-              Qo.and     5.050k i/100ms
+             Vanilla    34.600k i/100ms
+              Qo.and     4.851k i/100ms
 Calculating -------------------------------------
-             Vanilla    411.041k (± 2.3%) i/s -      2.064M in   5.024556s
-              Qo.and     50.029k (± 5.0%) i/s -    252.500k in   5.060014s
+             Vanilla    392.298k (± 2.6%) i/s -      1.972M in   5.030828s
+              Qo.and     48.213k (± 4.8%) i/s -    242.550k in   5.043068s
 
 Comparison:
-             Vanilla:   411041.4 i/s
-              Qo.and:    50028.6 i/s - 8.22x  slower
+             Vanilla:   392298.2 i/s
+              Qo.and:    48213.1 i/s - 8.14x  slower
 
 
 Hash * Object - Property match
@@ -97,13 +98,13 @@ Vanilla result: [#<struct Person name="Robert", age=22>, #<struct Person name="R
 Qo.and result: [#<struct Person name="Robert", age=22>, #<struct Person name="Roberta", age=22>]
 
 Warming up --------------------------------------
-             Vanilla    36.167k i/100ms
-              Qo.and     5.263k i/100ms
+             Vanilla    32.783k i/100ms
+              Qo.and     4.422k i/100ms
 Calculating -------------------------------------
-             Vanilla    411.057k (± 3.4%) i/s -      2.062M in   5.021612s
-              Qo.and     52.776k (± 4.0%) i/s -    268.413k in   5.094233s
+             Vanilla    361.140k (± 9.7%) i/s -      1.803M in   5.053763s
+              Qo.and     46.667k (±10.8%) i/s -    229.944k in   5.002258s
 
 Comparison:
-             Vanilla:   411057.2 i/s
-              Qo.and:    52775.9 i/s - 7.79x  slower
+             Vanilla:   361140.4 i/s
+              Qo.and:    46667.1 i/s - 7.74x  slower
 

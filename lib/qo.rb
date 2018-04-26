@@ -8,6 +8,7 @@ require 'qo/matchers/guard_block_matcher'
 
 # Meta Matchers
 require 'qo/matchers/pattern_match'
+require 'qo/matchers/pattern_match_block'
 
 # Helpers
 require 'qo/helpers'

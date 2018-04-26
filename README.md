@@ -43,7 +43,15 @@ end
 
 # Run a select like an AR query, getting the age attribute against a range
 people.select(&Qo[age: 18..30])
+```
 
+How about some pattern matching? There are two styles:
+
+#### Pattern Match
+
+The original style
+
+```
 # How about some "right-hand assignment" pattern matching
 name_longer_than_three      = -> person { person.name.size > 3 }
 people_with_truncated_names = people.map(&Qo.match(
@@ -58,7 +66,25 @@ Qo.match(people.first,
 )
 ```
 
-Get a lot more expressiveness in your queries and transformations. Read on for the full details.
+#### Pattern Match Block
+
+The new style, likely to take over in `v1.0.0` after testing:
+
+```ruby
+name_longer_than_three      = -> person { person.name.size > 3 }
+people_with_truncated_names = people.map(&Qo.match { |m|
+  m.when(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) }
+  m.else(&:itself)
+})
+
+# And standalone like a case:
+Qo.match(people.first) { |m|
+  m.when(age: 10..19) { |person| "#{person.name} is a teen that's #{person.age} years old" }
+  m.else { |person| "#{person.name} is #{person.age} years old" }
+}
+```
+
+(More details coming on the difference and planned 1.0.0 APIs)
 
 ### Qo'isms
 

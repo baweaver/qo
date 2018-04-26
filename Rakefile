@@ -44,7 +44,7 @@ def xrun_benchmark(title, **benchmarks) end
 # be readability first with performance coming later. That means that early iterations
 # may well be slower, but the net expressiveness we get is worth it in the short run.
 task :perf do
-  puts "Running on Qo v#{Qo::VERSION} at commit #{`git rev-parse HEAD`}"
+  puts "Running on Qo v#{Qo::VERSION} at rev #{`git rev-parse HEAD`} - Ruby #{`ruby -v`}"
 
   # Compare simple array equality. I almost think this isn't fair to Qo considering
   # no sane dev should use it for literal 1 to 1 matches like this.
