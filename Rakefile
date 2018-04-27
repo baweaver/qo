@@ -19,13 +19,13 @@ task :default => :spec
 #       "anything can be a key" bit of Ruby.
 #
 # @return [Unit] StdOut
-def run_benchmark(title, **benchmarks)
+def run_benchmark(title, quiet = false, **benchmarks)
   puts '', title, '=' * title.size, ''
 
   # Validation
   benchmarks.each do |benchmark_name, benchmark_fn|
     puts "#{benchmark_name} result: #{benchmark_fn.call()}"
-  end
+  end unless quiet
 
   puts
 
@@ -227,5 +227,56 @@ task :perf_random do
 
     'full hash empty?':  -> { hash.empty? },
     'full array empty?': -> { array.empty? },
+  )
+end
+
+class CompiledMatch
+  def initialize(*matchers)
+    @matchers = matchers
+  end
+
+  def to_proc
+    @_call_method ||= eval(%~
+      Proc.new { |target| #{matchers_as_variants} }
+    ~)
+  end
+
+  def matchers_as_variants
+    @_mavs = @matchers.map { |m| variant(m) }.join(' && ')
+  end
+
+  def variant(matcher)
+    case matcher
+    when :*
+      "true"
+    when Class
+      "target.is_a?(#{matcher})"
+    when Regexp
+      "#{matcher.inspect}.match?(target)"
+    when Integer, Float
+      "#{matcher} == target"
+    when Range
+      "(#{matcher}).include?(target)"
+    when Symbol
+      "target.#{matcher}"
+    else
+      "#{matcher} === target"
+    end
+  end
+
+  def call(target)
+    self.to_proc.call(target)
+  end
+end
+
+task :perf_compile do
+  comp_match = CompiledMatch.new(Integer, 1..20, :odd?)
+
+  targets = [1, 2, 3] * 1_000
+
+  run_benchmark('Empty on blank array', true,
+    'Compiled Match': -> { targets.select(&comp_match) },
+    'Vanilla':        -> { targets.select { |v| v.is_a?(Integer) && (1..20).include?(v) && v.odd? } },
+    'Qo Match':       -> { targets.select(&Qo[Integer, 1..20, :odd?]) }
   )
 end
