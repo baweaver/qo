@@ -45,18 +45,23 @@ def xrun_benchmark(title, **benchmarks) end
 # may well be slower, but the net expressiveness we get is worth it in the short run.
 task :perf do
   puts "Running on Qo v#{Qo::VERSION} at commit #{`git rev-parse HEAD`}"
+  puts RUBY_VERSION
 
   # Compare simple array equality. I almost think this isn't fair to Qo considering
   # no sane dev should use it for literal 1 to 1 matches like this.
 
   simple_array = [1, 1]
-  run_benchmark('Array * Array - Literal',
+  xrun_benchmark('Array * Array - Literal',
     'Vanilla': -> {
       simple_array == simple_array
     },
 
     'Qo.and':  -> {
       Qo.and(1, 1).call(simple_array)
+    },
+
+    'Qo EVIL': -> {
+      Qo::Evil.match(1, 1).call(simple_array)
     }
   )
 
@@ -66,14 +71,18 @@ task :perf do
   range_match_set    = [1..10, 1..10, 1..10, 1..10]
   range_match_target = [1, 2, 3, 4]
 
-  run_benchmark('Array * Array - Index pattern match',
+  xrun_benchmark('Array * Array - Index pattern match',
     'Vanilla': -> {
       range_match_target.each_with_index.all? { |x, i| range_match_set[i] === x }
     },
 
     'Qo.and':  -> {
       Qo.and(1..10, 1..10, 1..10, 1..10).call(range_match_target)
-    }
+    },
+
+    'Qo EVIL':  -> {
+      Qo::Evil.and(1..10, 1..10, 1..10, 1..10).call(range_match_target)
+    },
   )
 
   # Now we're getting into things Qo makes sense for. Comparing an entire list
@@ -81,14 +90,18 @@ task :perf do
 
   numbers_array = [1, 2.0, 3, 4]
 
-  run_benchmark('Array * Object - Predicate match',
+  xrun_benchmark('Array * Object - Predicate match',
     'Vanilla': -> {
       numbers_array.all? { |i| i.is_a?(Integer) && i.even? && (20..30).include?(i) }
     },
 
     'Qo.and':  -> {
       numbers_array.all?(&Qo.and(Integer, :even?, 20..30))
-    }
+    },
+
+    'Qo EVIL':  -> {
+      numbers_array.all?(&Qo::Evil.and(Integer, :even?, 20..30))
+    },
   )
 
   # This one is a bit interesting. The vanilla version is written to reflect that
@@ -100,25 +113,46 @@ task :perf do
     ['Roberta', 22],
     ['Foo', 42],
     ['Bar', 18]
-  ]
+  ] * 100_000
 
   people_array_query = [/Rob/, 15..25]
 
-  run_benchmark('Array * Array - Select index pattern match',
+  qo_and      = Qo.and(/Rob/, 15..25)
+  qo_evil_and = Qo::Evil.and(/Rob/, 15..25)
+  normal_proc = proc { |person|
+    person.each_with_index.all? { |a, i| people_array_query[i] === a }
+  }
+  normal_cheating_proc = proc { |person|
+    /Rob/.match?(person[0]) && (15..25).include?(person[1])
+  }
+
+  puts(
+    "Array size:        #{people_array_target.size}",
+    "Qo.and == Qo EVIL: #{people_array_target.select(&qo_and) == people_array_target.select(&qo_evil_and)}",
+    "Qo EVIL == Normal: #{people_array_target.select(&qo_evil_and) == people_array_target.select(&normal_proc)}",
+  )
+
+  run_benchmark('Array * Array - Select index pattern match', true,
     'Vanilla': -> {
-      people_array_target.select { |person|
-        person.each_with_index.all? { |a, i| people_array_query[i] === a }
-      }
+      people_array_target.select(&normal_proc)
+    },
+
+    'Vanilla HAX': -> {
+      people_array_target.select(&normal_cheating_proc)
     },
 
     'Qo.and':  -> {
-      people_array_target.select(&Qo.and(/Rob/, 15..25))
-    }
+      people_array_target.select(&qo_and)
+    },
+
+    'Qo EVIL':  -> {
+      people_array_target.select(&qo_evil_and)
+    },
   )
 
   people_hashes = people_array_target.map { |(name, age)| {name: name, age: age} }
 
-  run_benchmark('Hash * Hash - Hash intersection',
+  xrun_benchmark('Hash * Hash - Hash intersection',
     'Vanilla': -> {
       people_hashes.select { |person| (15..25).include?(person[:age]) && /Rob/ =~ person[:name] }
     },
@@ -136,7 +170,7 @@ task :perf do
     Person.new('Bar', 17)
   ]
 
-  run_benchmark('Hash * Object - Property match',
+  xrun_benchmark('Hash * Object - Property match',
     'Vanilla': -> {
       people.select { |person| (15..25).include?(person.age) && /Rob/ =~ person.name }
     },

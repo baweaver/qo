@@ -16,6 +16,9 @@ require 'qo/helpers'
 require 'qo/exceptions'
 require 'qo/public_api'
 
+# EEEEEEEEEEEEEEEEVIL
+require 'qo/evil/evil'
+
 module Qo
   WILDCARD_MATCH = :*
 
