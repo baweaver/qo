@@ -113,7 +113,7 @@ task :perf do
     ['Roberta', 22],
     ['Foo', 42],
     ['Bar', 18]
-  ] * 100_000
+  ] * 1_000
 
   people_array_query = [/Rob/, 15..25]
 
@@ -152,14 +152,20 @@ task :perf do
 
   people_hashes = people_array_target.map { |(name, age)| {name: name, age: age} }
 
-  xrun_benchmark('Hash * Hash - Hash intersection',
-    'Vanilla': -> {
-      people_hashes.select { |person| (15..25).include?(person[:age]) && /Rob/ =~ person[:name] }
-    },
+  hash_hash_vanilla = proc { |person| (15..25).include?(person[:age]) && /Rob/ =~ person[:name] }
+  hash_hash_qo      = Qo.and(name: /Rob/, age: 15..25)
+  hash_hash_qo_evil = Qo::Evil.and(name: /Rob/, age: 15..25)
 
-    'Qo.and':  -> {
-      people_hashes.select(&Qo.and(name: /Rob/, age: 15..25))
-    }
+  puts(
+    "Array size:        #{people_hashes.size}",
+    "Qo.and == Qo EVIL: #{people_hashes.select(&hash_hash_qo) == people_hashes.select(&hash_hash_qo_evil)}",
+    "Qo EVIL == Normal: #{people_hashes.select(&hash_hash_qo_evil) == people_hashes.select(&hash_hash_vanilla)}",
+  )
+
+  run_benchmark('Hash * Hash - Hash intersection', true,
+    'Vanilla': -> { people_hashes.select(&hash_hash_vanilla) },
+    'Qo.and':  -> { people_hashes.select(&hash_hash_qo) },
+    'Qo EVIL':  -> { people_hashes.select(&hash_hash_qo_evil) },
   )
 
   Person = Struct.new(:name, :age)
@@ -168,16 +174,22 @@ task :perf do
     Person.new('Roberta', 22),
     Person.new('Foo', 42),
     Person.new('Bar', 17)
-  ]
+  ] * 1_000
 
-  xrun_benchmark('Hash * Object - Property match',
-    'Vanilla': -> {
-      people.select { |person| (15..25).include?(person.age) && /Rob/ =~ person.name }
-    },
+  hash_object_vanilla = proc { |person| (15..25).include?(person.age) && /Rob/ =~ person.name }
+  hash_object_qo      = Qo.and(name: /Rob/, age: 15..25)
+  hash_object_qo_evil = Qo::Evil.and(name: /Rob/, age: 15..25)
 
-    'Qo.and':  -> {
-      people.select(&Qo.and(name: /Rob/, age: 15..25))
-    }
+  puts(
+    "Array size:        #{people.size}",
+    "Qo.and == Qo EVIL: #{people.select(&hash_object_qo) == people.select(&hash_object_qo_evil)}",
+    "Qo EVIL == Normal: #{people.select(&hash_object_qo_evil) == people.select(&hash_object_vanilla)}",
+  )
+
+  run_benchmark('Hash * Object - Property match', true,
+    'Vanilla': -> { people.select(&hash_object_vanilla) },
+    'Qo.and':  -> { people.select(&hash_object_qo) },
+    'Qo EVIL': -> { people.select(&hash_object_qo_evil) },
   )
 end
 

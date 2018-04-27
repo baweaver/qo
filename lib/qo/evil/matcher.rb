@@ -2,9 +2,10 @@ module Qo
   module Evil
     class Matcher
       def initialize(type, *array_matchers, **keyword_matchers)
-        @type             = type
-        @array_matchers   = array_matchers
-        @keyword_matchers = keyword_matchers
+        @type             = type.tap { |v| p "type: #{v}" if @debug }
+        @array_matchers   = array_matchers.tap { |v| p "array_matchers: #{v}" if @debug }
+        @keyword_matchers = keyword_matchers.tap { |v| p "keyword_matchers: #{v}" if @debug }
+        @debug = false
       end
 
       def to_proc
@@ -21,10 +22,10 @@ module Qo
 
         variables.each { |name, var| bind.local_variable_set(name.to_sym, var) }
 
-        puts match_query
+        puts match_query if @debug
 
         puts(
-          "compiled_matchers:    #{compiled_matchers}",
+          # "compiled_matchers:    #{compiled_matchers}",
           "variables:            #{variables}",
           "match_query:          #{match_query}",
           "target:               #{target}",
@@ -43,28 +44,55 @@ module Qo
 
         matchers = if @array_matchers.empty?
           if target.is_a?(Hash)
-            raise 'hell'
-            @keyword_matchers.map { |key, m|
+            puts "Hash matches Hash" if @debug
 
+            @keyword_matchers.map { |key, m|
+              v = hash_hash_mapping(m, key)
+
+              puts(
+                "m:   #{m}",
+                "key: #{key}",
+                "v:   #{v}",
+              ) if @debug
+
+              next v if v
+
+              name = "_qo_evil_#{var_names.next}"
+              variables[name] = m
+              typed_key = key.is_a?(Symbol) ? ":#{key}" : "'#{key}'"
+              "#{name} === target[#{typed_key}]"
             }
           else
-            raise 'hell'
-            @keyword_matchers.map { |key, m|
+            puts "Hash matches Object"
 
+            @keyword_matchers.map { |key, m|
+              v = hash_object_mapping(m, key)
+
+              puts(
+                "m:   #{m}",
+                "key: #{key}",
+                "v:   #{v}",
+              ) if @debug
+
+              next v if v
+
+              name = "_qo_evil_#{var_names.next}"
+              variables[name] = m
+              "#{name} === target.#{sanitize(key)}"
             }
           end
         else
           if target.is_a?(Array)
-            # puts "Array matches Array"
+            puts "Array matches Array" if @debug
 
             @array_matchers.each_with_index.map { |m, i|
               v = array_array_mapping(m, i)
 
-              # puts(
-              #   "m: #{m}",
-              #   "i: #{i}",
-              #   "v: #{v}",
-              # )
+              puts(
+                "m: #{m}",
+                "i: #{i}",
+                "v: #{v}",
+              ) if @debug
 
               next v if v
 
@@ -73,8 +101,18 @@ module Qo
               "#{name} === target[#{i}]"
             }
           else
+            puts "Array matches Object" if @debug
+
             @array_matchers.map { |m|
-              v = array_object_mapping(m) and next v if v
+              v = array_object_mapping(m)
+
+              puts(
+                "m: #{m}",
+                "v: #{v}",
+              ) if @debug
+
+              next v if v
+
               name = "_qo_evil_#{var_names.next}"
               variables[name] = m
               "#{name} === target"
@@ -138,8 +176,53 @@ module Qo
         end
       end
 
+      def hash_hash_mapping(matcher, key)
+        typed_key = key.is_a?(Symbol) ? ":#{key}" : "'#{key}'"
+        case matcher
+        when :*
+          "true"
+        when Class
+          "target[#{typed_key}].is_a?(#{matcher})"
+        when Integer, Float, TrueClass, FalseClass, NilClass
+          "#{matcher} == target[#{typed_key}]"
+        when String
+          "'#{sanitize(matcher)}' == target[#{typed_key}]"
+        when Symbol
+          "target[#{typed_key}].#{sanitize(matcher)}"
+        when Regexp
+          "#{matcher.inspect}.match?(target[#{typed_key}])"
+        when Range
+          "(#{matcher.inspect}).include?(target[#{typed_key}])"
+        else
+          false
+        end
+      end
+
+      def hash_object_mapping(matcher, key)
+        clean_key = sanitize(key).to_sym
+
+        case matcher
+        when :*
+          "true"
+        when Class
+          "target.#{clean_key}.is_a?(#{matcher})"
+        when Integer, Float, TrueClass, FalseClass, NilClass
+          "#{matcher} == target.#{clean_key}"
+        when String
+          "'#{sanitize(matcher)}' == target.#{clean_key}"
+        when Symbol
+          "target.#{clean_key}.#{sanitize(matcher)}"
+        when Regexp
+          "#{matcher.inspect}.match?(target.#{clean_key})"
+        when Range
+          "(#{matcher.inspect}).include?(target.#{clean_key})"
+        else
+          false
+        end
+      end
+
       def sanitize(str)
-        str.to_s.gsub(/[^a-zA-Z0-9_]/, '')
+        str.to_s.gsub(/[^a-zA-Z0-9_?!]/, '')
       end
     end
   end
