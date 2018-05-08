@@ -44,22 +44,15 @@ module Qo
         variables.each { |name, var| bind.local_variable_set(name.to_sym, var) }
 
         @_proc = bind.eval(%~
-          Proc.new { |target|
+          lambda { |target|
             #{@full_query}
           }
         ~)
 
         self.define_singleton_method(:call, @_proc)
-        self.define_singleton_method(:to_proc, proc { @_proc })
+        self.define_singleton_method(:to_proc, -> { @_proc })
 
         @_proc.call(target)
-
-        @matchers.each { |guard_block_matcher|
-          did_match, match_result = guard_block_matcher.render(target)
-          return match_result if did_match
-        }
-
-        nil
       end
     end
   end
