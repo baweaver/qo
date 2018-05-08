@@ -51,17 +51,21 @@ task :perf do
   # no sane dev should use it for literal 1 to 1 matches like this.
 
   simple_array = [1, 1]
-  xrun_benchmark('Array * Array - Literal',
-    'Vanilla': -> {
+
+  simple_qo = Qo.and(1, 1)
+  simple_qo_evil = Qo::Evil.and(1, 1)
+
+  run_benchmark('Array * Array - Literal',
+    'Vanilla Optimized': -> {
       simple_array == simple_array
     },
 
     'Qo.and':  -> {
-      Qo.and(1, 1).call(simple_array)
+      simple_qo.call(simple_array)
     },
 
     'Qo EVIL': -> {
-      Qo::Evil.match(1, 1).call(simple_array)
+      simple_qo_evil.call(simple_array)
     }
   )
 
@@ -71,17 +75,27 @@ task :perf do
   range_match_set    = [1..10, 1..10, 1..10, 1..10]
   range_match_target = [1, 2, 3, 4]
 
-  xrun_benchmark('Array * Array - Index pattern match',
+  range_qo = Qo.and(1..10, 1..10, 1..10, 1..10)
+  range_qo_evil = Qo::Evil.and(1..10, 1..10, 1..10, 1..10)
+
+  run_benchmark('Array * Array - Index pattern match',
     'Vanilla': -> {
       range_match_target.each_with_index.all? { |x, i| range_match_set[i] === x }
     },
 
+    'Vanilla Optimized': -> {
+      range_match_set[0] === range_match_target[0] &&
+      range_match_set[1] === range_match_target[1] &&
+      range_match_set[2] === range_match_target[2] &&
+      range_match_set[3] === range_match_target[3]
+    },
+
     'Qo.and':  -> {
-      Qo.and(1..10, 1..10, 1..10, 1..10).call(range_match_target)
+      range_qo.call(range_match_target)
     },
 
     'Qo EVIL':  -> {
-      Qo::Evil.and(1..10, 1..10, 1..10, 1..10).call(range_match_target)
+      range_qo_evil.call(range_match_target)
     },
   )
 
@@ -90,17 +104,21 @@ task :perf do
 
   numbers_array = [1, 2.0, 3, 4]
 
-  xrun_benchmark('Array * Object - Predicate match',
+  ao_p_v       = proc { |i| i.is_a?(Integer) && i.even? && (20..30).include?(i) }
+  ao_p_qo      = Qo.and(Integer, :even?, 20..30)
+  ao_p_qo_evil = Qo::Evil.and(Integer, :even?, 20..30)
+
+  run_benchmark('Array * Object - Predicate match',
     'Vanilla': -> {
-      numbers_array.all? { |i| i.is_a?(Integer) && i.even? && (20..30).include?(i) }
+      numbers_array.all?(&ao_p_v)
     },
 
     'Qo.and':  -> {
-      numbers_array.all?(&Qo.and(Integer, :even?, 20..30))
+      numbers_array.all?(&ao_p_qo)
     },
 
     'Qo EVIL':  -> {
-      numbers_array.all?(&Qo::Evil.and(Integer, :even?, 20..30))
+      numbers_array.all?(&ao_p_qo_evil)
     },
   )
 
@@ -137,7 +155,7 @@ task :perf do
       people_array_target.select(&normal_proc)
     },
 
-    'Vanilla HAX': -> {
+    'Vanilla Optimized': -> {
       people_array_target.select(&normal_cheating_proc)
     },
 
@@ -152,7 +170,7 @@ task :perf do
 
   people_hashes = people_array_target.map { |(name, age)| {name: name, age: age} }
 
-  hash_hash_vanilla = proc { |person| (15..25).include?(person[:age]) && /Rob/ =~ person[:name] }
+  hash_hash_vanilla = proc { |person| (15..25).include?(person[:age]) && /Rob/.match?(person[:name]) }
   hash_hash_qo      = Qo.and(name: /Rob/, age: 15..25)
   hash_hash_qo_evil = Qo::Evil.and(name: /Rob/, age: 15..25)
 
@@ -176,7 +194,7 @@ task :perf do
     Person.new('Bar', 17)
   ] * 1_000
 
-  hash_object_vanilla = proc { |person| (15..25).include?(person.age) && /Rob/ =~ person.name }
+  hash_object_vanilla = proc { |person| (15..25).include?(person.age) && /Rob/.match?(person.name) }
   hash_object_qo      = Qo.and(name: /Rob/, age: 15..25)
   hash_object_qo_evil = Qo::Evil.and(name: /Rob/, age: 15..25)
 

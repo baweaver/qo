@@ -1,39 +1,54 @@
-Running on Qo v0.2.0 at commit ba999659acb51beec215fab4240a34298794a5bf
+Running on Qo v0.2.1 at commit c2c0f67e2d34d15307afc4e9ec6eecc46184b2af
+2.5.1
 
 Array * Array - Literal
 =======================
 
-Vanilla result: true
+Vanilla Optimized result: true
 Qo.and result: true
+"Qo::Evil generated: Proc.new { |target| 1 == target[0] && 1 == target[1] }"
+Qo EVIL result: true
 
 Warming up --------------------------------------
-             Vanilla   278.882k i/100ms
-              Qo.and    83.044k i/100ms
+   Vanilla Optimized   275.213k i/100ms
+              Qo.and   187.650k i/100ms
+             Qo EVIL   223.081k i/100ms
 Calculating -------------------------------------
-             Vanilla      8.950M (± 1.7%) i/s -     44.900M in   5.018406s
-              Qo.and      1.062M (± 1.2%) i/s -      5.315M in   5.003728s
+   Vanilla Optimized      8.077M (± 3.2%) i/s -     40.456M in   5.014506s
+              Qo.and      3.478M (± 4.6%) i/s -     17.451M in   5.028826s
+             Qo EVIL      5.086M (± 3.6%) i/s -     25.431M in   5.006920s
 
 Comparison:
-             Vanilla:  8949563.3 i/s
-              Qo.and:  1062331.4 i/s - 8.42x  slower
+   Vanilla Optimized:  8076802.5 i/s
+             Qo EVIL:  5085976.9 i/s - 1.59x  slower
+              Qo.and:  3478086.1 i/s - 2.32x  slower
 
 
 Array * Array - Index pattern match
 ===================================
 
 Vanilla result: true
+Vanilla Optimized result: true
 Qo.and result: true
+"Qo::Evil generated: Proc.new { |target| (1..10).include?(target[0]) && (1..10).include?(target[1]) && (1..10).include?(target[2]) && (1..10).include?(target[3]) }"
+Qo EVIL result: true
 
 Warming up --------------------------------------
-             Vanilla    49.757k i/100ms
-              Qo.and    22.362k i/100ms
+             Vanilla    45.641k i/100ms
+   Vanilla Optimized    94.160k i/100ms
+              Qo.and    29.661k i/100ms
+             Qo EVIL   112.390k i/100ms
 Calculating -------------------------------------
-             Vanilla    562.718k (± 4.0%) i/s -      2.836M in   5.048960s
-              Qo.and    238.217k (± 1.7%) i/s -      1.208M in   5.070540s
+             Vanilla    533.094k (± 3.5%) i/s -      2.693M in   5.057582s
+   Vanilla Optimized      1.304M (±16.2%) i/s -      6.309M in   5.061227s
+              Qo.and    307.796k (±15.5%) i/s -      1.483M in   5.028616s
+             Qo EVIL      1.531M (± 9.9%) i/s -      7.643M in   5.051637s
 
 Comparison:
-             Vanilla:   562718.0 i/s
-              Qo.and:   238216.8 i/s - 2.36x  slower
+             Qo EVIL:  1531378.2 i/s
+   Vanilla Optimized:  1303963.5 i/s - same-ish: difference falls within error
+             Vanilla:   533094.1 i/s - 2.87x  slower
+              Qo.and:   307796.0 i/s - 4.98x  slower
 
 
 Array * Object - Predicate match
@@ -41,69 +56,93 @@ Array * Object - Predicate match
 
 Vanilla result: false
 Qo.and result: false
+"Qo::Evil generated: Proc.new { |target| target.is_a?(Integer) && target.even? && (20..30).include?(target) }"
+Qo EVIL result: false
 
 Warming up --------------------------------------
-             Vanilla   145.056k i/100ms
-              Qo.and    27.888k i/100ms
+             Vanilla   130.610k i/100ms
+              Qo.and    33.867k i/100ms
+             Qo EVIL   119.199k i/100ms
 Calculating -------------------------------------
-             Vanilla      2.204M (± 4.4%) i/s -     11.024M in   5.011429s
-              Qo.and    323.232k (± 2.4%) i/s -      1.618M in   5.007142s
+             Vanilla      2.081M (± 4.1%) i/s -     10.449M in   5.029395s
+              Qo.and    401.067k (± 7.5%) i/s -      1.998M in   5.015319s
+             Qo EVIL      1.714M (± 8.6%) i/s -      8.702M in   5.134381s
 
 Comparison:
-             Vanilla:  2204056.6 i/s
-              Qo.and:   323232.5 i/s - 6.82x  slower
+             Vanilla:  2081121.8 i/s
+             Qo EVIL:  1714314.9 i/s - 1.21x  slower
+              Qo.and:   401067.1 i/s - 5.19x  slower
 
+"Qo::Evil generated: Proc.new { |target| /Rob/.match?(target[0]) && (15..25).include?(target[1]) }"
+Array size:        4000
+Qo.and == Qo EVIL: true
+Qo EVIL == Normal: true
 
 Array * Array - Select index pattern match
 ==========================================
 
-Vanilla result: [["Robert", 22], ["Roberta", 22]]
-Qo.and result: [["Robert", 22], ["Roberta", 22]]
 
 Warming up --------------------------------------
-             Vanilla    14.343k i/100ms
-              Qo.and     7.454k i/100ms
+             Vanilla    15.000  i/100ms
+   Vanilla Optimized   116.000  i/100ms
+              Qo.and     9.000  i/100ms
+             Qo EVIL   104.000  i/100ms
 Calculating -------------------------------------
-             Vanilla    149.518k (± 2.9%) i/s -    760.179k in   5.088601s
-              Qo.and     77.519k (± 2.8%) i/s -    387.608k in   5.004058s
+             Vanilla    158.586  (± 3.8%) i/s -    795.000  in   5.019669s
+   Vanilla Optimized      1.186k (± 4.0%) i/s -      6.032k in   5.095140s
+              Qo.and     90.529  (± 5.5%) i/s -    459.000  in   5.090254s
+             Qo EVIL      1.187k (± 2.4%) i/s -      6.032k in   5.083232s
 
 Comparison:
-             Vanilla:   149517.6 i/s
-              Qo.and:    77519.5 i/s - 1.93x  slower
+             Qo EVIL:     1187.4 i/s
+   Vanilla Optimized:     1185.9 i/s - same-ish: difference falls within error
+             Vanilla:      158.6 i/s - 7.49x  slower
+              Qo.and:       90.5 i/s - 13.12x  slower
 
+"Qo::Evil generated: Proc.new { |target| /Rob/.match?(target[:name]) && (15..25).include?(target[:age]) }"
+Array size:        4000
+Qo.and == Qo EVIL: true
+Qo EVIL == Normal: true
 
 Hash * Hash - Hash intersection
 ===============================
 
-Vanilla result: [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}]
-Qo.and result: [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}]
 
 Warming up --------------------------------------
-             Vanilla    36.214k i/100ms
-              Qo.and     5.050k i/100ms
+             Vanilla    90.000  i/100ms
+              Qo.and     6.000  i/100ms
+             Qo EVIL   102.000  i/100ms
 Calculating -------------------------------------
-             Vanilla    411.041k (± 2.3%) i/s -      2.064M in   5.024556s
-              Qo.and     50.029k (± 5.0%) i/s -    252.500k in   5.060014s
+             Vanilla    906.121  (± 3.1%) i/s -      4.590k in   5.070468s
+              Qo.and     68.629  (± 4.4%) i/s -    348.000  in   5.081320s
+             Qo EVIL      1.021k (± 3.7%) i/s -      5.100k in   5.004094s
 
 Comparison:
-             Vanilla:   411041.4 i/s
-              Qo.and:    50028.6 i/s - 8.22x  slower
+             Qo EVIL:     1020.6 i/s
+             Vanilla:      906.1 i/s - 1.13x  slower
+              Qo.and:       68.6 i/s - 14.87x  slower
 
+Hash matches Object
+"Qo::Evil generated: Proc.new { |target| /Rob/.match?(target.name) && (15..25).include?(target.age) }"
+Array size:        4000
+Qo.and == Qo EVIL: true
+Qo EVIL == Normal: true
 
 Hash * Object - Property match
 ==============================
 
-Vanilla result: [#<struct Person name="Robert", age=22>, #<struct Person name="Roberta", age=22>]
-Qo.and result: [#<struct Person name="Robert", age=22>, #<struct Person name="Roberta", age=22>]
 
 Warming up --------------------------------------
-             Vanilla    36.167k i/100ms
-              Qo.and     5.263k i/100ms
+             Vanilla    98.000  i/100ms
+              Qo.and     7.000  i/100ms
+             Qo EVIL   108.000  i/100ms
 Calculating -------------------------------------
-             Vanilla    411.057k (± 3.4%) i/s -      2.062M in   5.021612s
-              Qo.and     52.776k (± 4.0%) i/s -    268.413k in   5.094233s
+             Vanilla    988.312  (± 1.9%) i/s -      4.998k in   5.059097s
+              Qo.and     79.504  (± 2.5%) i/s -    399.000  in   5.021513s
+             Qo EVIL      1.092k (± 2.9%) i/s -      5.508k in   5.047259s
 
 Comparison:
-             Vanilla:   411057.2 i/s
-              Qo.and:    52775.9 i/s - 7.79x  slower
+             Qo EVIL:     1092.2 i/s
+             Vanilla:      988.3 i/s - 1.11x  slower
+              Qo.and:       79.5 i/s - 13.74x  slower
 

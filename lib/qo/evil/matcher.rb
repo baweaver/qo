@@ -30,11 +30,16 @@ module Qo
           "match_query:          #{match_query}",
           "target:               #{target}",
           "bind.local_variables: #{bind.local_variables}",
-        )
+        ) if @debug
+
+        p "Qo::Evil generated: Proc.new { |target| #{match_query} }"
 
         @_proc = bind.eval(%~
           Proc.new { |target| #{match_query} }
         ~)
+
+        self.define_singleton_method(:call, @_proc)
+        self.define_singleton_method(:to_proc, proc { @_proc })
 
         @_proc.call(target)
       end
