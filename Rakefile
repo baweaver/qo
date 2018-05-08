@@ -211,6 +211,89 @@ task :perf do
   )
 end
 
+task :perf_pattern_match do
+  require 'dry-matcher'
+  require 'pattern-match'
+  using PatternMatch
+
+  # Match `[:ok, some_value]` for success
+  success_case = Dry::Matcher::Case.new(
+    match: -> value { value.first == :ok },
+    resolve: -> value { value.last }
+  )
+
+  # Match `[:err, some_error_code, some_value]` for failure
+  failure_case = Dry::Matcher::Case.new(
+    match: -> value, *pattern {
+      value[0] == :err && (pattern.any? ? pattern.include?(value[1]) : true)
+    },
+    resolve: -> value { value.last }
+  )
+
+  # Build the matcher
+  matcher = Dry::Matcher.new(success: success_case, failure: failure_case)
+
+  qo_m = proc { |target|
+    Qo.match(target,
+      Qo.m(:ok)  { |(s, v)| v },
+      Qo.m(:err) { "ERR!" }
+    )
+  }
+
+  em = Qo::Evil.match(
+    Qo::Evil.m(:ok)  { |(s, v)| v },
+    Qo::Evil.m(:err) { 'ERR!' }
+  )
+
+  qo_e_m = proc { |target| em.call(target) }
+
+  pm_m = proc { |target|
+    match(target) do
+      with(_[:ok, a]) { a }
+      with(_[:err, a]) { 'ERR!' }
+    end
+  }
+
+  # eg_m = Qo[:ok, :*]
+
+  dm_m = proc { |target|
+    matcher.(target) do |m|
+      m.success { |v| v }
+      m.failure { 'ERR!' }
+    end
+  }
+
+  ok_target  = [:ok, 12345]
+  err_target = [:err, "OH NO!"]
+
+  run_benchmark('Single Item Tuple',
+    'Qo': -> {
+      "OK: #{qo_m[ok_target]}, ERR: #{qo_m[err_target]}"
+    },
+
+    'Qo Evil': -> {
+      "OK: #{qo_e_m[ok_target]}, ERR: #{qo_e_m[err_target]}"
+    },
+
+    'PatternMatch': -> {
+      "OK: #{pm_m[ok_target]}, ERR: #{pm_m[err_target]}"
+    },
+
+    'DryRB': -> {
+      "OK: #{dm_m[ok_target]}, ERR: #{dm_m[err_target]}"
+    }
+  )
+
+  collection = [ok_target, err_target] * 2_000
+
+  run_benchmark('Large Tuple Collection', true,
+    'Qo':           -> { collection.map(&qo_m) },
+    'Qo Evil':      -> { collection.map(&qo_e_m) },
+    'PatternMatch': -> { collection.map(&pm_m) },
+    'DryRB':        -> { collection.map(&dm_m) }
+  )
+end
+
 # Below this mark are mostly my experiments to see what features perform a bit better
 # than others, and are mostly left to check different versions of Ruby against eachother.
 #

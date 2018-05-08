@@ -60,7 +60,8 @@ module Qo
     class PatternMatch
       def initialize(*matchers)
         raise Qo::Exceptions::NotAllGuardMatchersProvided unless matchers.all? { |q|
-          q.is_a?(Qo::Matchers::GuardBlockMatcher)
+          q.is_a?(Qo::Matchers::GuardBlockMatcher) ||
+          q.is_a?(Qo::Evil::GuardBlockMatcher)
         }
 
         @matchers = matchers

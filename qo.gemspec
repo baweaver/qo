@@ -27,5 +27,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "yard"
-  spec.add_development_dependency "redcarpet"
+  spec.add_runtime_dependency "method_source"
+  # spec.add_development_dependency "redcarpet"
+
+  # Other pattern matching libraries to try against
+  spec.add_development_dependency "pattern-match"
+  spec.add_development_dependency "egison"
+  spec.add_development_dependency "dry-matcher"
 end

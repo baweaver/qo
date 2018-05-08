@@ -1,6 +1,8 @@
 module Qo
   module Evil
     class Matcher
+      attr_reader :query
+
       def initialize(type, *array_matchers, **keyword_matchers)
         @type             = type.tap { |v| p "type: #{v}" if @debug }
         @array_matchers   = array_matchers.tap { |v| p "array_matchers: #{v}" if @debug }
@@ -32,7 +34,9 @@ module Qo
           "bind.local_variables: #{bind.local_variables}",
         ) if @debug
 
-        p "Qo::Evil generated: Proc.new { |target| #{match_query} }"
+        # p "Qo::Evil generated: Proc.new { |target| #{match_query} }"
+
+        @query = match_query
 
         @_proc = bind.eval(%~
           Proc.new { |target| #{match_query} }
@@ -91,7 +95,7 @@ module Qo
             puts "Array matches Array" if @debug
 
             @array_matchers.each_with_index.map { |m, i|
-              v = array_array_mapping(m, i)
+              v = array_array_mapping(m, i, target)
 
               puts(
                 "m: #{m}",
@@ -160,7 +164,7 @@ module Qo
         end
       end
 
-      def array_array_mapping(matcher, i)
+      def array_array_mapping(matcher, i, target)
         case matcher
         when :*
           "true"
@@ -171,7 +175,11 @@ module Qo
         when String
           "'#{sanitize(matcher)}' == target[#{i}]"
         when Symbol
-          "target[#{i}].#{sanitize(matcher)}"
+          if target[i].respond_to?(matcher)
+            "target[#{i}].#{sanitize(matcher)}"
+          else
+            ":#{sanitize(matcher)} == target[#{i}]"
+          end
         when Regexp
           "#{matcher.inspect}.match?(target[#{i}])"
         when Range
