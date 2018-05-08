@@ -263,6 +263,11 @@ task :perf_pattern_match do
     end
   }
 
+  v_m = proc { |target|
+    next target[1] if target[0] == :ok
+    'ERR!'
+  }
+
   ok_target  = [:ok, 12345]
   err_target = [:err, "OH NO!"]
 
@@ -281,7 +286,11 @@ task :perf_pattern_match do
 
     'DryRB': -> {
       "OK: #{dm_m[ok_target]}, ERR: #{dm_m[err_target]}"
-    }
+    },
+
+    'Vanilla': -> {
+      "OK: #{v_m[ok_target]}, ERR: #{v_m[err_target]}"
+    },
   )
 
   collection = [ok_target, err_target] * 2_000
@@ -290,7 +299,8 @@ task :perf_pattern_match do
     'Qo':           -> { collection.map(&qo_m) },
     'Qo Evil':      -> { collection.map(&qo_e_m) },
     'PatternMatch': -> { collection.map(&pm_m) },
-    'DryRB':        -> { collection.map(&dm_m) }
+    'DryRB':        -> { collection.map(&dm_m) },
+    'Vanilla':      -> { collection.map(&v_m) }
   )
 end
 

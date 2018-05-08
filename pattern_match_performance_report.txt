@@ -6,23 +6,27 @@ Qo result: OK: 12345, ERR: ERR!
 Qo Evil result: OK: 12345, ERR: ERR!
 PatternMatch result: OK: 12345, ERR: ERR!
 DryRB result: OK: 12345, ERR: ERR!
+Vanilla result: OK: 12345, ERR: ERR!
 
 Warming up --------------------------------------
-                  Qo     3.931k i/100ms
-             Qo Evil    79.886k i/100ms
-        PatternMatch     1.253k i/100ms
-               DryRB    19.029k i/100ms
+                  Qo     3.845k i/100ms
+             Qo Evil    77.029k i/100ms
+        PatternMatch     1.218k i/100ms
+               DryRB    17.935k i/100ms
+             Vanilla   118.930k i/100ms
 Calculating -------------------------------------
-                  Qo     40.782k (± 2.7%) i/s -    204.412k in   5.016127s
-             Qo Evil      1.016M (± 2.1%) i/s -      5.113M in   5.035679s
-        PatternMatch     12.727k (± 2.6%) i/s -     63.903k in   5.024748s
-               DryRB    201.492k (± 1.9%) i/s -      1.009M in   5.007137s
+                  Qo     39.818k (± 3.1%) i/s -    199.940k in   5.026245s
+             Qo Evil    993.975k (± 2.0%) i/s -      5.007M in   5.039297s
+        PatternMatch     12.584k (± 2.9%) i/s -     63.336k in   5.037206s
+               DryRB    194.596k (± 2.4%) i/s -    986.425k in   5.072087s
+             Vanilla      1.686M (± 4.6%) i/s -      8.444M in   5.019942s
 
 Comparison:
-             Qo Evil:  1015771.1 i/s
-               DryRB:   201491.9 i/s - 5.04x  slower
-                  Qo:    40782.3 i/s - 24.91x  slower
-        PatternMatch:    12726.8 i/s - 79.81x  slower
+             Vanilla:  1686003.2 i/s
+             Qo Evil:   993974.7 i/s - 1.70x  slower
+               DryRB:   194596.2 i/s - 8.66x  slower
+                  Qo:    39817.8 i/s - 42.34x  slower
+        PatternMatch:    12584.1 i/s - 133.98x  slower
 
 
 Large Tuple Collection
@@ -31,18 +35,21 @@ Large Tuple Collection
 
 Warming up --------------------------------------
                   Qo     1.000  i/100ms
-             Qo Evil    87.000  i/100ms
+             Qo Evil    85.000  i/100ms
         PatternMatch     1.000  i/100ms
                DryRB     8.000  i/100ms
+             Vanilla   267.000  i/100ms
 Calculating -------------------------------------
-                  Qo     20.030  (± 5.0%) i/s -    100.000  in   5.005624s
-             Qo Evil    889.459  (± 1.8%) i/s -      4.524k in   5.087924s
-        PatternMatch      6.324  (± 0.0%) i/s -     32.000  in   5.063358s
-               DryRB     91.500  (± 5.5%) i/s -    464.000  in   5.085879s
+                  Qo     20.299  (± 4.9%) i/s -    102.000  in   5.035577s
+             Qo Evil    900.064  (± 1.7%) i/s -      4.505k in   5.006615s
+        PatternMatch      6.312  (± 0.0%) i/s -     32.000  in   5.071741s
+               DryRB    112.015  (± 2.7%) i/s -    560.000  in   5.002137s
+             Vanilla      2.817k (± 2.9%) i/s -     14.151k in   5.027002s
 
 Comparison:
-             Qo Evil:      889.5 i/s
-               DryRB:       91.5 i/s - 9.72x  slower
-                  Qo:       20.0 i/s - 44.41x  slower
-        PatternMatch:        6.3 i/s - 140.65x  slower
+             Vanilla:     2817.4 i/s
+             Qo Evil:      900.1 i/s - 3.13x  slower
+               DryRB:      112.0 i/s - 25.15x  slower
+                  Qo:       20.3 i/s - 138.80x  slower
+        PatternMatch:        6.3 i/s - 446.33x  slower
 
