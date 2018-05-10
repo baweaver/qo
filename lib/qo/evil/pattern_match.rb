@@ -5,7 +5,7 @@ module Qo
     class PatternMatch
       attr_reader :full_query
 
-      def initialize(*matchers)
+      def initialize(matchers)
         raise Qo::Exceptions::NotAllGuardMatchersProvided unless matchers.all? { |q|
           q.is_a?(Qo::Evil::GuardBlockMatcher)
         }
@@ -21,33 +21,25 @@ module Qo
         Proc.new { |target| self.call(target) }
       end
 
-      def var_names
-        @_var_names ||= ('a'..'zzz').to_enum
-      end
-
       def call(target)
-        variables = {}
-
         @full_query = @matchers.each_with_index.map { |m, i|
           query = m.pre_render(target)
-          var_name = "_qo_evil_guard_fn_#{var_names.next}"
+          function_name = "_qo_evil_guard_fn_#{i}"
 
-          variables[var_name] = m.fn
+          self.define_singleton_method(function_name, &m.fn)
 
-          "return #{var_name}.call(target) if (#{query})"
+          fn_arity = m.fn.arity
+
+          args = case fn_arity
+          when 0 then ''
+          when 1 then 'target'
+          else fn_arity.times.map { |n| "target[#{n}]" }.join(', ')
+          end
+
+          "return #{function_name}(#{args}) if (#{query})"
         }.join("\n")
 
-        # puts @full_query
-
-        bind = binding
-
-        variables.each { |name, var| bind.local_variable_set(name.to_sym, var) }
-
-        @_proc = bind.eval(%~
-          lambda { |target|
-            #{@full_query}
-          }
-        ~)
+        @_proc = binding.eval("lambda { |target| #{@full_query} }")
 
         self.define_singleton_method(:call, @_proc)
         self.define_singleton_method(:to_proc, -> { @_proc })

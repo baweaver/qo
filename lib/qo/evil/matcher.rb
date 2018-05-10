@@ -3,7 +3,7 @@ module Qo
     class Matcher
       attr_reader :query
 
-      def initialize(type, *array_matchers, **keyword_matchers)
+      def initialize(type, array_matchers, keyword_matchers)
         @type             = type.tap { |v| p "type: #{v}" if @debug }
         @array_matchers   = array_matchers.tap { |v| p "array_matchers: #{v}" if @debug }
         @keyword_matchers = keyword_matchers.tap { |v| p "keyword_matchers: #{v}" if @debug }
@@ -24,23 +24,8 @@ module Qo
 
         variables.each { |name, var| bind.local_variable_set(name.to_sym, var) }
 
-        puts match_query if @debug
-
-        puts(
-          # "compiled_matchers:    #{compiled_matchers}",
-          "variables:            #{variables}",
-          "match_query:          #{match_query}",
-          "target:               #{target}",
-          "bind.local_variables: #{bind.local_variables}",
-        ) if @debug
-
-        # p "Qo::Evil generated: Proc.new { |target| #{match_query} }"
-
         @query = match_query
-
-        @_proc = bind.eval(%~
-          Proc.new { |target| #{match_query} }
-        ~)
+        @_proc = bind.eval("lambda { |target| #{match_query} }")
 
         self.define_singleton_method(:call, @_proc)
         self.define_singleton_method(:to_proc, proc { @_proc })

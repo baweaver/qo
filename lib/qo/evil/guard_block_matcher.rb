@@ -8,15 +8,9 @@ module Qo
       # Definition of a non-match
       NON_MATCH = [false, false]
 
-      def initialize(*array_matchers, **keyword_matchers, &fn)
+      def initialize(array_matchers, keyword_matchers, fn)
         @fn = fn || IDENTITY
-        super('and', *array_matchers, **keyword_matchers)
-      end
-
-      def initialize(*array_matchers, **keyword_matchers, &fn)
-        @fn = fn || IDENTITY
-
-        super('and', *array_matchers, **keyword_matchers)
+        super('and', array_matchers, keyword_matchers)
       end
 
       def pre_render(target)

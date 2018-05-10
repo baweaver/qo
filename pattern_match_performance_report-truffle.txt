@@ -1,31 +1,31 @@
 Warming up --------------------------------------
-                  Qo   469.000  i/100ms
-             Qo Evil   152.276k i/100ms
-               DryRB    46.347k i/100ms
-             Vanilla   253.618k i/100ms
+                  Qo   437.000  i/100ms
+             Qo Evil    72.922k i/100ms
+               DryRB    24.244k i/100ms
+             Vanilla    85.292k i/100ms
 Calculating -------------------------------------
-                  Qo     89.749k (±33.9%) i/s -    218.554k in   4.994715s
-             Qo Evil      5.573M (±36.3%) i/s -     19.644M in   5.096285s
-               DryRB      1.128M (±35.7%) i/s -      4.032M in   5.010975s
-             Vanilla      8.621M (±43.1%) i/s -     26.376M in   5.016513s
+                  Qo     92.028k (±37.0%) i/s -    203.205k in   4.997026s
+             Qo Evil      7.469M (±35.7%) i/s -     23.991M in   5.109930s
+               DryRB      1.358M (±33.1%) i/s -      4.849M in   4.996255s
+             Vanilla     10.226M (±40.6%) i/s -     28.061M in   4.997839s
 Warming up --------------------------------------
                   Qo     2.000  i/100ms
-             Qo Evil   429.000  i/100ms
-               DryRB    38.000  i/100ms
-             Vanilla   337.000  i/100ms
+             Qo Evil   678.000  i/100ms
+               DryRB    44.000  i/100ms
+             Vanilla   439.000  i/100ms
 Calculating -------------------------------------
-                  Qo     19.415  (±56.7%) i/s -     62.000  in   5.035733s
-             Qo Evil      4.903k (±28.2%) i/s -     21.879k in   5.170323s
-               DryRB    616.611  (±33.9%) i/s -      2.546k in   5.287227s
-             Vanilla      9.907k (±34.2%) i/s -     37.407k in   5.018701s
+                  Qo     39.811  (±42.7%) i/s -    130.000  in   5.033196s
+             Qo Evil      9.800k (±28.2%) i/s -     41.358k in   5.009820s
+               DryRB    661.954  (±38.5%) i/s -      2.508k in   5.017203s
+             Vanilla     11.648k (±30.4%) i/s -     46.534k in   5.024403s
 Warming up --------------------------------------
                   Qo     1.000  i/100ms
-             Qo Evil     1.000  i/100ms
-             Vanilla    74.000  i/100ms
+             Qo Evil    20.000  i/100ms
+             Vanilla   107.000  i/100ms
 Calculating -------------------------------------
-                  Qo     72.650  (±28.9%) i/s -    287.000  in   5.159415s
-             Qo Evil      1.167k (±17.0%) i/s -      4.447k in   4.977507s
-             Vanilla    961.709  (±29.2%) i/s -      4.144k in   5.053230s
+                  Qo    102.401  (±23.4%) i/s -    429.000  in   4.997456s
+             Qo Evil      1.436k (±26.1%) i/s -      5.620k in   5.009220s
+             Vanilla      1.229k (±18.6%) i/s -      5.778k in   5.063730s
 
 Single Item Tuple
 =================
@@ -37,10 +37,10 @@ Vanilla result: OK: 12345, ERR: ERR!
 
 
 Comparison:
-             Vanilla:  8621208.2 i/s
-             Qo Evil:  5573244.1 i/s - same-ish: difference falls within error
-               DryRB:  1128011.9 i/s - 7.64x  slower
-                  Qo:    89748.8 i/s - 96.06x  slower
+             Vanilla: 10225647.7 i/s
+             Qo Evil:  7468804.7 i/s - same-ish: difference falls within error
+               DryRB:  1358112.7 i/s - 7.53x  slower
+                  Qo:    92027.6 i/s - 111.12x  slower
 
 
 Large Tuple Collection
@@ -49,10 +49,10 @@ Large Tuple Collection
 
 
 Comparison:
-             Vanilla:     9907.1 i/s
-             Qo Evil:     4902.6 i/s - 2.02x  slower
-               DryRB:      616.6 i/s - 16.07x  slower
-                  Qo:       19.4 i/s - 510.29x  slower
+             Vanilla:    11647.7 i/s
+             Qo Evil:     9799.6 i/s - same-ish: difference falls within error
+               DryRB:      662.0 i/s - 17.60x  slower
+                  Qo:       39.8 i/s - 292.57x  slower
 
 
 Large Object Collection
@@ -61,7 +61,7 @@ Large Object Collection
 
 
 Comparison:
-             Qo Evil:     1167.3 i/s
-             Vanilla:      961.7 i/s - same-ish: difference falls within error
-                  Qo:       72.6 i/s - 16.07x  slower
+             Qo Evil:     1435.6 i/s
+             Vanilla:     1229.1 i/s - same-ish: difference falls within error
+                  Qo:      102.4 i/s - 14.02x  slower
 
