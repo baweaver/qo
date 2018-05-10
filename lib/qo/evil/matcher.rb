@@ -53,8 +53,6 @@ module Qo
 
         matchers = if @array_matchers.empty?
           if target.is_a?(Hash)
-            puts "Hash matches Hash" if @debug
-
             @keyword_matchers.map { |key, m|
               v = hash_hash_mapping(m, key)
 
@@ -72,8 +70,6 @@ module Qo
               "#{name} === target[#{typed_key}]"
             }
           else
-            puts "Hash matches Object"
-
             @keyword_matchers.map { |key, m|
               v = hash_object_mapping(m, key)
 
@@ -92,8 +88,6 @@ module Qo
           end
         else
           if target.is_a?(Array)
-            puts "Array matches Array" if @debug
-
             @array_matchers.each_with_index.map { |m, i|
               v = array_array_mapping(m, i, target)
 
@@ -110,8 +104,6 @@ module Qo
               "#{name} === target[#{i}]"
             }
           else
-            puts "Array matches Object" if @debug
-
             @array_matchers.map { |m|
               v = array_object_mapping(m)
 

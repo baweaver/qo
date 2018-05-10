@@ -213,8 +213,8 @@ end
 
 task :perf_pattern_match do
   require 'dry-matcher'
-  require 'pattern-match'
-  using PatternMatch
+  # require 'pattern-match'
+  # using PatternMatch
 
   # Match `[:ok, some_value]` for success
   success_case = Dry::Matcher::Case.new(
@@ -247,12 +247,12 @@ task :perf_pattern_match do
 
   qo_e_m = proc { |target| em.call(target) }
 
-  pm_m = proc { |target|
-    match(target) do
-      with(_[:ok, a]) { a }
-      with(_[:err, a]) { 'ERR!' }
-    end
-  }
+  # pm_m = proc { |target|
+  #   match(target) do
+  #     with(_[:ok, a]) { a }
+  #     with(_[:err, a]) { 'ERR!' }
+  #   end
+  # }
 
   # eg_m = Qo[:ok, :*]
 
@@ -280,9 +280,9 @@ task :perf_pattern_match do
       "OK: #{qo_e_m[ok_target]}, ERR: #{qo_e_m[err_target]}"
     },
 
-    'PatternMatch': -> {
-      "OK: #{pm_m[ok_target]}, ERR: #{pm_m[err_target]}"
-    },
+    # 'PatternMatch': -> {
+    #   "OK: #{pm_m[ok_target]}, ERR: #{pm_m[err_target]}"
+    # },
 
     'DryRB': -> {
       "OK: #{dm_m[ok_target]}, ERR: #{dm_m[err_target]}"
@@ -298,10 +298,43 @@ task :perf_pattern_match do
   run_benchmark('Large Tuple Collection', true,
     'Qo':           -> { collection.map(&qo_m) },
     'Qo Evil':      -> { collection.map(&qo_e_m) },
-    'PatternMatch': -> { collection.map(&pm_m) },
+    # 'PatternMatch': -> { collection.map(&pm_m) },
     'DryRB':        -> { collection.map(&dm_m) },
     'Vanilla':      -> { collection.map(&v_m) }
   )
+
+  Person = Struct.new(:name, :age)
+  people = [
+    Person.new('Robert', 22),
+    Person.new('Roberta', 22),
+    Person.new('Foo', 42),
+    Person.new('Bar', 17)
+  ] * 1_000
+
+  v_om = proc { |target|
+    if /^F/.match?(target.name) && (30..50).include?(target.age)
+      "It's foo!"
+    else
+      "Not foo"
+    end
+  }
+
+  qo_om = Qo.match(
+    Qo.m(name: /^F/, age: 30..50)  { "It's foo!" },
+    Qo.m(:*) { "Not foo" }
+  )
+
+  qo_e_om = Qo::Evil.match(
+    Qo::Evil.m(name: /^F/, age: 30..50)  { "It's foo!" },
+    Qo::Evil.m(:*) { "Not foo" }
+  )
+
+  run_benchmark('Large Object Collection', true,
+    'Qo':           -> { people.map(&qo_om) },
+    'Qo Evil':      -> { people.map(&qo_e_om) },
+    'Vanilla':      -> { people.map(&v_om) }
+  )
+
 end
 
 # Below this mark are mostly my experiments to see what features perform a bit better

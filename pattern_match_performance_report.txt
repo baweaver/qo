@@ -1,55 +1,67 @@
+Warming up --------------------------------------
+                  Qo   334.000  i/100ms
+             Qo Evil    42.648k i/100ms
+               DryRB    33.472k i/100ms
+             Vanilla    98.139k i/100ms
+Calculating -------------------------------------
+                  Qo     89.868k (±35.3%) i/s -    220.440k in   5.001338s
+             Qo Evil      6.103M (±32.2%) i/s -     19.703M in   4.997646s
+               DryRB      1.217M (±34.8%) i/s -      4.251M in   5.016126s
+             Vanilla      9.242M (±42.1%) i/s -     25.025M in   5.085387s
+Warming up --------------------------------------
+                  Qo     2.000  i/100ms
+             Qo Evil   316.000  i/100ms
+               DryRB    30.000  i/100ms
+             Vanilla   365.000  i/100ms
+Calculating -------------------------------------
+                  Qo     29.402  (±51.0%) i/s -     90.000  in   5.054029s
+             Qo Evil      3.855k (±29.9%) i/s -     15.800k in   5.022594s
+               DryRB    594.882  (±38.5%) i/s -      2.190k in   5.008171s
+             Vanilla     10.517k (±32.9%) i/s -     39.785k in   5.009173s
+Warming up --------------------------------------
+                  Qo     1.000  i/100ms
+             Qo Evil     7.000  i/100ms
+             Vanilla    98.000  i/100ms
+Calculating -------------------------------------
+                  Qo     92.475  (±24.9%) i/s -    385.000  in   5.000090s
+             Qo Evil      1.314k (±21.8%) i/s -      5.068k in   4.993952s
+             Vanilla      1.187k (±20.1%) i/s -      5.488k in   5.029405s
 
 Single Item Tuple
 =================
 
 Qo result: OK: 12345, ERR: ERR!
 Qo Evil result: OK: 12345, ERR: ERR!
-PatternMatch result: OK: 12345, ERR: ERR!
 DryRB result: OK: 12345, ERR: ERR!
 Vanilla result: OK: 12345, ERR: ERR!
 
-Warming up --------------------------------------
-                  Qo     3.845k i/100ms
-             Qo Evil    77.029k i/100ms
-        PatternMatch     1.218k i/100ms
-               DryRB    17.935k i/100ms
-             Vanilla   118.930k i/100ms
-Calculating -------------------------------------
-                  Qo     39.818k (± 3.1%) i/s -    199.940k in   5.026245s
-             Qo Evil    993.975k (± 2.0%) i/s -      5.007M in   5.039297s
-        PatternMatch     12.584k (± 2.9%) i/s -     63.336k in   5.037206s
-               DryRB    194.596k (± 2.4%) i/s -    986.425k in   5.072087s
-             Vanilla      1.686M (± 4.6%) i/s -      8.444M in   5.019942s
 
 Comparison:
-             Vanilla:  1686003.2 i/s
-             Qo Evil:   993974.7 i/s - 1.70x  slower
-               DryRB:   194596.2 i/s - 8.66x  slower
-                  Qo:    39817.8 i/s - 42.34x  slower
-        PatternMatch:    12584.1 i/s - 133.98x  slower
+             Vanilla:  9241800.2 i/s
+             Qo Evil:  6103108.1 i/s - same-ish: difference falls within error
+               DryRB:  1216506.9 i/s - 7.60x  slower
+                  Qo:    89868.0 i/s - 102.84x  slower
 
 
 Large Tuple Collection
 ======================
 
 
-Warming up --------------------------------------
-                  Qo     1.000  i/100ms
-             Qo Evil    85.000  i/100ms
-        PatternMatch     1.000  i/100ms
-               DryRB     8.000  i/100ms
-             Vanilla   267.000  i/100ms
-Calculating -------------------------------------
-                  Qo     20.299  (± 4.9%) i/s -    102.000  in   5.035577s
-             Qo Evil    900.064  (± 1.7%) i/s -      4.505k in   5.006615s
-        PatternMatch      6.312  (± 0.0%) i/s -     32.000  in   5.071741s
-               DryRB    112.015  (± 2.7%) i/s -    560.000  in   5.002137s
-             Vanilla      2.817k (± 2.9%) i/s -     14.151k in   5.027002s
 
 Comparison:
-             Vanilla:     2817.4 i/s
-             Qo Evil:      900.1 i/s - 3.13x  slower
-               DryRB:      112.0 i/s - 25.15x  slower
-                  Qo:       20.3 i/s - 138.80x  slower
-        PatternMatch:        6.3 i/s - 446.33x  slower
+             Vanilla:    10516.8 i/s
+             Qo Evil:     3854.9 i/s - 2.73x  slower
+               DryRB:      594.9 i/s - 17.68x  slower
+                  Qo:       29.4 i/s - 357.69x  slower
+
+
+Large Object Collection
+=======================
+
+
+
+Comparison:
+             Qo Evil:     1314.1 i/s
+             Vanilla:     1187.0 i/s - same-ish: difference falls within error
+                  Qo:       92.5 i/s - 14.21x  slower
 
