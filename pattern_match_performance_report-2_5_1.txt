@@ -1,0 +1,67 @@
+
+Single Item Tuple
+=================
+
+Qo result: OK: 12345, ERR: ERR!
+Qo Evil result: OK: 12345, ERR: ERR!
+DryRB result: OK: 12345, ERR: ERR!
+Vanilla result: OK: 12345, ERR: ERR!
+
+Warming up --------------------------------------
+                  Qo     3.376k i/100ms
+             Qo Evil    72.543k i/100ms
+               DryRB    16.416k i/100ms
+             Vanilla   111.906k i/100ms
+Calculating -------------------------------------
+                  Qo     35.887k (± 4.1%) i/s -    182.304k in   5.089746s
+             Qo Evil    929.878k (± 2.0%) i/s -      4.715M in   5.073112s
+               DryRB    177.232k (± 2.7%) i/s -    886.464k in   5.005576s
+             Vanilla      1.579M (± 2.1%) i/s -      7.945M in   5.033213s
+
+Comparison:
+             Vanilla:  1579322.8 i/s
+             Qo Evil:   929878.2 i/s - 1.70x  slower
+               DryRB:   177232.2 i/s - 8.91x  slower
+                  Qo:    35887.3 i/s - 44.01x  slower
+
+
+Large Tuple Collection
+======================
+
+
+Warming up --------------------------------------
+                  Qo     1.000  i/100ms
+             Qo Evil    80.000  i/100ms
+               DryRB     7.000  i/100ms
+             Vanilla   262.000  i/100ms
+Calculating -------------------------------------
+                  Qo     18.198  (±11.0%) i/s -     91.000  in   5.053820s
+             Qo Evil    848.093  (± 2.9%) i/s -      4.240k in   5.003916s
+               DryRB    100.687  (± 4.0%) i/s -    504.000  in   5.013154s
+             Vanilla      2.557k (± 4.8%) i/s -     12.838k in   5.031595s
+
+Comparison:
+             Vanilla:     2557.4 i/s
+             Qo Evil:      848.1 i/s - 3.02x  slower
+               DryRB:      100.7 i/s - 25.40x  slower
+                  Qo:       18.2 i/s - 140.53x  slower
+
+
+Large Object Collection
+=======================
+
+
+Warming up --------------------------------------
+                  Qo     2.000  i/100ms
+             Qo Evil    64.000  i/100ms
+             Vanilla   105.000  i/100ms
+Calculating -------------------------------------
+                  Qo     18.846  (±15.9%) i/s -     94.000  in   5.105415s
+             Qo Evil    619.874  (±14.4%) i/s -      3.072k in   5.081553s
+             Vanilla    919.732  (±13.0%) i/s -      4.515k in   5.005409s
+
+Comparison:
+             Vanilla:      919.7 i/s
+             Qo Evil:      619.9 i/s - 1.48x  slower
+                  Qo:       18.8 i/s - 48.80x  slower
+

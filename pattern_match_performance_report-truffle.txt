@@ -1,0 +1,67 @@
+Warming up --------------------------------------
+                  Qo   469.000  i/100ms
+             Qo Evil   152.276k i/100ms
+               DryRB    46.347k i/100ms
+             Vanilla   253.618k i/100ms
+Calculating -------------------------------------
+                  Qo     89.749k (±33.9%) i/s -    218.554k in   4.994715s
+             Qo Evil      5.573M (±36.3%) i/s -     19.644M in   5.096285s
+               DryRB      1.128M (±35.7%) i/s -      4.032M in   5.010975s
+             Vanilla      8.621M (±43.1%) i/s -     26.376M in   5.016513s
+Warming up --------------------------------------
+                  Qo     2.000  i/100ms
+             Qo Evil   429.000  i/100ms
+               DryRB    38.000  i/100ms
+             Vanilla   337.000  i/100ms
+Calculating -------------------------------------
+                  Qo     19.415  (±56.7%) i/s -     62.000  in   5.035733s
+             Qo Evil      4.903k (±28.2%) i/s -     21.879k in   5.170323s
+               DryRB    616.611  (±33.9%) i/s -      2.546k in   5.287227s
+             Vanilla      9.907k (±34.2%) i/s -     37.407k in   5.018701s
+Warming up --------------------------------------
+                  Qo     1.000  i/100ms
+             Qo Evil     1.000  i/100ms
+             Vanilla    74.000  i/100ms
+Calculating -------------------------------------
+                  Qo     72.650  (±28.9%) i/s -    287.000  in   5.159415s
+             Qo Evil      1.167k (±17.0%) i/s -      4.447k in   4.977507s
+             Vanilla    961.709  (±29.2%) i/s -      4.144k in   5.053230s
+
+Single Item Tuple
+=================
+
+Qo result: OK: 12345, ERR: ERR!
+Qo Evil result: OK: 12345, ERR: ERR!
+DryRB result: OK: 12345, ERR: ERR!
+Vanilla result: OK: 12345, ERR: ERR!
+
+
+Comparison:
+             Vanilla:  8621208.2 i/s
+             Qo Evil:  5573244.1 i/s - same-ish: difference falls within error
+               DryRB:  1128011.9 i/s - 7.64x  slower
+                  Qo:    89748.8 i/s - 96.06x  slower
+
+
+Large Tuple Collection
+======================
+
+
+
+Comparison:
+             Vanilla:     9907.1 i/s
+             Qo Evil:     4902.6 i/s - 2.02x  slower
+               DryRB:      616.6 i/s - 16.07x  slower
+                  Qo:       19.4 i/s - 510.29x  slower
+
+
+Large Object Collection
+=======================
+
+
+
+Comparison:
+             Qo Evil:     1167.3 i/s
+             Vanilla:      961.7 i/s - same-ish: difference falls within error
+                  Qo:       72.6 i/s - 16.07x  slower
+
