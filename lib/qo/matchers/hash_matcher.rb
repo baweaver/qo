@@ -65,7 +65,6 @@ module Qo
       # @return [Boolean] Match status
       private def match_hash_value?(target, match_key, matcher)
         return false unless target.key?(match_key)
-        return true if wildcard_match?(matcher)
 
         return hash_recurse(target[match_key], matcher) if target.is_a?(Hash) && matcher.is_a?(Hash)
 
@@ -83,7 +82,6 @@ module Qo
       private def match_object_value?(target, match_property, matcher)
         return false unless target.respond_to?(match_property)
 
-        wildcard_match?(matcher) ||
         hash_method_case_match?(target, match_property, matcher)
       end
 

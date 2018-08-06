@@ -28,4 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "redcarpet"
+
+  spec.add_runtime_dependency "any", '0.1.0'
 end

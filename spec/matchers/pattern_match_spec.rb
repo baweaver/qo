@@ -5,7 +5,7 @@ RSpec.describe Qo::Matchers::PatternMatch do
     [
       Qo::Matchers::GuardBlockMatcher.new(1) { |v| v + 4 },
       Qo::Matchers::GuardBlockMatcher.new(2) { |v| v * 2 },
-      Qo::Matchers::GuardBlockMatcher.new(:*),
+      Qo::Matchers::GuardBlockMatcher.new(Any),
     ]
   end
 
@@ -59,10 +59,10 @@ RSpec.describe Qo::Matchers::PatternMatch do
     context 'When working with numbers' do
       let(:pattern_match) {
         Qo.match(
-          Qo.m(10..15, :*)       { |a, b| a * b },
+          Qo.m(10..15, Any)       { |a, b| a * b },
           Qo.m(:even?, :odd?)    { |a, b| b - a },
           Qo.m(Integer, Integer) { |a, b| a + b },
-          Qo.m(:*)
+          Qo.m(Any)
         )
       }
 
@@ -86,10 +86,10 @@ RSpec.describe Qo::Matchers::PatternMatch do
     context 'When working with Strings' do
       let(:pattern_match) {
         Qo.match(
-          Qo.m(/foo/, :*) { |a, b| a + b },
+          Qo.m(/foo/, Any) { |a, b| a + b },
 
           Qo.m(
-            Qo.or(/ba/, /baz/), :*
+            Qo.or(/ba/, /baz/), Any
           ) { |a, b| "#{a} really likes #{b}" },
 
           Qo.m(String, :empty?) { |a, b| "Well you're no fun #{a}, givin me a blank!" }

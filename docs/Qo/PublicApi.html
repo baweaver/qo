@@ -180,7 +180,7 @@ disappointment from the creator.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#match-instance_method" title="#match (instance method)">#<strong>match</strong>(*args)  &#x21d2; Qo::PatternMatch | Any </a>
+      <a href="#match-instance_method" title="#match (instance method)">#<strong>match</strong>(*args, &amp;fn)  &#x21d2; Qo::PatternMatchBlock, ... </a>
     
 
     
@@ -391,7 +391,7 @@ a false match.</p>
       <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='kw'>and</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>and</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>and</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -401,7 +401,7 @@ a false match.</p>
       <div class="method_details ">
   <h3 class="signature " id="match-instance_method">
   
-    #<strong>match</strong>(*args)  &#x21d2; <tt>Qo::PatternMatch | Any</tt> 
+    #<strong>match</strong>(*args, &amp;fn)  &#x21d2; <tt>Qo::PatternMatchBlock</tt>, ... 
   
 
   
@@ -422,6 +422,23 @@ associated matcher&#39;s block function.</p>
 <div class="tags">
   <p class="tag_title">Parameters:</p>
 <ul class="param">
+  
+    <li>
+      
+        <span class='name'>fn</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If provided, the pattern match will become block-style, utilizing
+PatternMatchBlock instead. If any args are provided, the first
+will be treated as the target.</p>
+</div>
+      
+    </li>
   
     <li>
       
@@ -446,12 +463,41 @@ associated matcher&#39;s block function.</p>
     <li>
       
       
-        <span class='type'>(<tt>Qo::PatternMatch | Any</tt>)</span>
+        <span class='type'>(<tt>Qo::PatternMatchBlock</tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>Returns a PatternMatch waiting for a target, or an evaluated PatternMatch response</p>
+        <div class='inline'><p>If a value is not provided, a block style pattern match will be returned
+that responds to proc coercion. It can be used for functions like <code>map</code>.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Qo::PatternMatch</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If a value is not provided and no function is present, a PatternMatch
+will be returned, awaiting a value to match against.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Any</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If a value is provided, matchers will attempt to call through on it,
+returning the result of the function.</p>
 </div>
       
     </li>
@@ -479,19 +525,31 @@ associated matcher&#39;s block function.</p>
       <pre class="lines">
 
 
-90
-91
-92
-93
-94
-95
-96
-97</pre>
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 90</span>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 104</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span>
+      <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/PatternMatchBlock.html" title="Qo::Matchers::PatternMatchBlock (class)">PatternMatchBlock</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/PatternMatchBlock.html#initialize-instance_method" title="Qo::Matchers::PatternMatchBlock#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span> <span class='op'>:</span>
+      <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/PatternMatchBlock.html" title="Qo::Matchers::PatternMatchBlock (class)">PatternMatchBlock</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/PatternMatchBlock.html#initialize-instance_method" title="Qo::Matchers::PatternMatchBlock#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Matchers/PatternMatchBlock.html#call-instance_method" title="Qo::Matchers::PatternMatchBlock#call (method)">call</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
   <span class='kw'>if</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/GuardBlockMatcher.html" title="Qo::Matchers::GuardBlockMatcher (class)">GuardBlockMatcher</a></span></span><span class='rparen'>)</span>
     <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/PatternMatch.html" title="Qo::Matchers::PatternMatch (class)">PatternMatch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/PatternMatch.html#initialize-instance_method" title="Qo::Matchers::PatternMatch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='kw'>else</span>
@@ -737,7 +795,7 @@ a true match.</p>
       <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='kw'>not</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>not</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>not</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -845,7 +903,7 @@ a true match.</p>
       <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='kw'>or</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>or</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>or</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -857,9 +915,9 @@ a true match.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Apr 15 20:29:44 2018 by
+  Generated on Sun Aug  5 20:52:10 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.12 (ruby-2.4.4).
+  0.9.12 (ruby-2.5.1).
 </div>
 
     </div>

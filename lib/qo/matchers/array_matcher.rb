@@ -76,7 +76,6 @@ module Qo
       #
       # @return [Boolean] Match status
       private def match_value?(target, matcher)
-        wildcard_match?(matcher) ||
         case_match?(target, matcher) ||
         method_matches?(target, matcher)
       end

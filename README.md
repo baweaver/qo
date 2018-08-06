@@ -30,6 +30,9 @@ Fast forward a few months and I kind of wanted to make it real, so here it is. I
 
 ## Usage
 
+Note that Qo uses the [Any](https://www.github.com/baweaver/any) gem for wildcard matching. Any will respond true to any `==` or `===` query against it,
+and is included in the gem.
+
 ### Quick Start
 
 Qo is used for pattern matching in Ruby. All Qo matchers respond to `===` and `to_proc` meaning they can be used with `case` and Enumerable functions alike:
@@ -37,7 +40,7 @@ Qo is used for pattern matching in Ruby. All Qo matchers respond to `===` and `t
 
 ```ruby
 case ['Foo', 42]
-when Qo[:*, 42] then 'Truly the one answer'
+when Qo[Any, 42] then 'Truly the one answer'
 else nil
 end
 
@@ -56,13 +59,13 @@ The original style
 name_longer_than_three      = -> person { person.name.size > 3 }
 people_with_truncated_names = people.map(&Qo.match(
   Qo.m(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) },
-  Qo.m(:*) # Identity function, catch-all
+  Qo.m(Any) # Identity function, catch-all
 ))
 
 # And standalone like a case:
 Qo.match(people.first,
   Qo.m(age: 10..19) { |person| "#{person.name} is a teen that's #{person.age} years old" },
-  Qo.m(:*) { |person| "#{person.name} is #{person.age} years old" }
+  Qo.m(Any) { |person| "#{person.name} is #{person.age} years old" }
 )
 ```
 
@@ -130,16 +133,16 @@ people_objects = [
 
 ### 1 - Wildcard Matching
 
-Qo has a concept of a Wildcard, `:*`, which will match against any value
+Qo has a concept of a Wildcard, `Any`, which will match against any value
 
 ```ruby
-Qo[:*, :*] === ['Robert', 22] # true
+Qo[Any, Any] === ['Robert', 22] # true
 ```
 
 A single wildcard will match anything, and can frequently be used as an always true:
 
 ```ruby
-Qo[:*] === :literally_anything_here
+Qo[Any] === :literally_anything_here
 ```
 
 ### 2 - Array Matching
@@ -156,63 +159,40 @@ This gives us the `and` matcher shorthand for array matchers.
 
 When an Array matcher is run against an Array, it will compare elements by index in the following priority:
 
-1. Was a wildcard provided?
-2. Does it case match (`===`)?
-3. Does it have a predicate method by that name that matches?
+1. Does it case match (`===`)?
+2. Does it have a predicate method by that name that matches?
 
 This functionality is left biased and permissive, meaning that if the right side of the argument is longer it will ignore those items in the match. If it's shorter? Not so much.
 
-##### 2.1.1 - Wildcard provided
-
-```ruby
-# Standalone
-
-Qo[:*, :*] === ['Robert', 22]
-# => true
-
-# Case statement
-
-case ['Roberta', 22]
-when Qo[:*, :*] then 'it matched'
-else 'will not ever be reached'
-end
-# => 'it matched'
-
-# Select
-
-people_arrays.select(&Qo[:*, :*])
-# => [['Robert', 22], ['Roberta', 22], ['Foo', 42], ['Bar', 18]]
-```
-
-##### 2.1.2 - Case Match present
+##### 2.1.1 - Case Match present
 
 We've seen some case matching so far with `Range` and `Regex`:
 
 ```ruby
 # Standalone
 
-Qo[/Rob/, :*] === ['Robert', 22]
+Qo[/Rob/, Any] === ['Robert', 22]
 # => true
 
 # Case statement
 
 case ['Roberta', 22]
-when Qo[:*, 0..9] then 'child'
-when Qo[:*, 10..19] then 'teen'
-when Qo[:*, 20..99] then 'adult'
+when Qo[Any, 0..9] then 'child'
+when Qo[Any, 10..19] then 'teen'
+when Qo[Any, 20..99] then 'adult'
 else 'not sure'
 end
 # => 'adult'
 
 # Select
 
-people_arrays.select(&Qo[:*, 10..19])
+people_arrays.select(&Qo[Any, 10..19])
 # => [['Bar', 18]]
 ```
 
-##### 2.1.3 - Predicate Method matched
+##### 2.1.2 - Predicate Method matched
 
-If no wildcard or case match is found, it will attempt to see if a predicate method by the same name exists, call it, and check the result:
+If no case match is found, it will attempt to see if a predicate method by the same name exists, call it, and check the result:
 
 ```ruby
 dirty_values = [nil, '', true]
@@ -225,14 +205,14 @@ Qo[:nil?] === [nil]
 # Case statement
 
 case ['Roberta', nil]
-when Qo[:*, :nil?] then 'no age'
+when Qo[Any, :nil?] then 'no age'
 else 'not sure'
 end
 # => 'no age'
 
 # Select
 
-people_arrays.select(&Qo[:*, :even?])
+people_arrays.select(&Qo[Any, :even?])
 # => [["Robert", 22], ["Roberta", 22], ["Foo", 42], ["Bar", 18]]
 ```
 
@@ -240,21 +220,12 @@ people_arrays.select(&Qo[:*, :even?])
 
 When an Array matcher is matched against anything other than an Array it will follow the priority:
 
-1. Was a wildcard provided?
 2. Does it case match (`===`)?
 3. Does it have a predicate method by that name that matches?
 
 Every argument provided will be run against the target object.
 
-##### 2.2.1 - Wildcard provided
-
-A wildcard in an Array to Object match is functionally an always true, but can be used as such:
-
-```ruby
-Qo[:*] === :literally_anything_here
-```
-
-##### 2.2.2 - Case Match present
+##### 2.2.1 - Case Match present
 
 ```ruby
 # Standalone
@@ -270,7 +241,7 @@ Qo[Integer, 15..25] === 20
 # => [10, "string"]
 ```
 
-##### 2.2.3 - Predicate Method matched
+##### 2.2.2 - Predicate Method matched
 
 Now this is where some of the fun starts in
 
@@ -302,10 +273,9 @@ end
 
 1. Does the key exist on the other hash?
 2. Are the match value and match target hashes?
-3. Was a wildcard value provided?
-4. Does the target object's value case match against the match value?
-5. Does the target object's value predicate match against the match value?
-6. What about the String version of the match key? Abort if it can't coerce.
+3. Does the target object's value case match against the match value?
+4. Does the target object's value predicate match against the match value?
+5. What about the String version of the match key? Abort if it can't coerce.
 
 ##### 3.1.1 - Key present
 
@@ -352,16 +322,7 @@ Qo.or(a: {
 })
 ```
 
-##### 3.1.3 - Wildcard provided
-
-As with other wildcards, if the value matched against is a wildcard it'll always get through:
-
-```ruby
-Qo[name: :*] === {name: 'Foo'}
-# => true
-```
-
-##### 3.1.4 - Case match present
+##### 3.1.3 - Case match present
 
 If a case match is present for the key, it'll try and compare:
 
@@ -386,7 +347,7 @@ people_hashes.select(&Qo[age: 15..25])
 # => [{:name=>"Robert", :age=>22}, {:name=>"Roberta", :age=>22}, {:name=>"Bar", :age=>18}]
 ```
 
-##### 3.1.5 - Predicate match present
+##### 3.1.4 - Predicate match present
 
 Much like our array friend above, if a predicate style method is present see if it'll work
 
@@ -413,26 +374,21 @@ people_hashes.reject(&Qo[age: :nil?])
 
 Careful though, if the key doesn't exist that won't match. I'll have to consider this one later.
 
-##### 3.1.6 - String variant present
+##### 3.1.5 - String variant present
 
 Coerces the key into a string if possible, and sees if that can provide a valid case match
 
 #### 3.2 - Hash matched against an Object
 
 1. Does the object respond to the match key?
-2. Was a wildcard value provided?
-3. Does the result of sending the match key as a method case match the provided value?
-4. Does a predicate method exist for it?
+2. Does the result of sending the match key as a method case match the provided value?
+3. Does a predicate method exist for it?
 
 ##### 3.2.1 - Responds to match key
 
 If it doesn't know how to deal with it, false out.
 
-##### 3.2.2 - Wildcard provided
-
-Same as other wildcards, but if the object doesn't respond to the method you specify it'll have false'd out before it reaches here.
-
-##### 3.2.3 - Case match present
+##### 3.2.2 - Case match present
 
 This is where we can get into some interesting code, much like the hash selections above
 
@@ -456,7 +412,7 @@ people_objects.select(&Qo[name: /Rob/])
 # => [Person(Robert, 22), Person(Roberta, 22)]
 ```
 
-##### 3.2.4 - Predicate match present
+##### 3.2.3 - Predicate match present
 
 ```ruby
 # Standalone
@@ -484,16 +440,16 @@ This is where I start going a bit off into the weeds. We're going to try and get
 
 ```ruby
 Qo.match(['Robert', 22],
-  Qo.m(:*, 20..99) { |n, a| "#{n} is an adult that is #{a} years old" },
-  Qo.m(:*)
+  Qo.m(Any, 20..99) { |n, a| "#{n} is an adult that is #{a} years old" },
+  Qo.m(Any)
 )
 # => "Robert is an adult that is 22 years old"
 ```
 
 ```ruby
 Qo.match(people_objects.first,
-  Qo.m(name: :*, age: 20..99) { |person| "#{person.name} is an adult that is #{person.age} years old" },
-  Qo.m(:*)
+  Qo.m(name: Any, age: 20..99) { |person| "#{person.name} is an adult that is #{person.age} years old" },
+  Qo.m(Any)
 )
 ```
 
@@ -514,7 +470,7 @@ people_objects.map(&Qo.match(
     person.name = person.name[0..2]
     person
   },
-  Qo.m(:*)
+  Qo.m(Any)
 ))
 
 # => [Person(age: 22, name: "Rob"), Person(age: 22, name: "Rob"), Person(age: 42, name: "Foo"), Person(age: 17, name: "Bar")]
@@ -619,7 +575,7 @@ HTTP responses.
 def get_url(url)
   Net::HTTP.get_response(URI(url)).yield_self(&Qo.match(
     Qo.m(Net::HTTPSuccess) { |response| response.body.size },
-    Qo.m(:*)               { |response| raise response.message }
+    Qo.m(Any)              { |response| raise response.message }
   ))
 end
 

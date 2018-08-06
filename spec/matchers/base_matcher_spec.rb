@@ -38,12 +38,6 @@ RSpec.describe Qo::Matchers::BaseMatcher do
       end
     end
 
-    describe '#wildcard_match?' do
-      it 'will check if the provided value matches the WILDCARD' do
-        expect(qo_matcher.send(:wildcard_match?, :*)).to eq(true)
-      end
-    end
-
     describe '#case_match?' do
       it 'wraps ===' do
         expect(qo_matcher.send(:case_match?, 'foobar', /foo/)).to eq(true)

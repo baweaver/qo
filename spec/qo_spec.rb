@@ -24,14 +24,14 @@ RSpec.describe Qo do
   # Specific tests against match and RHA assignment, not Unit
   describe '#match' do
     it 'will use identity for empty function matches' do
-      result = Qo.match(people.first, Qo.m(:*))
+      result = Qo.match(people.first, Qo.m(Any))
 
       expect(result).to eq(people.first)
     end
 
     it 'will send the matching object into a match node function' do
       result = Qo.match(people.first,
-        Qo.m(:*) { |person| person.name }
+        Qo.m(Any) { |person| person.name }
       )
 
       expect(result).to eq(people.first.name)
@@ -39,7 +39,7 @@ RSpec.describe Qo do
 
     it 'will work with procs like sane Ruby too' do
       result = Qo.match(people.first,
-        Qo.m(:*, &:name)
+        Qo.m(Any, &:name)
       )
 
       expect(result).to eq(people.first.name)
@@ -64,7 +64,7 @@ RSpec.describe Qo do
     # if you're really so inclined.
     it 'can deconstruct hash to hash matches' do
       result = Qo.match(people.first.to_h,
-        Qo.m(name: :*, age: 22) { |name:, age:| age + 1 }
+        Qo.m(name: Any, age: 22) { |name:, age:| age + 1 }
       )
 
       expect(result).to eq(23)
@@ -86,7 +86,7 @@ RSpec.describe Qo do
         end
 
         it 'can recognize wildcards' do
-          expect(Qo[/Rob/, :*] === matched_array).to eq(true)
+          expect(Qo[/Rob/, Any] === matched_array).to eq(true)
         end
 
         it 'can be used for select with triple equals respondant values' do
@@ -121,7 +121,7 @@ RSpec.describe Qo do
               ]
             }
 
-            let(:query) { Qo[:*, 18..25] }
+            let(:query) { Qo[Any, 18..25] }
 
             it 'can be used with #select' do
               expect(
@@ -160,7 +160,7 @@ RSpec.describe Qo do
       let(:matched_hash) { {name: 'Foo', age: 42} }
 
       it 'can match a hash to a hash' do
-        expect(Qo[name: /^F/, age: :*] === matched_hash).to eq(true)
+        expect(Qo[name: /^F/, age: Any] === matched_hash).to eq(true)
       end
 
       it 'can find matching hashes in an array' do

@@ -50,13 +50,13 @@ RSpec.describe Qo::Matchers::HashMatcher do
     describe '#match_hash_value' do
       it 'will return false unless the key is present in the other hash' do
         expect(
-          qo_matcher.send(:match_hash_value?, {a: 1}, :b, :*)
+          qo_matcher.send(:match_hash_value?, {a: 1}, :b, Any)
         ).to eq(false)
       end
 
       it 'will return true on a wildcard match' do
         expect(
-          qo_matcher.send(:match_hash_value?, {a: 1}, :a, :*)
+          qo_matcher.send(:match_hash_value?, {a: 1}, :a, Any)
         ).to eq(true)
       end
 
@@ -84,13 +84,13 @@ RSpec.describe Qo::Matchers::HashMatcher do
     describe '#match_object_value?' do
       it 'will return false unless the target responds to the match property' do
         expect(
-          qo_matcher.send(:match_object_value?, person, :nope, :*)
+          qo_matcher.send(:match_object_value?, person, :nope, Any)
         ).to eq(false)
       end
 
       it 'will return true for a wildcard match' do
         expect(
-          qo_matcher.send(:match_object_value?, person, :name, :*)
+          qo_matcher.send(:match_object_value?, person, :name, Any)
         ).to eq(true)
       end
 

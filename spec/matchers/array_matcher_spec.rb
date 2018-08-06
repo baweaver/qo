@@ -49,7 +49,7 @@ RSpec.describe Qo::Matchers::ArrayMatcher do
   describe 'Private API' do
     describe '#match_value?' do
       it 'will wildcard match' do
-        expect(qo_matcher.send(:match_value?, 1, :*)).to eq(true)
+        expect(qo_matcher.send(:match_value?, 1, Any)).to eq(true)
       end
 
       it 'will case match' do

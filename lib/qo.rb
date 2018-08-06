@@ -1,3 +1,6 @@
+# Wildcard matching
+require 'any'
+
 require "qo/version"
 
 # Matchers
@@ -18,8 +21,6 @@ require 'qo/exceptions'
 require 'qo/public_api'
 
 module Qo
-  WILDCARD_MATCH = :*
-
   extend Qo::Exceptions
   extend Qo::Helpers
   extend Qo::PublicApi

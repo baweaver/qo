@@ -66,18 +66,6 @@ module Qo
         collection.all?(&fn)
       end
 
-      # Wraps wildcard in case we want to do anything fun with it later
-      #
-      # @param value [Any] Value to test against the wild card
-      #
-      # @note The rescue is because some classes override `==` to do silly things,
-      #       like IPAddr, and I kinda want to use that.
-      #
-      # @return [Boolean]
-      private def wildcard_match?(value)
-        value == WILDCARD_MATCH rescue false
-      end
-
       # Wraps a case equality statement to make it a bit easier to read. The
       # typical left bias of `===` can be confusing reading down a page, so
       # more of a clarity thing than anything. Also makes for nicer stack traces.
