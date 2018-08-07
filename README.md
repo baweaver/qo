@@ -52,42 +52,50 @@ How about some pattern matching? There are two styles:
 
 #### Pattern Match
 
-The original style
+##### Case Statements
+
+Qo case statements work much like a Ruby case statement, except in that they leverage
+the full power of Qo matchers behind the scenes.
 
 ```ruby
 # How about some "right-hand assignment" pattern matching
-name_longer_than_three      = -> person { person.name.size > 3 }
-people_with_truncated_names = people.map(&Qo.match(
-  Qo.m(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) },
-  Qo.m(Any) # Identity function, catch-all
-))
+name_longer_than_three = -> person { person.name.size > 3 }
 
-# And standalone like a case:
-Qo.match(people.first,
-  Qo.m(age: 10..19) { |person| "#{person.name} is a teen that's #{person.age} years old" },
-  Qo.m(Any) { |person| "#{person.name} is #{person.age} years old" }
-)
-```
+person_with_truncated_name = Qo.case(people.first) { |m|
+  m.when(name_longer_than_three) { |person|
+    Person.new(person.name[0..2], person.age)
+  }
 
-#### Pattern Match Block
-
-The new style, likely to take over in `v1.0.0` after testing:
-
-```ruby
-name_longer_than_three      = -> person { person.name.size > 3 }
-people_with_truncated_names = people.map(&Qo.match { |m|
-  m.when(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) }
-  m.else(&:itself)
-})
-
-# And standalone like a case:
-Qo.match(people.first) { |m|
-  m.when(age: 10..19) { |person| "#{person.name} is a teen that's #{person.age} years old" }
-  m.else { |person| "#{person.name} is #{person.age} years old" }
+  m.else
 }
 ```
 
-(More details coming on the difference and planned 1.0.0 APIs)
+It takes in a value directly, and returns the result, much like a case statement.
+
+Note that if `else` receives no block, it will default to an identity function
+(`{ |v| v }`). If no else is provided and there's no match, you'll get back a nil.
+You can write this out if you wish.
+
+##### Match Statements
+
+Match statements are like case statements, except in that they don't directly take
+a value to match against. They're waiting for a value to come in later from
+something else.
+
+```ruby
+name_longer_than_three = -> person { person.name.size > 3 }
+
+people_with_truncated_names = people.map(&Qo.match { |m|
+  m.when(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) }
+  m.else
+})
+
+# And standalone like a case:
+Qo.match { |m|
+  m.when(age: 10..19) { |person| "#{person.name} is a teen that's #{person.age} years old" }
+  m.else { |person| "#{person.name} is #{person.age} years old" }
+}.call(people.first)
+```
 
 ### Qo'isms
 
@@ -439,18 +447,18 @@ people_hashes.select(&Qo[age: :nil?])
 This is where I start going a bit off into the weeds. We're going to try and get RHA style pattern matching in Ruby.
 
 ```ruby
-Qo.match(['Robert', 22],
-  Qo.m(Any, 20..99) { |n, a| "#{n} is an adult that is #{a} years old" },
-  Qo.m(Any)
-)
+Qo.case(['Robert', 22]) { |m|
+  m.when(Any, 20..99) { |n, a| "#{n} is an adult that is #{a} years old" }
+  m.else
+}
 # => "Robert is an adult that is 22 years old"
 ```
 
 ```ruby
-Qo.match(people_objects.first,
-  Qo.m(name: Any, age: 20..99) { |person| "#{person.name} is an adult that is #{person.age} years old" },
-  Qo.m(Any)
-)
+Qo.case(people_objects.first) { |m|
+  m.when(name: Any, age: 20..99) { |person| "#{person.name} is an adult that is #{person.age} years old" }
+  m.else
+}
 ```
 
 In this case it's trying to do a few things:
@@ -460,18 +468,14 @@ In this case it's trying to do a few things:
 
 If no block function is provided, it assumes an identity function (`-> v { v }`) instead. If no match is found, `nil` will be returned.
 
-If an initial target is not furnished, the matcher will become a curried proc awaiting a target. In more simple terms it just wants a target to run against, so let's give it a few with map:
-
 ```ruby
 name_longer_than_three = -> person { person.name.size > 3 }
 
-people_objects.map(&Qo.match(
-  Qo.m(name_longer_than_three) { |person|
-    person.name = person.name[0..2]
-    person
-  },
-  Qo.m(Any)
-))
+people_objects.map(&Qo.match { |m|
+  m.when(name_longer_than_three) { |person| Person.new(person.name[0..2], person.age) }
+
+  m.else
+})
 
 # => [Person(age: 22, name: "Rob"), Person(age: 22, name: "Rob"), Person(age: 42, name: "Foo"), Person(age: 17, name: "Bar")]
 ```
@@ -516,6 +520,8 @@ Qo.count_by([1,2,3,2,2,2,1], &:even?)
 #   true  => 4
 # }
 ```
+
+This feature may be added to Ruby 2.6+: https://bugs.ruby-lang.org/issues/11076
 
 ### 5 - Hacky Fun Time
 
@@ -573,10 +579,10 @@ HTTP responses.
 
 ```ruby
 def get_url(url)
-  Net::HTTP.get_response(URI(url)).yield_self(&Qo.match(
-    Qo.m(Net::HTTPSuccess) { |response| response.body.size },
-    Qo.m(Any)              { |response| raise response.message }
-  ))
+  Net::HTTP.get_response(URI(url)).yield_self(&Qo.match { |m|
+    m.when(Net::HTTPSuccess) { |response| response.body.size },
+    m.else                   { |response| raise response.message }
+  })
 end
 
 get_url('https://github.com/baweaver/qo')
@@ -590,7 +596,7 @@ The difference between this and case? Well, the first is you can pass this to
 be used in there, including predicate and content checks on the body:
 
 ```ruby
-Qo.m(Net::HTTPSuccess, body: /Qo/)
+m.when(Net::HTTPSuccess, body: /Qo/)
 ```
 
 You could put as many checks as you want in there, or use different Qo matchers
@@ -617,11 +623,11 @@ The nice thing about Unix style commands is that they use headers, which means C
 ```ruby
 rows = CSV.new(`df -h`, col_sep: " ", headers: true).read.map(&:to_h)
 
-rows.map(&Qo.match(
-  Qo.m(Avail: /Gi$/) { |row|
+rows.map(&Qo.match { |m|
+  m.when(Avail: /Gi$/) { |row|
     "#{row['Filesystem']} mounted on #{row['Mounted']} [#{row['Avail']} / #{row['Size']}]"
   }
-)).compact
+}).compact
 # => ["/dev/***** mounted on / [186Gi / 466Gi]"]
 ```
 

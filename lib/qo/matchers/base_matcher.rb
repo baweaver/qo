@@ -22,10 +22,12 @@ module Qo
     # @since 0.2.0
     #
     class BaseMatcher
-      def initialize(type, *array_matchers, **keyword_matchers)
-        @array_matchers   = array_matchers
-        @keyword_matchers = keyword_matchers
-        @type             = type
+      def initialize(type, array_matchers, keyword_matchers)
+        @type = type
+
+        @full_matcher = array_matchers.empty? ?
+          Qo::Matchers::HashMatcher.new(type, keyword_matchers) :
+          Qo::Matchers::ArrayMatcher.new(type, array_matchers)
       end
 
       # Converts a Matcher to a proc for use in querying, such as:
@@ -34,9 +36,7 @@ module Qo
       #
       # @return [Proc[Any]]
       def to_proc
-        @array_matchers.empty? ?
-          Qo::Matchers::HashMatcher.new(@type, **@keyword_matchers).to_proc :
-          Qo::Matchers::ArrayMatcher.new(@type, *@array_matchers).to_proc
+        @full_matcher.to_proc
       end
 
       # You can directly call a matcher as well, much like a Proc,
@@ -46,7 +46,7 @@ module Qo
       #
       # @return [Boolean] Result of the match
       def call(target)
-        self.to_proc.call(target)
+        @full_matcher.call(target)
       end
 
       alias_method :===, :call
@@ -60,10 +60,12 @@ module Qo
       #
       # @return [Boolean] Result of the match
       private def match_with(collection, &fn)
-        return collection.any?(&fn)  if @type == 'or'
-        return collection.none?(&fn) if @type == 'not'
-
-        collection.all?(&fn)
+        case @type
+        when 'and' then collection.all?(&fn)
+        when 'or'  then collection.any?(&fn)
+        when 'not' then collection.none?(&fn)
+        else false
+        end
       end
 
       # Wraps a case equality statement to make it a bit easier to read. The

@@ -27,19 +27,6 @@ module Qo
       end
     end
 
-    # In the case of a Pattern Match, we need to ensure all arguments are
-    # GuardBlockMatchers.
-    #
-    # @author baweaver
-    # @since 0.2.0
-    #
-    class NotAllGuardMatchersProvided < ArgumentError
-      def to_s
-        "All provided matchers must be of type Qo::Matchers::GuardBlockMatcher " +
-        "defined with `Qo.matcher` or `Qo.m` instead of regular matchers."
-      end
-    end
-
     # In the case of a Pattern Match, we should only have one "else" clause
     #
     # @author baweaver

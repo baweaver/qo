@@ -5,7 +5,7 @@ RSpec.describe Qo::Matchers::BaseMatcher do
   let(:array_matchers) { [] }
   let(:keyword_matchers) { {} }
 
-  let(:qo_matcher) { Qo::Matchers::BaseMatcher.new(type, *array_matchers, **keyword_matchers) }
+  let(:qo_matcher) { Qo::Matchers::BaseMatcher.new(type, array_matchers, keyword_matchers) }
 
   describe '#initialize' do
     it 'can be created' do
@@ -23,7 +23,7 @@ RSpec.describe Qo::Matchers::BaseMatcher do
     it 'attempts to call its child proc' do
       expect(qo_matcher).to receive(:to_proc).and_return(Proc.new { |v| v })
 
-      expect(qo_matcher.call(1)).to eq(1)
+      expect(qo_matcher.to_proc.call(1)).to eq(1)
     end
   end
 

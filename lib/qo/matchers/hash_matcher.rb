@@ -26,6 +26,11 @@ module Qo
     # @since 0.2.0
     #
     class HashMatcher < BaseMatcher
+      def initialize(type, keyword_matchers)
+        @keyword_matchers = keyword_matchers
+        @type             = type
+      end
+
       # Wrapper around call to allow for invocation in an Enumerable function,
       # such as:
       #
@@ -95,6 +100,7 @@ module Qo
       # @return [Boolean]
       private def hash_case_match?(target, match_key, matcher)
         return true if case_match?(target[match_key], matcher)
+        return false unless target.keys.first.is_a?(String)
 
         match_key.respond_to?(:to_s) &&
         target.key?(match_key.to_s) &&

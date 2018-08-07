@@ -4,7 +4,7 @@ RSpec.describe Qo::Matchers::ArrayMatcher do
   let(:type) { 'and' }
   let(:array_matchers) { [1] }
 
-  let(:qo_matcher) { Qo::Matchers::ArrayMatcher.new(type, *array_matchers) }
+  let(:qo_matcher) { Qo::Matchers::ArrayMatcher.new(type, array_matchers) }
 
   describe '#initialize' do
     it 'can be created' do

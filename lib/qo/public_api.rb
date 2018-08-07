@@ -15,8 +15,11 @@ module Qo
     # must pass to be considered a "match". It will short-circuit in the case of
     # a false match.
     #
-    # @param *array_matchers    [Array] Array-like conditionals
-    # @param **keyword_matchers [Hash]  Keyword style conditionals
+    # @param *array_matchers [Array]
+    #   Array-like conditionals
+    #
+    # @param **keyword_matchers [Hash]
+    #   Keyword style conditionals
     #
     # @return [Proc[Any]]
     #     Any -> Bool # Given a target, will return if it "matches"
@@ -31,8 +34,11 @@ module Qo
     # must pass to be considered a "match". It will short-circuit in the case of
     # a true match.
     #
-    # @param *array_matchers    [Array] Array-like conditionals
-    # @param **keyword_matchers [Hash]  Keyword style conditionals
+    # @param *array_matchers [Array]
+    #   Array-like conditionals
+    #
+    # @param **keyword_matchers [Hash]
+    #   Keyword style conditionals
     #
     # @return [Proc[Any]]
     #     Any -> Bool # Given a target, will return if it "matches"
@@ -44,8 +50,11 @@ module Qo
     # should pass to be considered a "match". It will short-circuit in the case of
     # a true match.
     #
-    # @param *array_matchers    [Array] Array-like conditionals
-    # @param **keyword_matchers [Hash]  Keyword style conditionals
+    # @param *array_matchers [Array]
+    #   Array-like conditionals
+    #
+    # @param **keyword_matchers [Hash]
+    #   Keyword style conditionals
     #
     # @return [Proc[Any]]
     #     Any -> Bool # Given a target, will return if it "matches"
@@ -53,90 +62,74 @@ module Qo
       create_matcher('not', array_matchers, keyword_matchers)
     end
 
-    # Creates a Guard Block matcher.
+    # A pattern match will try and run all guard block style matchers in sequence
+    # until it finds one that "matches". Once found, it will pass the target
+    # into the associated matcher's block function.
     #
-    # A guard block matcher is used to guard a function from running unless
-    # the left-hand matcher passes. Once called with a value, it will either
-    # return `[false, false]` or `[true, Any]`.
-    #
-    # This wrapping is done to preserve intended false or nil responses,
-    # and is unwrapped with match below.
-    #
-    # @param *array_matchers    [Array] varargs matchers
-    # @param **keyword_matchers [Hash]  kwargs matchers
-    # @param &fn                [Proc]  Guarded function
-    #
-    # @return [Proc[Any]]
-    #     Any -> Proc[Any]
-    def matcher(*array_matchers, **keyword_matchers, &fn)
-      Qo::Matchers::GuardBlockMatcher.new(*array_matchers, **keyword_matchers, &fn)
-    end
-
-    # Might be a tinge fond of shorthand
-    alias_method :m, :matcher
-
-    # "Curried" function that waits for a target, or evaluates immediately if given
-    # one.
-    #
-    # A PatternMatch will try and run all GuardBlock matchers in sequence until
-    # it finds one that "matches". Once found, it will pass the target into the
-    # associated matcher's block function.
+    # @example
+    #   [1,2,3].map(&Qo.match { |m|
+    #     m.when(:even?) { |v| v * 3 }
+    #     m.else         { |v| v - 1 }
+    #   })
+    #   => [0, 6, 2]
     #
     # @param fn [Proc]
-    #   If provided, the pattern match will become block-style, utilizing
-    #   PatternMatchBlock instead. If any args are provided, the first
-    #   will be treated as the target.
-    #
-    # @param *args [Array[Any, *GuardBlockMatcher]]
-    #   Collection of matchers to run, potentially prefixed by a target object
-    #
-    # @return [Qo::PatternMatchBlock]
-    #   If a value is not provided, a block style pattern match will be returned
-    #   that responds to proc coercion. It can be used for functions like `map`.
+    #   Body of the matcher, as shown in examples
     #
     # @return [Qo::PatternMatch]
-    #   If a value is not provided and no function is present, a PatternMatch
-    #   will be returned, awaiting a value to match against.
+    #   A function awaiting a value to match against
+    def match(&fn)
+      return proc { false } unless block_given?
+
+      Qo::Matchers::PatternMatch.new(&fn)
+    end
+
+    # Similar to the common case statement of Ruby, except in that it behaves
+    # as if `Array#===` and `Hash#===` exist in the form of Qo matchers.
+    #
+    # @note
+    #   I refer to the potential 2.6+ features currently being discussed here:
+    #
+    #   * `Hash#===`  - https://bugs.ruby-lang.org/issues/14869
+    #   * `Array#===` - https://bugs.ruby-lang.org/issues/14916
+    #
+    # @see Qo#match
+    #
+    # @example
+    #   Qo.case([1, 1]) { |m|
+    #     m.when(Any, Any) { |a, b| a + b }
+    #     m.else { |v| v }
+    #   }
+    #   => 2
+    #
+    # @param value [Any]
+    #   Value to match against
+    #
+    # @param &fn [Proc]
+    #   Body of the matcher, as shown above
     #
     # @return [Any]
-    #   If a value is provided, matchers will attempt to call through on it,
-    #   returning the result of the function.
-    def match(*args, &fn)
-      if block_given?
-        return args.empty? ?
-          Qo::Matchers::PatternMatchBlock.new(&fn) :
-          Qo::Matchers::PatternMatchBlock.new(&fn).call(args.first)
-      end
-
-      if args.first.is_a?(Qo::Matchers::GuardBlockMatcher)
-        Qo::Matchers::PatternMatch.new(*args)
-      else
-        match_target, *qo_matchers = args
-        Qo::Matchers::PatternMatch.new(*qo_matchers).call(match_target)
-      end
+    #   The result of calling a pattern match with a provided value
+    def case(value, &fn)
+      Qo::Matchers::PatternMatch.new(&fn).call(value)
     end
 
     # Abstraction for creating a matcher, allowing for common error handling scenarios.
     #
-    # @param type [String] Type of matcher
-    # @param *array_matchers [Array] Array-like conditionals
-    # @param **keyword_matchers [Hash] Keyword style conditionals
+    # @param type [String]
+    #   Type of matcher
     #
-    # @raises Qo::Exceptions::NoMatchersProvided
-    # @raises Qo::Exceptions::MultipleMatchersProvided
+    # @param array_matchers [Array[Any]]
+    #   Array-like conditionals
+    #
+    # @param keyword_matchers [Hash[Any, Any]]
+    #   Keyword style conditionals
     #
     # @return [Qo::Matcher]
     private def create_matcher(type, array_matchers, keyword_matchers)
-      array_empty, hash_empty = array_matchers.empty?, keyword_matchers.empty?
+      raise MultipleMatchersProvided if !array_matchers.empty? && !keyword_matchers.empty?
 
-      raise Qo::NoMatchersProvided       if array_empty && hash_empty
-      raise Qo::MultipleMatchersProvided if !(array_empty || hash_empty)
-
-      if hash_empty
-        Qo::Matchers::ArrayMatcher.new(type, *array_matchers)
-      else
-        Qo::Matchers::HashMatcher.new(type, **keyword_matchers)
-      end
+      Qo::Matchers::BaseMatcher.new(type, array_matchers, keyword_matchers)
     end
   end
 end

@@ -5,7 +5,7 @@ RSpec.describe Qo::Matchers::GuardBlockMatcher do
   let(:keyword_matchers) { {} }
   let(:fn) { -> v { v } }
 
-  let(:qo_matcher) { Qo::Matchers::GuardBlockMatcher.new(*array_matchers, **keyword_matchers, &fn) }
+  let(:qo_matcher) { Qo::Matchers::GuardBlockMatcher.new(array_matchers, keyword_matchers, &fn) }
 
   describe '#initialize' do
     it 'can be created' do

@@ -5,8 +5,11 @@ module Qo
     # @note This method will attempt to coerce path segments to Symbols
     #       if unsuccessful in first dig.
     #
-    # @param path_map       [String] Dot-delimited path
-    # @param expected_value [Any]    Matcher
+    # @param path_map [String]
+    #   Dot-delimited path
+    #
+    # @param expected_value [Any]
+    #   Matcher
     #
     # @return [Proc]
     #     Hash -> Bool # Status of digging against the hash
@@ -22,10 +25,14 @@ module Qo
     # Counts by a function. This is entirely because I hackney this everywhere in
     # pry anyways, so I want a function to do it for me already.
     #
-    # @param targets [Array[Any]] Targets to count
-    # @param &fn     [Proc]       Function to define count key
+    # @param targets [Array[Any]]
+    #   Targets to count
     #
-    # @return [Hash[Any, Integer]] Counts
+    # @param &fn [Proc]
+    #   Function to define count key
+    #
+    # @return [Hash[Any, Integer]]
+    #   Counts
     def count_by(targets, &fn)
       fn ||= -> v { v }
 

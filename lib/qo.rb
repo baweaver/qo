@@ -11,7 +11,6 @@ require 'qo/matchers/guard_block_matcher'
 
 # Meta Matchers
 require 'qo/matchers/pattern_match'
-require 'qo/matchers/pattern_match_block'
 
 # Helpers
 require 'qo/helpers'
@@ -21,6 +20,9 @@ require 'qo/exceptions'
 require 'qo/public_api'
 
 module Qo
+  # Identity function that returns its argument directly
+  IDENTITY = -> v { v }
+
   extend Qo::Exceptions
   extend Qo::Helpers
   extend Qo::PublicApi
