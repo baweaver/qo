@@ -89,6 +89,24 @@ module Qo
         @else = fn || Qo::IDENTITY
       end
 
+      def success(*array_matchers, **keyword_matchers, &fn)
+        @matchers << Qo::Matchers::TypedGuardBlockMatcher.new(
+          :ok,
+          array_matchers,
+          keyword_matchers,
+          &(fn || Qo::IDENTITY)
+        )
+      end
+
+      def failure(*array_matchers, **keyword_matchers, &fn)
+        @matchers << Qo::Matchers::TypedGuardBlockMatcher.new(
+          :err,
+          array_matchers,
+          keyword_matchers,
+          &(fn || Qo::IDENTITY)
+        )
+      end
+
       # Proc version of a PatternMatch
       #
       # @return [Proc]
@@ -118,6 +136,9 @@ module Qo
 
         nil
       end
+
+      alias_method :===, :call
+      alias_method :[], :call
     end
   end
 end

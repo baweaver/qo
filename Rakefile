@@ -19,13 +19,13 @@ task :default => :spec
 #       "anything can be a key" bit of Ruby.
 #
 # @return [Unit] StdOut
-def run_benchmark(title, **benchmarks)
+def run_benchmark(title, quiet = false, **benchmarks)
   puts '', title, '=' * title.size, ''
 
   # Validation
   benchmarks.each do |benchmark_name, benchmark_fn|
     puts "#{benchmark_name} result: #{benchmark_fn.call()}"
-  end
+  end unless quiet
 
   puts
 
@@ -145,6 +145,107 @@ task :perf do
       people.select(&Qo.and(name: /Rob/, age: 15..25))
     }
   )
+end
+
+task :perf_pattern_match do
+  require 'dry-matcher'
+
+  # Match `[:ok, some_value]` for success
+  success_case = Dry::Matcher::Case.new(
+    match:   -> value { value.first == :ok },
+    resolve: -> value { value.last }
+  )
+
+  # Match `[:err, some_error_code, some_value]` for failure
+  failure_case = Dry::Matcher::Case.new(
+    match: -> value, *pattern {
+      value[0] == :err && (pattern.any? ? pattern.include?(value[1]) : true)
+    },
+    resolve: -> value { value.last }
+  )
+
+  # Build the matcher
+  matcher = Dry::Matcher.new(success: success_case, failure: failure_case)
+
+  qo_m = Qo.match { |m|
+    m.success(Any) { |v| v }
+    m.failure(Any) { "ERR!" }
+  }
+
+  qo_m_case = proc { |target|
+    Qo.case(target) { |m|
+      m.success(Any) { |v| v }
+      m.failure(Any) { "ERR!" }
+    }
+  }
+
+  dm_m = proc { |target|
+    matcher.(target) do |m|
+      m.success { |(v)| v }
+      m.failure { 'ERR!' }
+    end
+  }
+
+  # v_m = proc { |target|
+  #   next target[1] if target[0] == :ok
+  #   'ERR!'
+  # }
+
+  ok_target  = [:ok, 12345]
+  err_target = [:err, "OH NO!"]
+
+  run_benchmark('Single Item Tuple',
+    'Qo': -> {
+      "OK: #{qo_m[ok_target]}, ERR: #{qo_m[err_target]}"
+    },
+
+    'Qo Case': -> {
+      "OK: #{qo_m_case[ok_target]}, ERR: #{qo_m_case[err_target]}"
+    },
+
+    'DryRB': -> {
+      "OK: #{dm_m[ok_target]}, ERR: #{dm_m[err_target]}"
+    },
+
+    # 'Vanilla': -> {
+    #   "OK: #{v_m[ok_target]}, ERR: #{v_m[err_target]}"
+    # },
+  )
+
+  collection = [ok_target, err_target] * 2_000
+
+  run_benchmark('Large Tuple Collection', true,
+    'Qo':           -> { collection.map(&qo_m)      },
+    'Qo Case':      -> { collection.map(&qo_m_case) },
+    'DryRB':        -> { collection.map(&dm_m)      },
+    # 'Vanilla':      -> { collection.map(&v_m) }
+  )
+
+  # Person = Struct.new(:name, :age)
+  # people = [
+  #   Person.new('Robert', 22),
+  #   Person.new('Roberta', 22),
+  #   Person.new('Foo', 42),
+  #   Person.new('Bar', 17)
+  # ] * 1_000
+
+  # v_om = proc { |target|
+  #   if /^F/.match?(target.name) && (30..50).include?(target.age)
+  #     "It's foo!"
+  #   else
+  #     "Not foo"
+  #   end
+  # }
+
+  # qo_om = Qo.match { |m|
+  #   m.when(name: /^F/, age: 30..50)  { "It's foo!" }
+  #   m.else { "Not foo" }
+  # }
+
+  # run_benchmark('Large Object Collection', true,
+  #   'Qo':           -> { people.map(&qo_om) },
+  #   'Vanilla':      -> { people.map(&v_om) }
+  # )
 end
 
 # Below this mark are mostly my experiments to see what features perform a bit better
