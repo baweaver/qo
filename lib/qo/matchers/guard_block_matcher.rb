@@ -32,6 +32,32 @@ module Qo
         super('and', array_matchers, keyword_matchers)
       end
 
+      # Direct test of whether or not a target matches the GuardBlock's
+      # condition
+      #
+      # @param target [Any]
+      #   Target value to match against
+      #
+      # @return [Boolean]
+      #   Whether or not the target matched
+      def match?(target)
+        super(target)
+      end
+
+      # Forces a resolution of a match. Note that this method should
+      # not be used outside of pattern matches, as only a pattern
+      # match will have the necessary additional context to call
+      # it correctly.
+      #
+      # @param target [Any]
+      #   Target value to match against
+      #
+      # @return [Any]
+      #   Result of the function being called on the target
+      def match(target)
+        @fn.call(target)
+      end
+
       # Overrides the base matcher's #to_proc to wrap the value in a status
       # and potentially call through to the associated block if a base
       # matcher would have passed

@@ -121,8 +121,6 @@ RSpec.describe Qo do
     # far more of a Rubyism than a Qo'ism. You could also play default args here
     # if you're really so inclined.
     it 'can deconstruct hash to hash matches' do
-      p people.first
-
       result = Qo.case(people.first.to_h) { |m|
         m.when(name: Any, age: 22) { |name:, age:| age + 1 }
       }

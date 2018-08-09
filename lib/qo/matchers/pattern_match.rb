@@ -89,24 +89,6 @@ module Qo
         @else = fn || Qo::IDENTITY
       end
 
-      def success(*array_matchers, **keyword_matchers, &fn)
-        @matchers << Qo::Matchers::TypedGuardBlockMatcher.new(
-          :ok,
-          array_matchers,
-          keyword_matchers,
-          &(fn || Qo::IDENTITY)
-        )
-      end
-
-      def failure(*array_matchers, **keyword_matchers, &fn)
-        @matchers << Qo::Matchers::TypedGuardBlockMatcher.new(
-          :err,
-          array_matchers,
-          keyword_matchers,
-          &(fn || Qo::IDENTITY)
-        )
-      end
-
       # Proc version of a PatternMatch
       #
       # @return [Proc]
@@ -128,8 +110,8 @@ module Qo
       #   No matches were found, so nothing is returned
       def call(target)
         @matchers.each { |guard_block_matcher|
-          did_match, match_result = guard_block_matcher.call(target)
-          return match_result if did_match
+          next unless guard_block_matcher.match?(target)
+          return guard_block_matcher.match(target)
         }
 
         return @else.call(target) if @else

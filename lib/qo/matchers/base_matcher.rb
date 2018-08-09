@@ -51,6 +51,7 @@ module Qo
 
       alias_method :===, :call
       alias_method :[],  :call
+      alias_method :match?,  :call
 
       # Runs the relevant match method against the given collection with the
       # given matcher function.

@@ -148,6 +148,9 @@ task :perf do
 end
 
 task :perf_pattern_match do
+  # Going to redefine the way that success and fail happen in here.
+  return false
+
   require 'dry-matcher'
 
   # Match `[:ok, some_value]` for success
