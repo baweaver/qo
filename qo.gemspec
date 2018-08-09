@@ -28,7 +28,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "redcarpet"
+
+  # Testing compatability with DryRB gems
   spec.add_development_dependency "dry-matcher"
+  spec.add_development_dependency "dry-monads"
 
   spec.add_runtime_dependency "any", '0.1.0'
 end

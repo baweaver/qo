@@ -16,14 +16,14 @@ require 'qo/matchers/pattern_match'
 require 'qo/helpers'
 
 # Public API
-require 'qo/exceptions'
-require 'qo/public_api'
+require 'qo/api/exceptions'
+require 'qo/api/public'
 
 module Qo
   # Identity function that returns its argument directly
   IDENTITY = -> v { v }
 
-  extend Qo::Exceptions
-  extend Qo::Helpers
-  extend Qo::PublicApi
+  extend Qo::Api::Exceptions
+  extend Qo::Api::Helpers
+  extend Qo::Api::PublicApi
 end

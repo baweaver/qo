@@ -1,7 +1,7 @@
 require 'qo/exceptions'
 
 module Qo
-  module Matchers
+  module PatternMatchers
     # Creates a PatternMatch in a succinct block format:
     #
     # ```ruby
@@ -39,7 +39,7 @@ module Qo
     # @author baweaver
     # @since 0.3.0
     #
-    class PatternMatch
+    class BasePatternMatch
       def initialize
         @matchers = []
 
