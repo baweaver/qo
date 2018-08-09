@@ -14,6 +14,14 @@ module Qo
     # # => true
     # ```
     #
+    # It should be noted that arrays of dissimilar size will result in an instant
+    # false return value. If you wish to do a single value match, simply use the
+    # provided `Any` type as such:
+    #
+    # ```ruby
+    # array.select(&Any)
+    # ```
+    #
     # In the case of an Array matching against an Object, it will match each provided
     # matcher against the object.
     #
@@ -33,6 +41,11 @@ module Qo
     # @since 0.2.0
     #
     class ArrayMatcher < BaseMatcher
+      def initialize(type, array_matchers)
+        @array_matchers = array_matchers
+        @type           = type
+      end
+
       # Wrapper around call to allow for invocation in an Enumerable function,
       # such as:
       #
@@ -59,6 +72,8 @@ module Qo
         return true if @array_matchers == target
 
         if target.is_a?(::Array)
+          return false unless target.size == @array_matchers.size
+
           match_with(@array_matchers.each_with_index) { |matcher, i|
             match_value?(target[i], matcher)
           }

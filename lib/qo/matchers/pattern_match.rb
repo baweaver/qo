@@ -2,71 +2,94 @@ require 'qo/exceptions'
 
 module Qo
   module Matchers
-    # Creates a PatternMatch, which will evaluate once given a match target.
+    # Creates a PatternMatch in a succinct block format:
     #
-    # Each GuardBlockMatcher given will be run in sequence until a "match" is
-    # located. Once that condition is met, it will call the associated block
-    # function of that GuardBlockMatcher with the match target.
-    #
-    # This is done as an effort to emulate Right Hand Assignment seen in other
-    # functionally oriented languages pattern matching systems. Most notably this
-    # is done in Scala: (https://docs.scala-lang.org/tour/pattern-matching.html)
-    #
-    # ```scala
-    # notification match {
-    #   case Email(email, title, _) =>
-    #     s"You got an email from $email with title: $title"
-    #
-    #   case SMS(number, message) =>
-    #     s"You got an SMS from $number! Message: $message"
-    #
-    #   case VoiceRecording(name, link) =>
-    #     s"You received a Voice Recording from $name! Click the link to hear it: $link"
-    #
-    #   case other => other
+    # ```ruby
+    # Qo.match(target) { |m|
+    #   m.when(/^F/, 42) { |(name, age)| "#{name} is #{age}" }
+    #   m.else { "We need a default, right?" }
     # }
     # ```
     #
-    # Qo will instead pipe the entire matched object, and might look something like this:
+    # The Public API obscures the fact that the matcher is only called when it
+    # is explicitly given an argument to match against. If it is not, it will
+    # just return a class waiting for a target, as such:
     #
     # ```ruby
-    # # Assuming notification is in the form of a tuple
+    # def get_url(url)
+    #   Net::HTTP.get_response(URI(url)).yield_self(&Qo.match { |m|
+    #     m.when(Net::HTTPSuccess) { |response| response.body.size }
+    #     m.else { |response| raise response.message }
+    #   })
+    # end
     #
-    # Qo.match(notification,
-    #   Qo.m(EMAIL_REGEX, String, :*) { |email, title, _|
-    #     "You got an email from #{email} with title: #{title}"
-    #   },
-    #
-    #   Qo.m(PHONE_REGEX, String) { |number, message, _|
-    #     "You got an SMS from #{number}! Message: #{message}"
-    #   },
-    #
-    #   Qo.m(String, LINK_REGEX) { |name, link, _|
-    #     "You received a Voice Recording from #{name}! Click the link to hear it: #{link}"
-    #   },
-    #
-    #   Qo.m(:*)
-    # )
+    # get_url('https://github.com/baweaver/qo')
+    # # => 142387
+    # get_url('https://github.com/baweaver/qo/does_not_exist')
+    # # => RuntimeError: Not Found
     # ```
     #
-    # Efforts to emulate the case class mechanic may be present in later versions,
-    # but for now the associated performance penalty may be too steep to consider.
+    # This is intended for flexibility between singular calls and calls as a
+    # paramater to higher order functions like `map` and `yield_self`.
     #
-    # We'll evaluate those options in a few experiments later.
+    # This variant was inspired by ideas from Scala, Haskell, and various Ruby
+    # libraries dealing with Async and self-yielding blocks. Especially notable
+    # were websocket handlers and dry-ruby implementations.
     #
     # @author baweaver
-    # @since 0.2.0
+    # @since 0.3.0
     #
     class PatternMatch
-      def initialize(*matchers)
-        raise Qo::Exceptions::NotAllGuardMatchersProvided unless matchers.all? { |q|
-          q.is_a?(Qo::Matchers::GuardBlockMatcher)
-        }
+      def initialize
+        @matchers = []
 
-        @matchers = matchers
+        yield(self)
       end
 
-      # Function return of a PatternMatch waiting for a target to run
+      # Creates a match case. This is the exact same as any other `and` style
+      # match reflected in the public API, except that it's a Guard Block
+      # match being performed. That means if the left side matches, the right
+      # side function is invoked and that value is returned.
+      #
+      # @param *array_matchers [Array[Any]]
+      #   Array style matchers
+      #
+      # @param **keyword_matchers [Hash[Any, Any]]
+      #   Hash style matchers
+      #
+      # @param &fn [Proc]
+      #   If matched, this function will be called. If no function is provided
+      #   Qo will default to identity
+      #
+      # @return [Array[GuardBlockMatcher]]
+      #   The return of this method should not be directly depended on, but will
+      #   provide all matchers currently present. This will likely be left for
+      #   ease of debugging later.
+      def when(*array_matchers, **keyword_matchers, &fn)
+        @matchers << Qo::Matchers::GuardBlockMatcher.new(
+          array_matchers,
+          keyword_matchers,
+          &(fn || Qo::IDENTITY)
+        )
+      end
+
+      # Else is the last statement that will be evaluated if all other parts
+      # fail. It should be noted that it won't magically appear, you have to
+      # explicitly put an `else` case in for it to catch on no match unless
+      # you want a `nil` return
+      #
+      # @param &fn [Proc]
+      #   Function to call when all other matches have failed. If no value is
+      #   provided, it assumes `Qo::IDENTITY` which will return the value given.
+      #
+      # @return [Proc]
+      def else(&fn)
+        raise Qo::Exceptions::MultipleElseClauses if @else
+
+        @else = fn || Qo::IDENTITY
+      end
+
+      # Proc version of a PatternMatch
       #
       # @return [Proc]
       #     Any -> Any | nil
@@ -80,15 +103,24 @@ module Qo
       #   Target to run against and pipe to the associated block if it
       #   "matches" any of the GuardBlocks
       #
-      # @return [Any | nil] Result of the piped block, or nil on a miss
+      # @return [Any]
+      #   Result of the piped block
+      #
+      # @return [nil]
+      #   No matches were found, so nothing is returned
       def call(target)
         @matchers.each { |guard_block_matcher|
-          did_match, match_result = guard_block_matcher.call(target)
-          return match_result if did_match
+          next unless guard_block_matcher.match?(target)
+          return guard_block_matcher.match(target)
         }
+
+        return @else.call(target) if @else
 
         nil
       end
+
+      alias_method :===, :call
+      alias_method :[], :call
     end
   end
 end

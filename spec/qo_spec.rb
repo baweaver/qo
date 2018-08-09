@@ -24,37 +24,41 @@ RSpec.describe Qo do
   # Specific tests against match and RHA assignment, not Unit
   describe '#match' do
     it 'will use identity for empty function matches' do
-      result = Qo.match(people.first, Qo.m(Any))
+      result = Qo.match { |m|
+        m.else { |v| v }
+      }.call(people.first)
 
       expect(result).to eq(people.first)
     end
 
     it 'will send the matching object into a match node function' do
-      result = Qo.match(people.first,
-        Qo.m(Any) { |person| person.name }
-      )
+      result = Qo.match { |m|
+        m.when(Any) { |person| person.name }
+      }.call(people.first)
 
       expect(result).to eq(people.first.name)
     end
 
     it 'will work with procs like sane Ruby too' do
-      result = Qo.match(people.first,
-        Qo.m(Any, &:name)
-      )
+      result = Qo.match { |m|
+        m.when(Any, &:name)
+      }.call(people.first)
 
       expect(result).to eq(people.first.name)
     end
 
     it 'will return nil if nothing is found' do
-      result = Qo.match(people.first, Qo.m(:non_existant_method))
+      result = Qo.match { |m|
+        m.when(:non_existant_method)
+      }.call(people.first)
 
       expect(result).to eq(nil)
     end
 
     it 'can deconstruct array to array matches' do
-      result = Qo.match(people_arrays.first,
-        Qo.m(String, Integer) { |name, age| "#{name} is #{age} years old" }
-      )
+      result = Qo.match { |m|
+        m.when(String, Integer) { |name, age| "#{name} is #{age} years old" }
+      }.call(people_arrays.first)
 
       expect(result).to eq("Robert is 22 years old")
     end
@@ -63,9 +67,63 @@ RSpec.describe Qo do
     # far more of a Rubyism than a Qo'ism. You could also play default args here
     # if you're really so inclined.
     it 'can deconstruct hash to hash matches' do
-      result = Qo.match(people.first.to_h,
-        Qo.m(name: Any, age: 22) { |name:, age:| age + 1 }
-      )
+      result = Qo.match { |m|
+        m.when(name: Any, age: 22) { |name:, age:| age + 1 }
+      }.call(people.first.to_h)
+
+      expect(result).to eq(23)
+    end
+  end
+
+  # Specific tests against match and RHA assignment, not Unit
+  describe '#match' do
+    it 'will use identity for empty function matches' do
+      result = Qo.case(people.first) { |m|
+        m.else { |v| v }
+      }
+
+      expect(result).to eq(people.first)
+    end
+
+    it 'will send the matching object into a match node function' do
+      result = Qo.case(people.first) { |m|
+        m.when(Any) { |person| person.name }
+      }
+
+      expect(result).to eq(people.first.name)
+    end
+
+    it 'will work with procs like sane Ruby too' do
+      result = Qo.case(people.first) { |m|
+        m.when(Any, &:name)
+      }
+
+      expect(result).to eq(people.first.name)
+    end
+
+    it 'will return nil if nothing is found' do
+      result = Qo.case(people.first) { |m|
+        m.when(:non_existant_method)
+      }
+
+      expect(result).to eq(nil)
+    end
+
+    it 'can deconstruct array to array matches' do
+      result = Qo.case(people_arrays.first) { |m|
+        m.when(String, Integer) { |name, age| "#{name} is #{age} years old" }
+      }
+
+      expect(result).to eq("Robert is 22 years old")
+    end
+
+    # _technically_ it can. You still need to specify all the params and this is
+    # far more of a Rubyism than a Qo'ism. You could also play default args here
+    # if you're really so inclined.
+    it 'can deconstruct hash to hash matches' do
+      result = Qo.case(people.first.to_h) { |m|
+        m.when(name: Any, age: 22) { |name:, age:| age + 1 }
+      }
 
       expect(result).to eq(23)
     end

@@ -1,27 +1,17 @@
 require "spec_helper"
 
 RSpec.describe Qo::Matchers::PatternMatch do
-  let(:guard_matchers) do
-    [
-      Qo::Matchers::GuardBlockMatcher.new(1) { |v| v + 4 },
-      Qo::Matchers::GuardBlockMatcher.new(2) { |v| v * 2 },
-      Qo::Matchers::GuardBlockMatcher.new(Any),
-    ]
+  let(:pattern_match) do
+    Qo::Matchers::PatternMatch.new { |m|
+      m.when(1) { |v| v + 4 }
+      m.when(2) { |v| v * 2 }
+      m.else    { |v| v }
+    }
   end
-
-  let(:pattern_match) { Qo::Matchers::PatternMatch.new(*guard_matchers) }
 
   describe '#initialize' do
     it 'can be created' do
       expect(pattern_match).to be_a(Qo::Matchers::PatternMatch)
-    end
-
-    context 'When passed a non-guard matcher' do
-      let(:guard_matchers) { [Qo[1]] }
-
-      it 'will fail' do
-        expect { pattern_match }.to raise_error(Qo::Exceptions::NotAllGuardMatchersProvided)
-      end
     end
   end
 
@@ -43,7 +33,7 @@ RSpec.describe Qo::Matchers::PatternMatch do
     end
 
     context 'When no default matchers are given' do
-      let(:guard_matchers) { [] }
+      let(:pattern_match) { Qo::Matchers::PatternMatch.new { |m| } }
 
       it 'will return nil' do
         expect(pattern_match.call(1)).to eq(nil)
@@ -58,12 +48,12 @@ RSpec.describe Qo::Matchers::PatternMatch do
   describe '[Examples]' do
     context 'When working with numbers' do
       let(:pattern_match) {
-        Qo.match(
-          Qo.m(10..15, Any)       { |a, b| a * b },
-          Qo.m(:even?, :odd?)    { |a, b| b - a },
-          Qo.m(Integer, Integer) { |a, b| a + b },
-          Qo.m(Any)
-        )
+        Qo.match { |m|
+          m.when(10..15, Any)      { |a, b| a * b }
+          m.when(:even?, :odd?)    { |a, b| b - a }
+          m.when(Integer, Integer) { |a, b| a + b }
+          m.else { |v| v }
+        }
       }
 
       it 'will match the first case with 11 and 5' do
@@ -85,15 +75,15 @@ RSpec.describe Qo::Matchers::PatternMatch do
 
     context 'When working with Strings' do
       let(:pattern_match) {
-        Qo.match(
-          Qo.m(/foo/, Any) { |a, b| a + b },
+        Qo.match { |m|
+          m.when(/foo/, Any) { |a, b| a + b }
 
-          Qo.m(
+          m.when(
             Qo.or(/ba/, /baz/), Any
-          ) { |a, b| "#{a} really likes #{b}" },
+          ) { |a, b| "#{a} really likes #{b}" }
 
-          Qo.m(String, :empty?) { |a, b| "Well you're no fun #{a}, givin me a blank!" }
-        )
+          m.when(String, :empty?) { |a, b| "Well you're no fun #{a}, givin me a blank!" }
+        }
       }
 
       it 'will match the first with foo and anything else' do

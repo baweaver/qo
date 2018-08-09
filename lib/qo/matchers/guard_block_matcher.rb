@@ -10,9 +10,9 @@ module Qo
     # you're going to want to read that documentation first.
     #
     # @example
-    #     Qo::Matchers::GuardBlockMatcher == Qo.matcher == Qo.m
+    #     Qo::Matchers::GuardBlockMatcher
     #
-    #     guard_matcher = Qo.m(Integer) { |v| v * 2 }
+    #     guard_matcher = Qo::Matchers::GuardBlockMatcher.new(Integer) { |v| v * 2 }
     #     guard_matcher.call(1)  # => [true, 2]
     #     guard_matcher.call(:x) # => [false, false]
     #
@@ -23,28 +23,68 @@ module Qo
     # @since 0.1.5
     #
     class GuardBlockMatcher < BaseMatcher
-      # Identity function that returns its argument directly
-      IDENTITY  = -> v { v }
-
       # Definition of a non-match
       NON_MATCH = [false, false]
 
-      def initialize(*array_matchers, **keyword_matchers, &fn)
-        @fn = fn || IDENTITY
+      def initialize(array_matchers, keyword_matchers, &fn)
+        @fn = fn || Qo::IDENTITY
 
-        super('and', *array_matchers, **keyword_matchers)
+        super('and', array_matchers, keyword_matchers)
+      end
+
+      # Direct test of whether or not a target matches the GuardBlock's
+      # condition
+      #
+      # @param target [Any]
+      #   Target value to match against
+      #
+      # @return [Boolean]
+      #   Whether or not the target matched
+      def match?(target)
+        super(target)
+      end
+
+      # Forces a resolution of a match. Note that this method should
+      # not be used outside of pattern matches, as only a pattern
+      # match will have the necessary additional context to call
+      # it correctly.
+      #
+      # @param target [Any]
+      #   Target value to match against
+      #
+      # @return [Any]
+      #   Result of the function being called on the target
+      def match(target)
+        @fn.call(target)
       end
 
       # Overrides the base matcher's #to_proc to wrap the value in a status
       # and potentially call through to the associated block if a base
       # matcher would have passed
       #
-      # @return [Proc[Any] - (Bool, Any)]
-      #   (status, result) tuple
+      # @see Qo::Matchers::GuardBlockMatcher#call
+      #
+      # @return [Proc[Any]]
+      #   Function awaiting target value
       def to_proc
-        Proc.new { |target|
-          super[target] ? [true, @fn.call(target)] : NON_MATCH
-        }
+        Proc.new { |target| self.call(target) }
+      end
+
+
+      # Overrides the call method to wrap values in a return tuple to represent
+      # a positive match to guard against valid falsy returns
+      #
+      # @param target [Any]
+      #   Target value to match against
+      #
+      # @return [Array[false, false]]
+      #   The guard block did not match
+      #
+      # @return [Array[true, Any]]
+      #   The guard block matched, and the provided function called through
+      #   providing a return value.
+      def call(target)
+        super(target) ? [true, @fn.call(target)] : NON_MATCH
       end
     end
   end
