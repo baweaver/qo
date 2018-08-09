@@ -14,3 +14,6 @@
 # built gems
 *.gem
 repro_cases/*.rb
+
+# Junk files
+.DS_Store
