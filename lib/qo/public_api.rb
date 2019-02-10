@@ -81,7 +81,17 @@ module Qo
     def match(&fn)
       return proc { false } unless block_given?
 
-      Qo::Matchers::PatternMatch.new(&fn)
+      Qo::PatternMatchers::PatternMatch.new(&fn)
+    end
+
+    def result_match(&fn)
+      return proc { false } unless block_given?
+
+      Qo::PatternMatchers::ResultPatternMatch.new(&fn)
+    end
+
+    def result_case(target, &fn)
+      Qo::PatternMatchers::ResultPatternMatch.new(&fn).call(target)
     end
 
     # Similar to the common case statement of Ruby, except in that it behaves
@@ -111,7 +121,7 @@ module Qo
     # @return [Any]
     #   The result of calling a pattern match with a provided value
     def case(value, &fn)
-      Qo::Matchers::PatternMatch.new(&fn).call(value)
+      Qo::PatternMatchers::PatternMatch.new(&fn).call(value)
     end
 
     # Abstraction for creating a matcher, allowing for common error handling scenarios.
@@ -127,9 +137,7 @@ module Qo
     #
     # @return [Qo::Matcher]
     private def create_matcher(type, array_matchers, keyword_matchers)
-      raise MultipleMatchersProvided if !array_matchers.empty? && !keyword_matchers.empty?
-
-      Qo::Matchers::BaseMatcher.new(type, array_matchers, keyword_matchers)
+      Qo::Matchers::Matcher.new(type, array_matchers, keyword_matchers)
     end
   end
 end

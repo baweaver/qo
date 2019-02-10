@@ -149,7 +149,7 @@ end
 
 task :perf_pattern_match do
   # Going to redefine the way that success and fail happen in here.
-  return false
+  # return false
 
   require 'dry-matcher'
 
@@ -170,13 +170,13 @@ task :perf_pattern_match do
   # Build the matcher
   matcher = Dry::Matcher.new(success: success_case, failure: failure_case)
 
-  qo_m = Qo.match { |m|
+  qo_m = Qo.result_match { |m|
     m.success(Any) { |v| v }
     m.failure(Any) { "ERR!" }
   }
 
   qo_m_case = proc { |target|
-    Qo.case(target) { |m|
+    Qo.result_case(target) { |m|
       m.success(Any) { |v| v }
       m.failure(Any) { "ERR!" }
     }
