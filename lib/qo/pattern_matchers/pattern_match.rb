@@ -1,21 +1,15 @@
 module Qo
   module PatternMatchers
-    DEFAULT_BRANCHES = [ Qo::Branches::WhenBranch.new, Qo::Branches::ElseBranch.new ]
-
     class PatternMatch
-      def initialize(branches: DEFAULT_BRANCHES, deconstruct: false, &fn)
-        @branches = branches
-        @matchers = []
-        @default  = nil
+      include Branching
 
-        # Enable later
-        # raise Qo::MultipleDefaultBranches unless brances.one?(&:default?)
-        # raise Qo::BranchNameCollision unless branches.uniq_by(&:name).size == branches.size
+      register_branch Qo::Branches::WhenBranch.new
+      register_branch Qo::Branches::ElseBranch.new
 
-        branches.each do |branch|
-          branch.deconstruct = deconstruct
-          register_branch(branch)
-        end
+      def initialize(deconstruct: false, &fn)
+        @matchers    = []
+        @default     = nil
+        @deconstruct = deconstruct
 
         yield(self)
       end
@@ -43,18 +37,6 @@ module Qo
 
       def to_proc
         -> target { self.call(target) }
-      end
-
-      private def register_branch(branch)
-        define_singleton_method(branch.name) do |*conditions, **keyword_conditions, &function|
-          matcher = branch.create_matcher(Qo.and(*conditions, **keyword_conditions), &function)
-
-          if branch.default?
-            @default = matcher
-          else
-            @matchers << matcher
-          end
-        end
       end
     end
   end

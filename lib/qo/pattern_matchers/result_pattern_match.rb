@@ -1,13 +1,11 @@
 module Qo
   module PatternMatchers
     class ResultPatternMatch < PatternMatch
-      DEFAULT_BRANCHES = [
-        Qo::Branches::SuccessBranch.new,
-        Qo::Branches::FailureBranch.new,
-      ]
+      register_branch Qo::Branches::SuccessBranch.new
+      register_branch Qo::Branches::FailureBranch.new
 
       def initialize(deconstruct: false)
-        super(branches: DEFAULT_BRANCHES)
+        super(deconstruct: deconstruct)
       end
     end
   end

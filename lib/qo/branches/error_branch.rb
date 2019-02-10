@@ -6,7 +6,7 @@ module Qo
           name: 'error',
           deconstruct: deconstruct,
           precondition: -> v { v.first == :err },
-          extractor: -> v { v.last },
+          extractor: :last,
           required: true,
         )
       end

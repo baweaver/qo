@@ -24,11 +24,13 @@ module Qo
         @default
       end
 
-      def create_matcher(conditions, &function)
+      def create_matcher(conditions, should_deconstruct: false, &function)
         Proc.new { |value|
           extracted_value  = @extractor.call(value)
 
-          next [true, deconstruct(extracted_value, &function)] if @default
+          if @default
+            next [true, deconstruct(extracted_value, should_deconstruct, &function)]
+          end
 
           if @precondition === value && conditions === extracted_value
             [true, deconstruct(extracted_value, &function)]
@@ -38,8 +40,8 @@ module Qo
         }
       end
 
-      def deconstruct(value, &function)
-        return function.call(value) unless @deconstruct
+      def deconstruct(value, should_deconstruct = false, &function)
+        return function.call(value) unless should_deconstruct || @deconstruct
 
         extracted_names  = function.parameters.map(&:last)
         extracted_values = value.is_a?(Hash) ?

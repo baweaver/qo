@@ -6,7 +6,7 @@ module Qo
           name: 'success',
           deconstruct: deconstruct,
           precondition: -> v { v.first == :ok },
-          extractor: -> v { v.last },
+          extractor: :last,
           required: true,
         )
       end
