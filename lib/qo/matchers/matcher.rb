@@ -1,16 +1,45 @@
 module Qo
   module Matchers
+    # Matcher used to determine whether a value matches a certain set of
+    # conditions
+    #
+    # @author baweaver
+    # @since 1.0.0
+    #
     class Matcher
+      # Creates a new matcher
+      #
+      # @param type [String]
+      #   Type of the matcher: any, all, or none. Used to determine how a
+      #   match is determined
+      #
+      # @param array_matchers = [] [Array[Any]]
+      #   Conditions given as an array
+      #
+      # @param keyword_matchers = {} [Hash[Any, Any]]
+      #   Conditions given as keywords
+      #
+      # @return [Qo::Matchers::Matcher]
       def initialize(type, array_matchers = [], keyword_matchers = {})
         @type = type
         @array_matchers = array_matchers
         @keyword_matchers = keyword_matchers
       end
 
+      # Proc-ified version of `call`
+      #
+      # @return [Proc[Any] => Boolean]
       def to_proc
         -> target { self.call(target) }
       end
 
+      # Calls the matcher on a given target value
+      #
+      # @param target [Any]
+      #   Target to match against
+      #
+      # @return [Boolean]
+      #   Whether or not the target matched
       def call(target)
         combined_check(array_call(target), keyword_call(target))
       end
@@ -25,7 +54,8 @@ module Qo
       #   Any key mapping to any value that responds to `===`. Notedly more
       #   satisfying when `===` does something fun.
       #
-      # @return [Boolean] Result of the match
+      # @return [Boolean]
+      #   Result of the match
       private def keyword_call(target)
         return true if @keyword_matchers == target
 
@@ -148,9 +178,14 @@ module Qo
 
       # Checks if an object property matches a given matcher
       #
-      # @param target         [Any]    Target of the match
-      # @param match_property [Symbol] Property of the object to reference
-      # @param matcher        [#===]   Any matcher responding to ===
+      # @param target [Any]
+      #   Target of the match
+      #
+      # @param match_property [Symbol]
+      #   Property of the object to reference
+      #
+      # @param matcher [#===]
+      #   Any matcher responding to ===
       #
       # @return [Boolean] Match status
       private def match_object_value?(target, match_property, matcher)
@@ -162,9 +197,14 @@ module Qo
       # Double wraps case match in order to ensure that we try against both Symbol
       # and String variants of the keys, as this is a very common mixup in Ruby.
       #
-      # @param target    [Hash]   Target of the match
-      # @param match_key [Symbol] Key to match against
-      # @param matcher   [#===]   Matcher
+      # @param target [Hash]
+      #   Target of the match
+      #
+      # @param match_key [Symbol]
+      #   Key to match against
+      #
+      # @param matcher [#===]
+      #   Matcher
       #
       # @return [Boolean]
       private def hash_case_match?(target, match_key, matcher)
@@ -178,9 +218,14 @@ module Qo
 
       # Attempts to run a matcher as a predicate method against the target
       #
-      # @param target          [Hash]   Target of the match
-      # @param match_key       [Symbol] Method to call
-      # @param match_predicate [Symbol] Matcher
+      # @param target [Hash]
+      #   Target of the match
+      #
+      # @param match_key [Symbol]
+      #   Method to call
+      #
+      # @param match_predicate [Symbol]
+      #   Matcher
       #
       # @return [Boolean]
       private def hash_method_predicate_match?(target, match_key, match_predicate)
@@ -190,9 +235,14 @@ module Qo
       # Attempts to run a case match against a method call derived from a hash
       # key, and checks the result.
       #
-      # @param target         [Hash]   Target of the match
-      # @param match_property [Symbol] Method to call
-      # @param matcher        [#===]   Matcher
+      # @param target [Hash]
+      #   Target of the match
+      #
+      # @param match_property [Symbol]
+      #   Method to call
+      #
+      # @param matcher [#===]
+      #   Matcher
       #
       # @return [Boolean]
       private def hash_method_case_match?(target, match_property, matcher)
@@ -201,8 +251,11 @@ module Qo
 
       # Recurses on nested hashes.
       #
-      # @param target  [Hash]
+      # @param target [Hash]
+      #   Target to recurse into
+      #
       # @param matcher [Hash]
+      #   Matcher to use to recurse with
       #
       # @return [Boolean]
       private def hash_recurse(target, matcher)
@@ -225,6 +278,14 @@ module Qo
         end
       end
 
+      # When combining array and keyword type matchers, depending on how
+      # we're matching we may need to combine them slightly differently.
+      #
+      # @param *checks [Array]
+      #   The checks we're combining
+      #
+      # @return [Boolean]
+      #   Whether or not there's a match
       private def combined_check(*checks)
         case @type
         when 'and', 'not' then checks.all?

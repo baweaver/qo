@@ -73,6 +73,10 @@ module Qo
     #   })
     #   => [0, 6, 2]
     #
+    # @param destructure: [Boolean]
+    #   Whether or not to destructure an object before yielding it to the
+    #   given function.
+    #
     # @param fn [Proc]
     #   Body of the matcher, as shown in examples
     #
@@ -82,16 +86,6 @@ module Qo
       return proc { false } unless block_given?
 
       Qo::PatternMatchers::PatternMatch.new(destructure: destructure, &fn)
-    end
-
-    def result_match(destructure: false, &fn)
-      return proc { false } unless block_given?
-
-      Qo::PatternMatchers::ResultPatternMatch.new(destructure: destructure, &fn)
-    end
-
-    def result_case(target, destructure: false, &fn)
-      Qo::PatternMatchers::ResultPatternMatch.new(destructure: destructure, &fn).call(target)
     end
 
     # Similar to the common case statement of Ruby, except in that it behaves
@@ -115,6 +109,10 @@ module Qo
     # @param value [Any]
     #   Value to match against
     #
+    # @param destructure: [Boolean]
+    #   Whether or not to destructure an object before yielding it to the
+    #   given function.
+    #
     # @param &fn [Proc]
     #   Body of the matcher, as shown above
     #
@@ -124,6 +122,101 @@ module Qo
       Qo::PatternMatchers::PatternMatch.new(destructure: destructure, &fn).call(value)
     end
 
+    # Similar to `match`, except it uses a `ResultPatternMatch` which instead
+    # responds to tuple types:
+    #
+    # @example
+    #
+    #   ```ruby
+    #   pm = Qo.result_match { |m|
+    #     m.success { |v| v + 10 }
+    #     m.failure { |v| "Error: #{v}" }
+    #   }
+    #
+    #   pm.call([:ok, 3])
+    #   # => 13
+    #
+    #   pm.call([:err, "No Good"])
+    #   # => "Error: No Good"
+    #   ```
+    #
+    # @param destructure: [Boolean]
+    #   Whether or not to destructure an object before yielding it to the
+    #   given function.
+    #
+    # @param &fn [Proc]
+    #   Body of the matcher, as shown above
+    #
+    # @see match
+    #
+    # @return [Proc[Any] => Any]
+    #   Proc awaiting a value to match against.
+    def result_match(destructure: false, &fn)
+      return proc { false } unless block_given?
+
+      Qo::PatternMatchers::ResultPatternMatch.new(destructure: destructure, &fn)
+    end
+
+    # Similar to `case`, except it uses a `ResultPatternMatch` instead.
+    #
+    # @see match
+    # @see result_match
+    # @see case
+    #
+    # @param target [Any]
+    #   Target to match against
+    #
+    # @param destructure: [Boolean]
+    #   Whether or not to destructure an object before yielding it to the
+    #   given function.
+    #
+    # @param &fn [Proc]
+    #   Body of the matcher, as shown above
+    #
+    # @return [Any]
+    #   Result of the match
+    def result_case(target, destructure: false, &fn)
+      Qo::PatternMatchers::ResultPatternMatch
+        .new(destructure: destructure, &fn)
+        .call(target)
+    end
+
+    # Dynamically creates a new branch to be used with custom pattern matchers.
+    #
+    # @param name: [String]
+    #   Name of the branch. This is what binds to the pattern match as a method,
+    #   meaning a name of `where` will result in calling it as `m.where`.
+    #
+    # @param precondition: Any [Symbol, #===]
+    #   A precondition to the branch being considered true. This is done for
+    #   static conditions like a certain type or perhaps checking a tuple type
+    #   like `[:ok, value]`.
+    #
+    #   If a `Symbol` is given, Qo will coerce it into a proc. This is done to
+    #   make a nicer shorthand for creating a branch.
+    #
+    # @param extractor: IDENTITY [Proc, Symbol]
+    #   How to pull the value out of a target object when a branch matches before
+    #   calling the associated function. For a monadic type this might be something
+    #   like extracting the value before yielding to the given block.
+    #
+    #   If a `Symbol` is given, Qo will coerce it into a proc. This is done to
+    #   make a nicer shorthand for creating a branch.
+    #
+    # @param destructure: false
+    #   Whether or not to destructure the given object before yielding to the
+    #   associated block. This means that the given block now places great
+    #   importance on the argument names, as they'll be used to extract values
+    #   from the associated object by that same method name, or key name in the
+    #   case of hashes.
+    #
+    # @param default: false [Boolean]
+    #   Whether this branch is considered to be a default condition. This is
+    #   done to ensure that a branch runs last after all other conditions have
+    #   failed. An example of this would be an `else` branch.
+    #
+    # @return [Class]
+    #   Anonymous branch class to be bound to a constant or used directly
     def create_branch(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)
       Qo::Branches::Branch.create(
         name:         name,
@@ -134,6 +227,13 @@ module Qo
       )
     end
 
+    # Creates a new type of pattern matcher from a set of branches
+    #
+    # @param branches: [Array[Branch]]
+    #   An array of branches that this pattern matcher will respond to
+    #
+    # @return [Class]
+    #   Anonymous pattern matcher to be bound to a constant or used directly
     def create_pattern_match(branches:)
       Qo::PatternMatchers::PatternMatch.create(branches: branches)
     end
