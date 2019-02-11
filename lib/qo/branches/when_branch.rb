@@ -1,8 +1,8 @@
 module Qo
   module Branches
     class WhenBranch < Branch
-      def initialize(deconstruct: false)
-        super(name: 'when', deconstruct: deconstruct, default: false, required: false)
+      def initialize(destructure: false)
+        super(name: 'when', destructure: destructure, default: false)
       end
     end
   end

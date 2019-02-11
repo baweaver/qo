@@ -78,20 +78,20 @@ module Qo
     #
     # @return [Qo::PatternMatch]
     #   A function awaiting a value to match against
-    def match(&fn)
+    def match(destructure: false, &fn)
       return proc { false } unless block_given?
 
-      Qo::PatternMatchers::PatternMatch.new(&fn)
+      Qo::PatternMatchers::PatternMatch.new(destructure: destructure, &fn)
     end
 
-    def result_match(&fn)
+    def result_match(destructure: false, &fn)
       return proc { false } unless block_given?
 
-      Qo::PatternMatchers::ResultPatternMatch.new(&fn)
+      Qo::PatternMatchers::ResultPatternMatch.new(destructure: destructure, &fn)
     end
 
-    def result_case(target, &fn)
-      Qo::PatternMatchers::ResultPatternMatch.new(&fn).call(target)
+    def result_case(target, destructure: false, &fn)
+      Qo::PatternMatchers::ResultPatternMatch.new(destructure: destructure, &fn).call(target)
     end
 
     # Similar to the common case statement of Ruby, except in that it behaves
@@ -120,11 +120,11 @@ module Qo
     #
     # @return [Any]
     #   The result of calling a pattern match with a provided value
-    def case(value, &fn)
-      Qo::PatternMatchers::PatternMatch.new(&fn).call(value)
+    def case(value, destructure: false, &fn)
+      Qo::PatternMatchers::PatternMatch.new(destructure: destructure, &fn).call(value)
     end
 
-    # Abstraction for creating a matcher, allowing for common error handling scenarios.
+    # Abstraction for creating a matcher.
     #
     # @param type [String]
     #   Type of matcher

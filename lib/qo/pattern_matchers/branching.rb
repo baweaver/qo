@@ -8,16 +8,10 @@ module Qo
       module ClassMethods
         def register_branch(branch)
           define_method(branch.name) do |*conditions, **keyword_conditions, &function|
-            qo_matcher = Qo::Matchers::Matcher.new(
-              'and',
-              conditions,
-              keyword_conditions
-            )
+            qo_matcher = Qo::Matchers::Matcher.new('and', conditions, keyword_conditions)
 
             branch_matcher = branch.create_matcher(
-              qo_matcher,
-              should_deconstruct: @deconstruct,
-              &function
+              qo_matcher, should_destructure: @destructure, &function
             )
 
             if branch.default?

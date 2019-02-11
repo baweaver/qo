@@ -4,8 +4,8 @@ module Qo
       register_branch Qo::Branches::SuccessBranch.new
       register_branch Qo::Branches::FailureBranch.new
 
-      def initialize(deconstruct: false)
-        super(deconstruct: deconstruct)
+      def initialize(destructure: false)
+        super(destructure: destructure)
       end
     end
   end

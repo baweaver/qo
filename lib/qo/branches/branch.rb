@@ -3,52 +3,54 @@ module Qo
     class Branch
       UNMATCHED = [false, nil]
 
-      attr_accessor :deconstruct
+      attr_accessor :destructure
 
       attr_reader :name
 
-      def initialize(name:, precondition: Any, extractor: IDENTITY, deconstruct: false, default: false, required: false)
+      def initialize(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)
         @name         = name
         @precondition = precondition.is_a?(Symbol) ? precondition.to_proc : precondition
         @extractor    = extractor.is_a?(Symbol)    ? extractor.to_proc    : extractor
-        @deconstruct  = deconstruct
+        @destructure  = destructure
         @default      = default
-        @required     = required
       end
 
-      def required?
-        @required
+      def self.create(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)
+        attributes = {
+          name:         name,
+          precondition: precondition,
+          extractor:    extractor,
+          destructure:  destructure,
+          default:      default
+        }
+
+        Class.new(Qo::Branches::Branch) do
+          define_method(:initialize) { super(**attributes) }
+        end
       end
 
       def default?
         @default
       end
 
-      def create_matcher(conditions, should_deconstruct: false, &function)
-        Proc.new { |value|
-          extracted_value  = @extractor.call(value)
+      def create_matcher(conditions, should_destructure: false, &function)
+        function ||= IDENTITY
 
-          if @default
-            next [true, deconstruct(extracted_value, should_deconstruct, &function)]
-          end
+        destructurer = Destructurers::Destructurer.new(
+          should_destructure: should_destructure, &function
+        )
+
+        Proc.new { |value|
+          extracted_value = @extractor.call(value)
+
+          next [true, destructurer.call(extracted_value)] if @default
 
           if @precondition === value && conditions === extracted_value
-            [true, deconstruct(extracted_value, &function)]
+            [true, destructurer.call(extracted_value)]
           else
             UNMATCHED
           end
         }
-      end
-
-      def deconstruct(value, should_deconstruct = false, &function)
-        return function.call(value) unless should_deconstruct || @deconstruct
-
-        extracted_names  = function.parameters.map(&:last)
-        extracted_values = value.is_a?(Hash) ?
-          extracted_names.map { |n| value[n] } :
-          extracted_names.map { |n| value.public_send(n) }
-
-        function.call(*extracted_values)
       end
     end
   end

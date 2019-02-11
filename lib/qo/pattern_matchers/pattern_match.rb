@@ -6,12 +6,18 @@ module Qo
       register_branch Qo::Branches::WhenBranch.new
       register_branch Qo::Branches::ElseBranch.new
 
-      def initialize(deconstruct: false, &fn)
+      def initialize(destructure: false, &fn)
         @matchers    = []
         @default     = nil
-        @deconstruct = deconstruct
+        @destructure = destructure
 
         yield(self)
+      end
+
+      def self.create(branches: [])
+        Class.new(Qo::PatternMatchers::PatternMatch) do
+          branches.each { |branch| register_branch(branch.new) }
+        end
       end
 
       def construct(&fn)

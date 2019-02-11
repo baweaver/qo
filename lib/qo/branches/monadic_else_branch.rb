@@ -1,13 +1,12 @@
 module Qo
   module Branches
     class MonadicElseBranch < Branch
-      def initialize(deconstruct: false, extractor: :value)
+      def initialize(destructure: false, extractor: :value)
         super(
           name: 'else',
-          deconstruct: deconstruct,
+          destructure: destructure,
           extractor: extractor,
           default: true,
-          required: false
         )
       end
     end

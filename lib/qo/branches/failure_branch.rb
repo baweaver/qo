@@ -1,13 +1,12 @@
 module Qo
   module Branches
     class FailureBranch < Branch
-      def initialize(deconstruct: false)
+      def initialize(destructure: false)
         super(
           name: 'failure',
-          deconstruct: deconstruct,
+          destructure: destructure,
           precondition: -> v { v.first == :err },
-          extractor: -> v { v.last },
-          required: true,
+          extractor: :last,
         )
       end
     end

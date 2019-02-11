@@ -1,13 +1,12 @@
 module Qo
   module Branches
     class SuccessBranch < Branch
-      def initialize(deconstruct: false)
+      def initialize(destructure: false)
         super(
           name: 'success',
-          deconstruct: deconstruct,
+          destructure: destructure,
           precondition: -> v { v.first == :ok },
           extractor: :last,
-          required: true,
         )
       end
     end

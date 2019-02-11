@@ -102,5 +102,17 @@ RSpec.describe Qo::PatternMatchers::PatternMatch do
         expect(pattern_match.call([nil, nil])).to eq(nil)
       end
     end
+
+    context 'When working with destructured elements' do
+      let(:pattern_match) {
+        Qo::PatternMatchers::PatternMatch.new(destructure: true) { |m|
+          m.when(name: /^F/) { |name, age| Person.new(name, age + 1) }
+        }
+      }
+
+      it 'will destructure an object using the arguments to the associated block' do
+        expect(pattern_match.call(Person.new('Foo', 42)).age).to eq(43)
+      end
+    end
   end
 end

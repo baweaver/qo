@@ -1,13 +1,12 @@
 module Qo
   module Branches
     class MonadicWhereBranch < Branch
-      def initialize(deconstruct: false, extractor: :value)
+      def initialize(destructure: false, extractor: :value)
         super(
           name: 'where',
-          deconstruct: deconstruct,
+          destructure: destructure,
           extractor: extractor,
           default: false,
-          required: false
         )
       end
     end

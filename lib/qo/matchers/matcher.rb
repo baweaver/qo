@@ -1,7 +1,7 @@
 module Qo
   module Matchers
     class Matcher
-      def initialize(type, array_matchers, keyword_matchers)
+      def initialize(type, array_matchers = [], keyword_matchers = {})
         @type = type
         @array_matchers = array_matchers
         @keyword_matchers = keyword_matchers
