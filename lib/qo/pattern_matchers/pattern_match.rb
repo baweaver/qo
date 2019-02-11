@@ -20,6 +20,16 @@ module Qo
         end
       end
 
+      def self.mixin(destructure: false, as: :unfold)
+        create_self = -> &function { new(destructure: destructure, &function) }
+
+        Module.new do
+          define_method(as) do |&function|
+            create_self.call(&function).call(self)
+          end
+        end
+      end
+
       def construct(&fn)
         yield(self)
       end

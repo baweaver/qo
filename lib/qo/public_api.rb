@@ -124,6 +124,20 @@ module Qo
       Qo::PatternMatchers::PatternMatch.new(destructure: destructure, &fn).call(value)
     end
 
+    def create_branch(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)
+      Qo::Branches::Branch.create(
+        name:         name,
+        precondition: precondition,
+        extractor:    extractor,
+        destructure:  destructure,
+        default:      default
+      )
+    end
+
+    def create_pattern_match(branches:)
+      Qo::PatternMatchers::PatternMatch.create(branches: branches)
+    end
+
     # Abstraction for creating a matcher.
     #
     # @param type [String]
