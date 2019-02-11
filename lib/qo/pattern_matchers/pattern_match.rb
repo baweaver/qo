@@ -11,7 +11,7 @@ module Qo
         @default     = nil
         @destructure = destructure
 
-        yield(self)
+        yield(self) if block_given?
       end
 
       def self.create(branches: [])
@@ -28,10 +28,6 @@ module Qo
             create_self.call(&function).call(self)
           end
         end
-      end
-
-      def construct(&fn)
-        yield(self)
       end
 
       def call(value)

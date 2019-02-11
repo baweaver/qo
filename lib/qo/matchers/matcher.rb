@@ -12,7 +12,6 @@ module Qo
       end
 
       def call(target)
-        # p method: 'call', target: target, array_matchers: @array_matchers, keyword_matchers: @keyword_matchers
         combined_check(array_call(target), keyword_call(target))
       end
 
@@ -23,8 +22,8 @@ module Qo
       # Used to match against a matcher made from Keyword Arguments (a Hash)
       #
       # @param matchers [Hash[Any, #===]]
-      #     Any key mapping to any value that responds to `===`. Notedly more
-      #     satisfying when `===` does something fun.
+      #   Any key mapping to any value that responds to `===`. Notedly more
+      #   satisfying when `===` does something fun.
       #
       # @return [Boolean] Result of the match
       private def keyword_call(target)
@@ -43,9 +42,11 @@ module Qo
       #
       # If the target is an Object, it will be matched via public send
       #
-      # @param target [Any] Target to match against
+      # @param target [Any]
+      #   Target to match against
       #
-      # @return [Boolean] Result of the match
+      # @return [Boolean]
+      #   Result of the match
       private def array_call(target)
         return true if @array_matchers == target
 
@@ -68,6 +69,7 @@ module Qo
       #
       # @param target  [Any]
       #   Target to match against
+      #
       # @param matcher [#===]
       #   Anything that responds to ===, preferably in a unique and entertaining way.
       #
@@ -79,10 +81,14 @@ module Qo
       # Guarded version of `public_send` meant to stamp out more
       # obscure errors when running against non-matching types.
       #
-      # @param target  [Any] Object to send to
-      # @param matcher [#to_sym] Anything that can be coerced into a method name
+      # @param target  [Any]
+      #   Object to send to
       #
-      # @return [Any] Response of sending to the method, or false if failed
+      # @param matcher [#to_sym]
+      #   Anything that can be coerced into a method name
+      #
+      # @return [Any]
+      #   Response of sending to the method, or false if failed
       private def method_send(target, matcher)
         matcher.respond_to?(:to_sym) &&
         target.respond_to?(matcher.to_sym) &&
@@ -91,20 +97,28 @@ module Qo
 
       # Predicate variant of `method_send` with the same guard concerns
       #
-      # @param target  [Any]     Object to send to
-      # @param matcher [#to_sym] Anything that can be coerced into a method name
+      # @param target [Any]
+      #   Object to send to
       #
-      # @return [Boolean] Success status of predicate
+      # @param matcher [#to_sym]
+      #   Anything that can be coerced into a method name
+      #
+      # @return [Boolean]
+      #   Success status of predicate
       private def method_matches?(target, matcher)
         !!method_send(target, matcher)
       end
 
       # Defines what it means for a value to match a matcher
       #
-      # @param target  [Any] Target to match against
-      # @param matcher [Any] Any matcher to run against, most frequently responds to ===
+      # @param target [Any]
+      #   Target to match against
       #
-      # @return [Boolean] Match status
+      # @param matcher [Any]
+      #   Any matcher to run against, most frequently responds to ===
+      #
+      # @return [Boolean]
+      #   Match status
       private def match_value?(target, matcher)
         case_match?(target, matcher) ||
         method_matches?(target, matcher)
@@ -112,11 +126,17 @@ module Qo
 
       # Checks if a hash value matches a given matcher
       #
-      # @param target    [Any]    Target of the match
-      # @param match_key [Symbol] Key of the hash to reference
-      # @param matcher   [#===]   Any matcher responding to ===
+      # @param target [Any]
+      #   Target of the match
       #
-      # @return [Boolean] Match status
+      # @param match_key [Symbol]
+      #   Key of the hash to reference
+      #
+      # @param matcher [#===]
+      #   Any matcher responding to ===
+      #
+      # @return [Boolean]
+      #   Match status
       private def match_hash_value?(target, match_key, matcher)
         return false unless target.key?(match_key)
 

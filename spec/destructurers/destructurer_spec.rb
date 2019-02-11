@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 RSpec.describe Qo::Destructurers::Destructurer do
-  let(:should_destructure) { true }
+  let(:destructure) { true }
   let(:function) { -> itself { itself } }
 
   let(:destructurer) {
     Qo::Destructurers::Destructurer.new(
-      should_destructure: should_destructure, &function
+      destructure: destructure, &function
     )
   }
 
@@ -22,7 +22,7 @@ RSpec.describe Qo::Destructurers::Destructurer do
     end
 
     context 'When destructuring is turned off' do
-      let(:should_destructure) { false }
+      let(:destructure) { false }
 
       it 'returns false' do
         expect(destructurer.destructure?).to eq(false)
