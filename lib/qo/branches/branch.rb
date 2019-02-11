@@ -166,7 +166,7 @@ module Qo
       #   Function to be called if a matcher matches.
       #
       # @return [Proc[Any]] [description]
-      def create_matcher(conditions, destructure: false, &function)
+      def create_matcher(conditions, destructure: @destructure, &function)
         function ||= IDENTITY
 
         destructurer = Destructurers::Destructurer.new(

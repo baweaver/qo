@@ -12,7 +12,7 @@ module Qo
     #
     # @author baweaver
     # @since 1.0.0
-    class MonadicWhereBranch < Branch
+    class MonadicWhenBranch < Branch
       def initialize(destructure: false, extractor: :value)
         super(
           name: 'where',

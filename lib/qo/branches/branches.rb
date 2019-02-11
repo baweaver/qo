@@ -33,5 +33,5 @@ require 'qo/branches/error_branch'
 require 'qo/branches/failure_branch'
 
 # Monadic matchers to extract values from items
-require 'qo/branches/monadic_where_branch'
+require 'qo/branches/monadic_when_branch'
 require 'qo/branches/monadic_else_branch'
