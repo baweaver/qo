@@ -1,4 +1,9 @@
 module Qo
+  # Classes for constructing pattern matchers, or defining your own
+  # should you want to.
+  #
+  # @author baweaver
+  # @since 1.0.0
   module PatternMatchers
   end
 end
