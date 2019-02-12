@@ -3,9 +3,6 @@ require 'any'
 
 require "qo/version"
 
-# Helpers
-require 'qo/helpers'
-
 # Public API
 require 'qo/exceptions'
 require 'qo/public_api'
@@ -18,7 +15,6 @@ module Qo
   IDENTITY = -> itself { itself }
 
   extend Qo::Exceptions
-  extend Qo::Helpers
   extend Qo::PublicApi
 end
 

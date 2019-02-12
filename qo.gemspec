@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "yard"
   spec.add_development_dependency "redcarpet"
   spec.add_development_dependency "dry-matcher"
-  spec.add_development_dependency "trace_spy"
 
   spec.add_runtime_dependency "any", '0.1.0'
 end
