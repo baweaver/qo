@@ -55,7 +55,7 @@ RSpec.describe Qo do
       expect(result).to eq(nil)
     end
 
-    it 'can destructure array to array matches' do
+    it 'can deconstruct array to array matches' do
       result = Qo.match { |m|
         m.when(String, Integer) { |name, age| "#{name} is #{age} years old" }
       }.call(people_arrays.first)
@@ -66,7 +66,7 @@ RSpec.describe Qo do
     # _technically_ it can. You still need to specify all the params and this is
     # far more of a Rubyism than a Qo'ism. You could also play default args here
     # if you're really so inclined.
-    it 'can destructure hash to hash matches' do
+    it 'can deconstruct hash to hash matches' do
       result = Qo.match { |m|
         m.when(name: Any, age: 22) { |name:, age:| age + 1 }
       }.call(people.first.to_h)
@@ -109,7 +109,7 @@ RSpec.describe Qo do
       expect(result).to eq(nil)
     end
 
-    it 'can destructure array to array matches' do
+    it 'can deconstruct array to array matches' do
       result = Qo.case(people_arrays.first) { |m|
         m.when(String, Integer) { |name, age| "#{name} is #{age} years old" }
       }
@@ -120,7 +120,7 @@ RSpec.describe Qo do
     # _technically_ it can. You still need to specify all the params and this is
     # far more of a Rubyism than a Qo'ism. You could also play default args here
     # if you're really so inclined.
-    it 'can destructure hash to hash matches' do
+    it 'can deconstruct hash to hash matches' do
       result = Qo.case(people.first.to_h) { |m|
         m.when(name: Any, age: 22) { |name:, age:| age + 1 }
       }

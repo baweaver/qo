@@ -51,7 +51,7 @@ module Qo
       # for direct access, rather than yielding an instance of that class to a
       # pattern matcher.
       #
-      # This is typically done for monadic types that need to `unfold`. When
+      # This is typically done for monadic types that need to `match`. When
       # combined with extractor type branches it can be very handy for dealing
       # with container types.
       #
@@ -98,7 +98,7 @@ module Qo
       #
       #   Some.new(1)
       #     .fmap { |v| v * 2 }
-      #     .unfold { |m|
+      #     .match { |m|
       #       m.some { |v| v + 100 }
       #       m.none { "OHNO!" }
       #     }
@@ -106,7 +106,7 @@ module Qo
       #
       #   Some.new(1)
       #     .fmap { |v| nil }
-      #     .unfold { |m|
+      #     .match { |m|
       #       m.some { |v| v + 100 }
       #       m.none { "OHNO!" }
       #     }
@@ -116,12 +116,12 @@ module Qo
       # @param destructure: false [Boolean]
       #   Whether or not to destructure values before yielding to a block
       #
-      # @param as: :unfold [Symbol]
+      # @param as: :match [Symbol]
       #   Name to use as a method name bound to the including class
       #
       # @return [Module]
       #   Module to be mixed into a class
-      def self.mixin(destructure: false, as: :unfold)
+      def self.mixin(destructure: false, as: :match)
         create_self = -> &function { new(destructure: destructure, &function) }
 
         Module.new do

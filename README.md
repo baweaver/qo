@@ -558,7 +558,7 @@ SomePatternMatch = Qo.create_pattern_match(branches: [
 ])
 
 class Some
-  # There's also a provided mixin that gives an `unfold` method that
+  # There's also a provided mixin that gives an `match` method that
   # works exactly like a pattern match without having to use it explicitly
   include SomePatternMatch.mixin
 
@@ -584,11 +584,11 @@ class None
   def fmap(&fn) None[value] end
 end
 
-# So now we can pattern match with `some` and `none` branches using the `unfold`
+# So now we can pattern match with `some` and `none` branches using the `match`
 # method that was mixed into both types.
 Some[1]
   .fmap { |v| v * 2 }
-  .unfold { |m|
+  .match { |m|
     m.some { |v| v + 100 }
     m.none { "OHNO!" }
   }
@@ -596,7 +596,7 @@ Some[1]
 
 Some[1]
   .fmap { |v| nil }
-  .unfold { |m|
+  .match { |m|
     m.some { |v| v + 100 }
     m.none { "OHNO!" }
   }
