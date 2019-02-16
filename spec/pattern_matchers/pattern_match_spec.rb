@@ -1,8 +1,8 @@
 require "spec_helper"
 
-RSpec.describe Qo::Matchers::PatternMatch do
+RSpec.describe Qo::PatternMatchers::PatternMatch do
   let(:pattern_match) do
-    Qo::Matchers::PatternMatch.new { |m|
+    Qo::PatternMatchers::PatternMatch.new { |m|
       m.when(1) { |v| v + 4 }
       m.when(2) { |v| v * 2 }
       m.else    { |v| v }
@@ -11,7 +11,7 @@ RSpec.describe Qo::Matchers::PatternMatch do
 
   describe '#initialize' do
     it 'can be created' do
-      expect(pattern_match).to be_a(Qo::Matchers::PatternMatch)
+      expect(pattern_match).to be_a(Qo::PatternMatchers::PatternMatch)
     end
   end
 
@@ -33,7 +33,7 @@ RSpec.describe Qo::Matchers::PatternMatch do
     end
 
     context 'When no default matchers are given' do
-      let(:pattern_match) { Qo::Matchers::PatternMatch.new { |m| } }
+      let(:pattern_match) { Qo::PatternMatchers::PatternMatch.new { |m| } }
 
       it 'will return nil' do
         expect(pattern_match.call(1)).to eq(nil)
@@ -100,6 +100,18 @@ RSpec.describe Qo::Matchers::PatternMatch do
 
       it 'will return nil because we forgot a default. Tsk tsk.' do
         expect(pattern_match.call([nil, nil])).to eq(nil)
+      end
+    end
+
+    context 'When working with destructured elements' do
+      let(:pattern_match) {
+        Qo::PatternMatchers::PatternMatch.new(destructure: true) { |m|
+          m.when(name: /^F/) { |name, age| Person.new(name, age + 1) }
+        }
+      }
+
+      it 'will destructure an object using the arguments to the associated block' do
+        expect(pattern_match.call(Person.new('Foo', 42)).age).to eq(43)
       end
     end
   end

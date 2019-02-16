@@ -33,3 +33,24 @@ class Person
     {name: @name, age: @age}
   end
 end
+
+class Some
+  attr_reader :value
+
+  def initialize(value) @value = value end
+  def self.[](value)    new(value)     end
+
+  def fmap(&fn)
+    new_value = fn.call(value)
+    new_value ? Some[new_value] : None[value]
+  end
+end
+
+class None
+  attr_reader :value
+
+  def initialize(value) @value = value end
+  def self.[](value)    new(value)     end
+
+  def fmap(&fn) None[value] end
+end

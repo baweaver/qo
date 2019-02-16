@@ -482,11 +482,11 @@ people_objects.map(&Qo.match { |m|
 
 So we just truncated everyone's name that was longer than three characters.
 
-### 6 - Helper functions
+### 5 - Helper functions
 
 There are a few functions added for convenience, and it should be noted that because all Qo matchers respond to `===` that they can be used as helpers as well.
 
-#### 6.1 - Dig
+#### 5.1 - Dig
 
 Dig is used to get in deep at a nested hash value. It takes a dot-path and a `===` respondent matcher:
 
@@ -500,7 +500,7 @@ Qo.dig('a.b.c', Qo.or(1..5, 15..25)) === {a: {b: {c: 20}}}
 
 To be fair that means anything that can respond to `===`, including classes and other such things.
 
-#### 6.2 - Count By
+#### 5.2 - Count By
 
 This ends up coming up a lot, especially around querying, so let's get a way to count by!
 
@@ -523,15 +523,95 @@ Qo.count_by([1,2,3,2,2,2,1], &:even?)
 
 This feature may be added to Ruby 2.6+: https://bugs.ruby-lang.org/issues/11076
 
-### 5 - Hacky Fun Time
+### 6 - Custom Pattern Matchers
+
+With the release of Qo 1.0.0 we introduced the idea of custom branches and pattern matchers for more advanced
+users of the library.
+
+Consider a Monadic type like `Some` and `None`:
+
+```ruby
+# Technically Some and None don't exist yet, so we have to "cheat" instead
+# of just saying `Some` for the precondition
+#
+# We start by defining two branches that match against a Some type and a None
+# type, extracting the value on match before yielding to their associated
+# functions
+SomeBranch = Qo.create_branch(
+  name:        'some',
+  precondition: -> v { v.is_a?(Some) },
+  extractor:    :value
+)
+
+NoneBranch = Qo.create_branch(
+  name:        'none',
+  precondition: -> v { v.is_a?(None) },
+  extractor:    :value
+)
+
+# Now we create a new pattern matching class with those branches. Note that
+# there's nothing stopping you from making as many branches as you want,
+# except that it may get confusing after a while.
+SomePatternMatch = Qo.create_pattern_match(branches: [
+  SomeBranch,
+  NoneBranch
+])
+
+class Some
+  # There's also a provided mixin that gives an `match` method that
+  # works exactly like a pattern match without having to use it explicitly
+  include SomePatternMatch.mixin
+
+  attr_reader :value
+
+  def initialize(value) @value = value end
+  def self.[](value)    new(value)     end
+
+  def fmap(&fn)
+    new_value = fn.call(value)
+    new_value ? Some[new_value] : None[value]
+  end
+end
+
+class None
+  include SomePatternMatch.mixin
+
+  attr_reader :value
+
+  def initialize(value) @value = value end
+  def self.[](value)    new(value)     end
+
+  def fmap(&fn) None[value] end
+end
+
+# So now we can pattern match with `some` and `none` branches using the `match`
+# method that was mixed into both types.
+Some[1]
+  .fmap { |v| v * 2 }
+  .match { |m|
+    m.some { |v| v + 100 }
+    m.none { "OHNO!" }
+  }
+=> 102
+
+Some[1]
+  .fmap { |v| nil }
+  .match { |m|
+    m.some { |v| v + 100 }
+    m.none { "OHNO!" }
+  }
+=> "OHNO!"
+```
+
+### 7 - Hacky Fun Time
 
 These examples will grow over the next few weeks as I think of more fun things to do with Qo. PRs welcome if you find fun uses!
 
-#### 5.1 - JSON and HTTP
+#### 7.1 - JSON and HTTP
 
 > Note that Qo does not support deep querying of hashes (yet)
 
-##### 5.1.1 - JSON Placeholder
+##### 7.1.1 - JSON Placeholder
 
 Qo tries to be clever though, it assumes Symbol keys first and then String keys, so how about some JSON?:
 
@@ -602,9 +682,26 @@ m.when(Net::HTTPSuccess, body: /Qo/)
 You could put as many checks as you want in there, or use different Qo matchers
 nested to get even further in.
 
-#### 5.2 - Opsy Stuff
+Now if we wanted to add more power and create an HTTP matcher:
 
-##### 5.2.1 - NMap
+```ruby
+HTTP_Matcher = Qo.create_pattern_match(branches: [
+  Qo.create_branch(name: 'success', precondition: Net::HTTPSuccess),
+  Qo.create_branch(name: 'error', precondition: Net::HTTPError),
+  Qo::Braches::ElseBranch
+])
+
+def get_url(url)
+  Net::HTTP.get_response(URI(url)).then(&HTTP_Matcher.match { |m|
+    m.success { |response| response.body.size },
+    m.else    { |response| raise response.message }
+  })
+end
+```
+
+#### 7.2 - Opsy Stuff
+
+##### 7.2.1 - NMap
 
 What about NMap for our Opsy friends? Well, simulated, but still fun.
 
@@ -616,7 +713,7 @@ hosts.select(&Qo[IPAddr.new('192.168.1.1/8')])
 => [["192.168.1.1", "(Router)"], ["192.168.1.2", "(My Computer)"]]
 ```
 
-##### 5.2.2 - `df`
+##### 7.2.2 - `df`
 
 The nice thing about Unix style commands is that they use headers, which means CSV can get a hold of them for some good formatting. It's also smart enough to deal with space separators that may vary in length:
 

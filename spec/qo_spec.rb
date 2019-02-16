@@ -248,30 +248,4 @@ RSpec.describe Qo do
       ).to eq(%w(Foo Bar))
     end
   end
-
-  describe '#dig' do
-    it 'can get at deep data' do
-      matcher = Qo.dig('a.b.c', Qo.or(1..5, 15..25))
-      target  = {a: {b: {c: 1}}}
-
-      expect(matcher.call(target)).to eq(true)
-    end
-  end
-
-  describe '#count_by' do
-    it 'counts without a block using an identity function' do
-      expect(Qo.count_by([1,2,3,2,2,2,1])).to eq({
-        1 => 2,
-        2 => 4,
-        3 => 1
-      })
-    end
-
-    it 'counts with a block' do
-      expect(Qo.count_by([1,2,3,2,2,2,1], &:even?)).to eq({
-        false => 3,
-        true  => 4
-      })
-    end
-  end
 end

@@ -13,6 +13,17 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://www.github.com/baweaver/qo"
   spec.license       = "MIT"
 
+  spec.post_install_message = <<~MESSAGE
+    Qo 0.99.0 is the last version of Qo under the official name "Qo". After this
+    version, Qo will be adopted into dry-rb (https://dry-rb.org/) as the new
+    dry-matcher.
+
+    As I'm fond of the name, "Qo" will remain an alias for "Dry::Matcher"
+    so you can use it as you have before. Qo v0.99.0 and Dry Matcher v1.0.0
+    will be directly compatible with eachother, and semantic versioning will
+    take over from there.
+  MESSAGE
+
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
