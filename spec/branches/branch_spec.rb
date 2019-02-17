@@ -17,6 +17,42 @@ RSpec.describe Qo::Branches::Branch do
     )
   }
 
+  context 'ordered' do
+    it do
+      collaborator_1 = ->(x) { true }
+      collaborator_2 = ->(x) {}
+
+      expect(collaborator_1).to receive(:===).and_return(true).ordered
+      expect(collaborator_2).to receive(:call).ordered
+
+      subject = proc do |x|
+        if collaborator_1 === x
+          collaborator_2.call(x)
+        end
+      end
+
+      subject.call()
+    end
+  end
+
+  context 'order of execution' do
+    let(:callback) { Qo::IDENTITY }
+    let(:condition) { Any }
+
+    let(:matcher) { branch.create_matcher(condition, &callback) }
+
+    let(:precondition) { ->(_) {} }
+    let(:extractor) { ->(_) {} }
+
+    it 'precondition -> extractor -> condition' do
+      expect(precondition).to receive(:===).and_return(true).ordered
+      expect(extractor).to receive(:call).ordered
+      expect(condition).to receive(:===).ordered
+
+      matcher.call(42)
+    end
+  end
+
   describe '.initialize' do
     it 'can be initialized' do
       expect(branch).to be_a(Qo::Branches::Branch)
