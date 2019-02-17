@@ -182,7 +182,7 @@ module Qo
 
           # Otherwise we check the precondition first before extracting the
           # value from whatever container it might be in.
-          return UNMATCHED unless @precondition === value
+          next UNMATCHED unless @precondition === value
           
           extracted_value = @extractor.call(value)
           
