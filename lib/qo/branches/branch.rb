@@ -180,11 +180,17 @@ module Qo
             next [true, destructurer.call(extracted_value)]
           end
 
-          if @precondition === value && conditions === (extracted_value = @extractor.call(value))
-            [true, destructurer.call(extracted_value)]
-          else
+          # Otherwise we check the precondition first before extracting the
+          # value from whatever container it might be in.
+          return UNMATCHED unless @precondition === value
+          
+          extracted_value = @extractor.call(value)
+          
+          # If that extracted value matches our conditions, destructure the value
+          # and return it, or return unmatched otherwise.
+          conditions === extracted_value ?
+            [true, destructurer.call(extracted_value)] :
             UNMATCHED
-          end
         }
       end
     end
