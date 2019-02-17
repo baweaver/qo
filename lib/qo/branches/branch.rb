@@ -30,7 +30,7 @@ module Qo
     # A branch will execute in the following order:
     #
     # ```
-    # value -> precondition ? -> condition ? -> extractor -> destructurer
+    # value -> precondition ? -> extractor -> condition ? -> destructurer
     # ```
     #
     # Preconditions allow for things like type checks or any static condition
@@ -174,16 +174,23 @@ module Qo
         )
 
         Proc.new { |value|
-          extracted_value = @extractor.call(value)
-
           # If it's a default branch, return true, as conditions are redundant
-          next [true, destructurer.call(extracted_value)] if @default
-
-          if @precondition === value && conditions === extracted_value
-            [true, destructurer.call(extracted_value)]
-          else
-            UNMATCHED
+          if @default
+            extracted_value = @extractor.call(value)
+            next [true, destructurer.call(extracted_value)]
           end
+
+          # Otherwise we check the precondition first before extracting the
+          # value from whatever container it might be in.
+          next UNMATCHED unless @precondition === value
+          
+          extracted_value = @extractor.call(value)
+          
+          # If that extracted value matches our conditions, destructure the value
+          # and return it, or return unmatched otherwise.
+          conditions === extracted_value ?
+            [true, destructurer.call(extracted_value)] :
+            UNMATCHED
         }
       end
     end
