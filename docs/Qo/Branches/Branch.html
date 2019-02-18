@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Qo::Branches::Branch
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Qo::Branches::Branch";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (B)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Qo.html" title="Qo (module)">Qo</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Branches.html" title="Qo::Branches (module)">Branches</a></span></span>
+     &raquo; 
+    <span class="title">Branch</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Qo::Branches::Branch
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Qo::Branches::Branch</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/qo/branches/branch.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <h3>Branches</h3>
+
+<p>A branch is a particular branch of a pattern match. The default branches
+emulate a <code>case</code> statement. Consider a <code>case</code> statement like this:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>case</span> <span class='id identifier rubyid_value'>value</span>
+<span class='kw'>when</span> <span class='id identifier rubyid_condition'>condition</span> <span class='kw'>then</span> <span class='id identifier rubyid_first_return'>first_return</span>
+<span class='kw'>else</span> <span class='id identifier rubyid_second_return'>second_return</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>With a Qo branch you would see something like this:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="../../Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="../PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='id identifier rubyid_condition'>condition</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_first_return'>first_return</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_second_return'>second_return</span> <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>The <code>when</code> and <code>else</code> are the names the branch was &quot;registered&quot; with in
+<code>Qo::PatternMatchers::Branching</code>. The name becomes the method name that
+the associated matcher uses.</p>
+
+<h3>Order of Execution</h3>
+
+<p>A branch will execute in the following order:</p>
+
+<pre class="code ruby"><code class="ruby">value -&gt; precondition ? -&gt; extractor -&gt; condition ? -&gt; destructurer
+</code></pre>
+
+<p>Preconditions allow for things like type checks or any static condition
+that will remain constant across all matches. Think of them as abstracting
+a single condition to guard before the branch continues.</p>
+
+<p>Conditions are typical Qo matchers, as documented in the README. Upon a
+match, the branch will be considered matched and continue on to calling
+the associated block function.</p>
+
+<p>Extractors are used to pull a value out of a container type, such as
+<code>value</code> for monadic types or <code>last</code> for response array tuples.</p>
+
+<p>Lastly, if given, Destructurers will destructure an object. That means
+that the associated function now places great significance on the
+names of the arguments as they&#39;ll be used to extract values from the
+object that would have normally been returned.</p>
+
+<p>Destructuring can be a complicated topic, see the following article to
+find out more on how this works or see the README for examples:</p>
+
+<p><a href="https://medium.com/rubyinside/destructuring-in-ruby-9e9bd2be0360">https://medium.com/rubyinside/destructuring-in-ruby-9e9bd2be0360</a></p>
+
+<h3>Match Tuples</h3>
+
+<p>Branches will respond with a tuple of (status, value). A status of false
+indicates a non-match, and a status or true indicates a match. This is done
+to ensure that truly <code>false</code> or <code>nil</code> returns are not swallowed by a
+match.</p>
+
+<p>A Pattern Match will use these statuses to find the first matching branch.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Author:</p>
+<ul class="author">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>baweaver</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><div id="subclasses">
+  <h2>Direct Known Subclasses</h2>
+  <p class="children"><span class='object_link'><a href="ElseBranch.html" title="Qo::Branches::ElseBranch (class)">ElseBranch</a></span>, <span class='object_link'><a href="ErrorBranch.html" title="Qo::Branches::ErrorBranch (class)">ErrorBranch</a></span>, <span class='object_link'><a href="FailureBranch.html" title="Qo::Branches::FailureBranch (class)">FailureBranch</a></span>, <span class='object_link'><a href="MonadicElseBranch.html" title="Qo::Branches::MonadicElseBranch (class)">MonadicElseBranch</a></span>, <span class='object_link'><a href="MonadicWhenBranch.html" title="Qo::Branches::MonadicWhenBranch (class)">MonadicWhenBranch</a></span>, <span class='object_link'><a href="SuccessBranch.html" title="Qo::Branches::SuccessBranch (class)">SuccessBranch</a></span>, <span class='object_link'><a href="WhenBranch.html" title="Qo::Branches::WhenBranch (class)">WhenBranch</a></span></p>
+</div>
+
+  <h2>Constant Summary</h2>
+  <dl class="constants">
+    
+      <dt id="UNMATCHED-constant" class="">UNMATCHED =
+        <div class="docstring">
+  <div class="discussion">
+    <p>Representation of an unmatched value. These values are wrapped in array
+tuples to preserve legitimate <code>false</code> and <code>nil</code> values by indicating
+the status of the match in the first position and the returned value in
+the second.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+      </dt>
+      <dd><pre class="code"><span class='lbracket'>[</span><span class='kw'>false</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rbracket'>]</span></pre></dd>
+    
+  </dl>
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Name of the branch, see the initializer for more information.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#create-class_method" title="create (class method)">.<strong>create</strong>(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)  &#x21d2; Class </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A dynamic creator for new branch types to be made on the fly in programs.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#create_matcher-instance_method" title="#create_matcher (instance method)">#<strong>create_matcher</strong>(conditions, destructure: @destructure, &amp;function)  &#x21d2; Proc[Any] </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Uses the current configuration of the branch to create a matcher to be used in a pattern match.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default%3F-instance_method" title="#default? (instance method)">#<strong>default?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Whether or not this is a default branch.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)  &#x21d2; Qo::Branches::Branch </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates an instance of a Branch.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)  &#x21d2; <tt><span class='object_link'><a href="" title="Qo::Branches::Branch (class)">Qo::Branches::Branch</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Creates an instance of a Branch</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name:</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Name of the branch. This is what binds to the pattern match as a method,
+meaning a name of <code>where</code> will result in calling it as <code>m.where</code>.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>precondition:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>Any</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Any [Symbol, #===]
+A precondition to the branch being considered true. This is done for
+static conditions like a certain type or perhaps checking a tuple type
+like <code>[:ok, value]</code>.</p>
+
+<p>If a <code>Symbol</code> is given, Qo will coerce it into a proc. This is done to
+make a nicer shorthand for creating a branch.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>extractor:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>IDENTITY</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>IDENTITY [Proc, Symbol]
+How to pull the value out of a target object when a branch matches before
+calling the associated function. For a monadic type this might be something
+like extracting the value before yielding to the given block.</p>
+
+<p>If a <code>Symbol</code> is given, Qo will coerce it into a proc. This is done to
+make a nicer shorthand for creating a branch.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>destructure:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>false
+Whether or not to destructure the given object before yielding to the
+associated block. This means that the given block now places great
+importance on the argument names, as they&#39;ll be used to extract values
+from the associated object by that same method name, or key name in the
+case of hashes.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>default:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>false [Boolean]
+Whether this branch is considered to be a default condition. This is
+done to ensure that a branch runs last after all other conditions have
+failed. An example of this would be an <code>else</code> branch.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+113
+114
+115
+116
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/branches/branch.rb', line 113</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>name:</span><span class='comma'>,</span> <span class='label'>precondition:</span> <span class='const'>Any</span><span class='comma'>,</span> <span class='label'>extractor:</span> <span class='const'><span class='object_link'><a href="../../Qo.html#IDENTITY-constant" title="Qo::IDENTITY (constant)">IDENTITY</a></span></span><span class='comma'>,</span> <span class='label'>destructure:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='ivar'>@name</span>         <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='ivar'>@precondition</span> <span class='op'>=</span> <span class='id identifier rubyid_precondition'>precondition</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_precondition'>precondition</span><span class='period'>.</span><span class='id identifier rubyid_to_proc'>to_proc</span> <span class='op'>:</span> <span class='id identifier rubyid_precondition'>precondition</span>
+  <span class='ivar'>@extractor</span>    <span class='op'>=</span> <span class='id identifier rubyid_extractor'>extractor</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>    <span class='op'>?</span> <span class='id identifier rubyid_extractor'>extractor</span><span class='period'>.</span><span class='id identifier rubyid_to_proc'>to_proc</span>    <span class='op'>:</span> <span class='id identifier rubyid_extractor'>extractor</span>
+  <span class='ivar'>@destructure</span>  <span class='op'>=</span> <span class='id identifier rubyid_destructure'>destructure</span>
+  <span class='ivar'>@default</span>      <span class='op'>=</span> <span class='id identifier rubyid_default'>default</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="name-instance_method">
+  
+    #<strong>name</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Name of the branch, see the initializer for more information</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/branches/branch.rb', line 76</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='ivar'>@name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="create-class_method">
+  
+    .<strong>create</strong>(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)  &#x21d2; <tt>Class</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>A dynamic creator for new branch types to be made on the fly in programs.
+This exists to make new types of pattern matches to suit your own needs.</p>
+
+<p>Prefer the public API to using this method directly, <code>Qo.create_branch</code>,
+mostly because it&#39;s less typing.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Class</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>new Class to be bound to a constant name, or used anonymously</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>for parameter documentation</li>
+    
+  </ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/branches/branch.rb', line 131</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span><span class='lparen'>(</span><span class='label'>name:</span><span class='comma'>,</span> <span class='label'>precondition:</span> <span class='const'>Any</span><span class='comma'>,</span> <span class='label'>extractor:</span> <span class='const'><span class='object_link'><a href="../../Qo.html#IDENTITY-constant" title="Qo::IDENTITY (constant)">IDENTITY</a></span></span><span class='comma'>,</span> <span class='label'>destructure:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>name:</span>         <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+    <span class='label'>precondition:</span> <span class='id identifier rubyid_precondition'>precondition</span><span class='comma'>,</span>
+    <span class='label'>extractor:</span>    <span class='id identifier rubyid_extractor'>extractor</span><span class='comma'>,</span>
+    <span class='label'>destructure:</span>  <span class='id identifier rubyid_destructure'>destructure</span><span class='comma'>,</span>
+    <span class='label'>default:</span>      <span class='id identifier rubyid_default'>default</span>
+  <span class='rbrace'>}</span>
+
+  <span class='const'>Class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Branches.html" title="Qo::Branches (module)">Branches</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="Qo::Branches::Branch (class)">Branch</a></span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_define_method'>define_method</span><span class='lparen'>(</span><span class='symbol'>:initialize</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='kw'>super</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_attributes'>attributes</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="create_matcher-instance_method">
+  
+    #<strong>create_matcher</strong>(conditions, destructure: @destructure, &amp;function)  &#x21d2; <tt>Proc[Any]</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Uses the current configuration of the branch to create a matcher to
+be used in a pattern match. The returned proc can be passed a value
+that will return back a tuple of <code>(status, value)</code> to indicate whether
+or not a match was made with this branch.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>conditions</span>
+      
+      
+        <span class='type'>(<tt>#===</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>A set of conditions to run against, typically a <code>Qo.and</code> matcher but
+could be anything that happens to respond to <code>===</code>.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>destructure:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>@destructure</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>false [Boolean]
+Whether or not to run the extracted value through a destructure before
+yielding it to the associated block.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>&amp;function</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Function to be called if a matcher matches.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Proc[Any]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>[description]</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/branches/branch.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='id identifier rubyid_conditions'>conditions</span><span class='comma'>,</span> <span class='label'>destructure:</span> <span class='ivar'>@destructure</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_function'>function</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_function'>function</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="../../Qo.html#IDENTITY-constant" title="Qo::IDENTITY (constant)">IDENTITY</a></span></span>
+
+  <span class='id identifier rubyid_destructurer'>destructurer</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Destructurers.html" title="Qo::Destructurers (module)">Destructurers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Destructurers/Destructurer.html" title="Qo::Destructurers::Destructurer (class)">Destructurer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../Destructurers/Destructurer.html#initialize-instance_method" title="Qo::Destructurers::Destructurer#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>destructure:</span> <span class='id identifier rubyid_destructure'>destructure</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_function'>function</span>
+  <span class='rparen'>)</span>
+
+  <span class='const'>Proc</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+    <span class='comment'># If it&#39;s a default branch, return true, as conditions are redundant
+</span>    <span class='kw'>if</span> <span class='ivar'>@default</span>
+      <span class='id identifier rubyid_extracted_value'>extracted_value</span> <span class='op'>=</span> <span class='ivar'>@extractor</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+      <span class='kw'>next</span> <span class='lbracket'>[</span><span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_destructurer'>destructurer</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_extracted_value'>extracted_value</span><span class='rparen'>)</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Otherwise we check the precondition first before extracting the
+</span>    <span class='comment'># value from whatever container it might be in.
+</span>    <span class='kw'>next</span> <span class='const'><span class='object_link'><a href="#UNMATCHED-constant" title="Qo::Branches::Branch::UNMATCHED (constant)">UNMATCHED</a></span></span> <span class='kw'>unless</span> <span class='ivar'>@precondition</span> <span class='op'>===</span> <span class='id identifier rubyid_value'>value</span>
+    
+    <span class='id identifier rubyid_extracted_value'>extracted_value</span> <span class='op'>=</span> <span class='ivar'>@extractor</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+    
+    <span class='comment'># If that extracted value matches our conditions, destructure the value
+</span>    <span class='comment'># and return it, or return unmatched otherwise.
+</span>    <span class='id identifier rubyid_conditions'>conditions</span> <span class='op'>===</span> <span class='id identifier rubyid_extracted_value'>extracted_value</span> <span class='op'>?</span>
+      <span class='lbracket'>[</span><span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_destructurer'>destructurer</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_extracted_value'>extracted_value</span><span class='rparen'>)</span><span class='rbracket'>]</span> <span class='op'>:</span>
+      <span class='const'><span class='object_link'><a href="#UNMATCHED-constant" title="Qo::Branches::Branch::UNMATCHED (constant)">UNMATCHED</a></span></span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="default?-instance_method">
+  
+    #<strong>default?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Whether or not this is a default branch</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+148
+149
+150</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/branches/branch.rb', line 148</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default?'>default?</span>
+  <span class='ivar'>@default</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Feb 18 01:59:30 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.6.1).
+</div>
+
+    </div>
+  </body>
+</html>

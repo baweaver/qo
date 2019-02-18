@@ -109,40 +109,48 @@ and is included in the gem.</p>
 
 <h4>Pattern Match</h4>
 
-<p>The original style</p>
+<h5>Case Statements</h5>
+
+<p>Qo case statements work much like a Ruby case statement, except in that they leverage
+the full power of Qo matchers behind the scenes.</p>
 
 <pre class="code ruby"><code class="ruby"><span class='comment'># How about some &quot;right-hand assignment&quot; pattern matching
-</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span>      <span class='op'>=</span> <span class='tlambda'>-&gt;</span> <span class='id identifier rubyid_person'>person</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>3</span> <span class='rbrace'>}</span>
-<span class='id identifier rubyid_people_with_truncated_names'>people_with_truncated_names</span> <span class='op'>=</span> <span class='id identifier rubyid_people'>people</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='const'>Person</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Any</span><span class='rparen'>)</span> <span class='comment'># Identity function, catch-all
-</span><span class='rparen'>)</span><span class='rparen'>)</span>
+</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span> <span class='id identifier rubyid_person'>person</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>3</span> <span class='rbrace'>}</span>
 
-<span class='comment'># And standalone like a case:
-</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_people'>people</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='label'>age:</span> <span class='int'>10</span><span class='op'>..</span><span class='int'>19</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is a teen that&#39;s </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Any</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
-<span class='rparen'>)</span>
-</code></pre>
+<span class='id identifier rubyid_person_with_truncated_name'>person_with_truncated_name</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_case'><span class='object_link'><a href="Qo/PublicApi.html#case-instance_method" title="Qo::PublicApi#case (method)">case</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_people'>people</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span>
+    <span class='const'>Person</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
 
-<h4>Pattern Match Block</h4>
-
-<p>The new style, likely to take over in <code>v1.0.0</code> after testing:</p>
-
-<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span>      <span class='op'>=</span> <span class='tlambda'>-&gt;</span> <span class='id identifier rubyid_person'>person</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>3</span> <span class='rbrace'>}</span>
-<span class='id identifier rubyid_people_with_truncated_names'>people_with_truncated_names</span> <span class='op'>=</span> <span class='id identifier rubyid_people'>people</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
-  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='const'>Person</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
-  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:itself</span><span class='rparen'>)</span>
-<span class='rbrace'>}</span><span class='rparen'>)</span>
-
-<span class='comment'># And standalone like a case:
-</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_people'>people</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
-  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='label'>age:</span> <span class='int'>10</span><span class='op'>..</span><span class='int'>19</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is a teen that&#39;s </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
-  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span>
 <span class='rbrace'>}</span>
 </code></pre>
 
-<p>(More details coming on the difference and planned 1.0.0 APIs)</p>
+<p>It takes in a value directly, and returns the result, much like a case statement.</p>
+
+<p>Note that if <code>else</code> receives no block, it will default to an identity function
+(<code>{ |v| v }</code>). If no else is provided and there&#39;s no match, you&#39;ll get back a nil.
+You can write this out if you wish.</p>
+
+<h5>Match Statements</h5>
+
+<p>Match statements are like case statements, except in that they don&#39;t directly take
+a value to match against. They&#39;re waiting for a value to come in later from
+something else.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span> <span class='id identifier rubyid_person'>person</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>3</span> <span class='rbrace'>}</span>
+
+<span class='id identifier rubyid_people_with_truncated_names'>people_with_truncated_names</span> <span class='op'>=</span> <span class='id identifier rubyid_people'>people</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='const'>Person</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span>
+<span class='rbrace'>}</span><span class='rparen'>)</span>
+
+<span class='comment'># And standalone like a case:
+</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='label'>age:</span> <span class='int'>10</span><span class='op'>..</span><span class='int'>19</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is a teen that&#39;s </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_people'>people</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='rparen'>)</span>
+</code></pre>
 
 <h3>Qo&#39;isms</h3>
 
@@ -156,7 +164,7 @@ and is included in the gem.</p>
 </span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_and'><span class='object_link'><a href="Qo/PublicApi.html#and-instance_method" title="Qo::PublicApi#and (method)">and</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Rob</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='int'>22</span><span class='rparen'>)</span>
 
 <span class='comment'># This is shorthand for
-</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Qo/Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Qo/Matchers/BaseMatcher.html" title="Qo::Matchers::BaseMatcher (class)">BaseMatcher</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Qo/Matchers/BaseMatcher.html#initialize-instance_method" title="Qo::Matchers::BaseMatcher#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>and</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Rob</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='int'>22</span><span class='rparen'>)</span>
+</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Qo/Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'>BaseMatcher</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>and</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Rob</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='int'>22</span><span class='rparen'>)</span>
 
 <span class='comment'># An `or` matcher uses the same shorthand as `and` but uses `any?` behind the scenes instead:
 </span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Rob</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='int'>22</span><span class='rparen'>)</span>
@@ -200,7 +208,7 @@ and is included in the gem.</p>
 
 <p>The first way a Qo matcher can be defined is by using <code>*varargs</code>:</p>
 
-<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Qo/Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Qo/Matchers/BaseMatcher.html" title="Qo::Matchers::BaseMatcher (class)">BaseMatcher</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_varargs'>varargs</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_kwargs'>kwargs</span><span class='rparen'>)</span>
+<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Qo/Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'>BaseMatcher</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_varargs'>varargs</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_kwargs'>kwargs</span><span class='rparen'>)</span>
 </code></pre>
 
 <p>This gives us the <code>and</code> matcher shorthand for array matchers.</p>
@@ -487,17 +495,17 @@ and is included in the gem.</p>
 
 <p>This is where I start going a bit off into the weeds. We&#39;re going to try and get RHA style pattern matching in Ruby.</p>
 
-<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Robert</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>22</span><span class='rbracket'>]</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Any</span><span class='comma'>,</span> <span class='int'>20</span><span class='op'>..</span><span class='int'>99</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='comma'>,</span> <span class='id identifier rubyid_a'>a</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_n'>n</span><span class='embexpr_end'>}</span><span class='tstring_content'> is an adult that is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_a'>a</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Any</span><span class='rparen'>)</span>
-<span class='rparen'>)</span>
+<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_case'><span class='object_link'><a href="Qo/PublicApi.html#case-instance_method" title="Qo::PublicApi#case (method)">case</a></span></span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Robert</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>22</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='const'>Any</span><span class='comma'>,</span> <span class='int'>20</span><span class='op'>..</span><span class='int'>99</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='comma'>,</span> <span class='id identifier rubyid_a'>a</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_n'>n</span><span class='embexpr_end'>}</span><span class='tstring_content'> is an adult that is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_a'>a</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span>
+<span class='rbrace'>}</span>
 <span class='comment'># =&gt; &quot;Robert is an adult that is 22 years old&quot;
 </span></code></pre>
 
-<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_people_objects'>people_objects</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='label'>name:</span> <span class='const'>Any</span><span class='comma'>,</span> <span class='label'>age:</span> <span class='int'>20</span><span class='op'>..</span><span class='int'>99</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is an adult that is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Any</span><span class='rparen'>)</span>
-<span class='rparen'>)</span>
+<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_case'><span class='object_link'><a href="Qo/PublicApi.html#case-instance_method" title="Qo::PublicApi#case (method)">case</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_people_objects'>people_objects</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='label'>name:</span> <span class='const'>Any</span><span class='comma'>,</span> <span class='label'>age:</span> <span class='int'>20</span><span class='op'>..</span><span class='int'>99</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> is an adult that is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='embexpr_end'>}</span><span class='tstring_content'> years old</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span>
+<span class='rbrace'>}</span>
 </code></pre>
 
 <p>In this case it&#39;s trying to do a few things:</p>
@@ -509,45 +517,41 @@ and is included in the gem.</p>
 
 <p>If no block function is provided, it assumes an identity function (<code>-&gt; v { v }</code>) instead. If no match is found, <code>nil</code> will be returned.</p>
 
-<p>If an initial target is not furnished, the matcher will become a curried proc awaiting a target. In more simple terms it just wants a target to run against, so let&#39;s give it a few with map:</p>
-
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span> <span class='id identifier rubyid_person'>person</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&gt;</span> <span class='int'>3</span> <span class='rbrace'>}</span>
 
-<span class='id identifier rubyid_people_objects'>people_objects</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span>
-    <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span>
-    <span class='id identifier rubyid_person'>person</span>
-  <span class='rbrace'>}</span><span class='comma'>,</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Any</span><span class='rparen'>)</span>
-<span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_people_objects'>people_objects</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='id identifier rubyid_name_longer_than_three'>name_longer_than_three</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_person'>person</span><span class='op'>|</span> <span class='const'>Person</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_person'>person</span><span class='period'>.</span><span class='id identifier rubyid_age'>age</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_else'>else</span>
+<span class='rbrace'>}</span><span class='rparen'>)</span>
 
 <span class='comment'># =&gt; [Person(age: 22, name: &quot;Rob&quot;), Person(age: 22, name: &quot;Rob&quot;), Person(age: 42, name: &quot;Foo&quot;), Person(age: 17, name: &quot;Bar&quot;)]
 </span></code></pre>
 
 <p>So we just truncated everyone&#39;s name that was longer than three characters.</p>
 
-<h3>6 - Helper functions</h3>
+<h3>5 - Helper functions</h3>
 
 <p>There are a few functions added for convenience, and it should be noted that because all Qo matchers respond to <code>===</code> that they can be used as helpers as well.</p>
 
-<h4>6.1 - Dig</h4>
+<h4>5.1 - Dig</h4>
 
 <p>Dig is used to get in deep at a nested hash value. It takes a dot-path and a <code>===</code> respondent matcher:</p>
 
-<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'><span class='object_link'><a href="Qo/Helpers.html#dig-instance_method" title="Qo::Helpers#dig (method)">dig</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a.b.c</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='int'>1</span><span class='op'>..</span><span class='int'>5</span><span class='comma'>,</span> <span class='int'>15</span><span class='op'>..</span><span class='int'>25</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>===</span> <span class='lbrace'>{</span><span class='label'>a:</span> <span class='lbrace'>{</span><span class='label'>b:</span> <span class='lbrace'>{</span><span class='label'>c:</span> <span class='int'>1</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span>
+<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a.b.c</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='int'>1</span><span class='op'>..</span><span class='int'>5</span><span class='comma'>,</span> <span class='int'>15</span><span class='op'>..</span><span class='int'>25</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>===</span> <span class='lbrace'>{</span><span class='label'>a:</span> <span class='lbrace'>{</span><span class='label'>b:</span> <span class='lbrace'>{</span><span class='label'>c:</span> <span class='int'>1</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span>
 <span class='comment'># =&gt; true
 </span>
-<span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'><span class='object_link'><a href="Qo/Helpers.html#dig-instance_method" title="Qo::Helpers#dig (method)">dig</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a.b.c</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='int'>1</span><span class='op'>..</span><span class='int'>5</span><span class='comma'>,</span> <span class='int'>15</span><span class='op'>..</span><span class='int'>25</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>===</span> <span class='lbrace'>{</span><span class='label'>a:</span> <span class='lbrace'>{</span><span class='label'>b:</span> <span class='lbrace'>{</span><span class='label'>c:</span> <span class='int'>20</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span>
+<span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a.b.c</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='int'>1</span><span class='op'>..</span><span class='int'>5</span><span class='comma'>,</span> <span class='int'>15</span><span class='op'>..</span><span class='int'>25</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>===</span> <span class='lbrace'>{</span><span class='label'>a:</span> <span class='lbrace'>{</span><span class='label'>b:</span> <span class='lbrace'>{</span><span class='label'>c:</span> <span class='int'>20</span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rbrace'>}</span>
 <span class='comment'># =&gt; true
 </span></code></pre>
 
 <p>To be fair that means anything that can respond to <code>===</code>, including classes and other such things.</p>
 
-<h4>6.2 - Count By</h4>
+<h4>5.2 - Count By</h4>
 
 <p>This ends up coming up a lot, especially around querying, so let&#39;s get a way to count by!</p>
 
-<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_count_by'><span class='object_link'><a href="Qo/Helpers.html#count_by-instance_method" title="Qo::Helpers#count_by (method)">count_by</a></span></span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='int'>1</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>3</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_count_by'>count_by</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='int'>1</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>3</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 
 <span class='comment'># =&gt; {
 </span><span class='comment'>#   1 =&gt; 2,
@@ -555,7 +559,7 @@ and is included in the gem.</p>
 </span><span class='comment'>#   3 =&gt; 1
 </span><span class='comment'># }
 </span>
-<span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_count_by'><span class='object_link'><a href="Qo/Helpers.html#count_by-instance_method" title="Qo::Helpers#count_by (method)">count_by</a></span></span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='int'>1</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>3</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>1</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='symbol'>:even?</span><span class='rparen'>)</span>
+<span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_count_by'>count_by</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='int'>1</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>3</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>2</span><span class='comma'>,</span><span class='int'>1</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='symbol'>:even?</span><span class='rparen'>)</span>
 
 <span class='comment'># =&gt; {
 </span><span class='comment'>#   false =&gt; 3,
@@ -563,17 +567,98 @@ and is included in the gem.</p>
 </span><span class='comment'># }
 </span></code></pre>
 
-<h3>5 - Hacky Fun Time</h3>
+<p>This feature may be added to Ruby 2.6+: <a href="https://bugs.ruby-lang.org/issues/11076">https://bugs.ruby-lang.org/issues/11076</a></p>
+
+<h3>6 - Custom Pattern Matchers</h3>
+
+<p>With the release of Qo 1.0.0 we introduced the idea of custom branches and pattern matchers for more advanced
+users of the library.</p>
+
+<p>Consider a Monadic type like <code>Some</code> and <code>None</code>:</p>
+
+<pre class="code ruby"><code class="ruby"># Technically Some and None don&#39;t exist yet, so we have to &quot;cheat&quot; instead
+# of just saying `Some` for the precondition
+#
+# We start by defining two branches that match against a Some type and a None
+# type, extracting the value on match before yielding to their associated
+# functions
+SomeBranch = Qo.create_branch(
+  name:        &#39;some&#39;,
+  precondition: -&gt; v { v.is_a?(Some) },
+  extractor:    :value
+)
+
+NoneBranch = Qo.create_branch(
+  name:        &#39;none&#39;,
+  precondition: -&gt; v { v.is_a?(None) },
+  extractor:    :value
+)
+
+# Now we create a new pattern matching class with those branches. Note that
+# there&#39;s nothing stopping you from making as many branches as you want,
+# except that it may get confusing after a while.
+SomePatternMatch = Qo.create_pattern_match(branches: [
+  SomeBranch,
+  NoneBranch
+])
+
+class Some
+  # There&#39;s also a provided mixin that gives an `match` method that
+  # works exactly like a pattern match without having to use it explicitly
+  include SomePatternMatch.mixin
+
+  attr_reader :value
+
+  def initialize(value) @value = value end
+  def self.[](value)    new(value)     end
+
+  def fmap(&amp;fn)
+    new_value = fn.call(value)
+    new_value ? Some[new_value] : None[value]
+  end
+end
+
+class None
+  include SomePatternMatch.mixin
+
+  attr_reader :value
+
+  def initialize(value) @value = value end
+  def self.[](value)    new(value)     end
+
+  def fmap(&amp;fn) None[value] end
+end
+
+# So now we can pattern match with `some` and `none` branches using the `match`
+# method that was mixed into both types.
+Some[1]
+  .fmap { |v| v * 2 }
+  .match { |m|
+    m.some { |v| v + 100 }
+    m.none { &quot;OHNO!&quot; }
+  }
+=&gt; 102
+
+Some[1]
+  .fmap { |v| nil }
+  .match { |m|
+    m.some { |v| v + 100 }
+    m.none { &quot;OHNO!&quot; }
+  }
+=&gt; &quot;OHNO!&quot;
+</code></pre>
+
+<h3>7 - Hacky Fun Time</h3>
 
 <p>These examples will grow over the next few weeks as I think of more fun things to do with Qo. PRs welcome if you find fun uses!</p>
 
-<h4>5.1 - JSON and HTTP</h4>
+<h4>7.1 - JSON and HTTP</h4>
 
 <blockquote>
 <p>Note that Qo does not support deep querying of hashes (yet)</p>
 </blockquote>
 
-<h5>5.1.1 - JSON Placeholder</h5>
+<h5>7.1.1 - JSON Placeholder</h5>
 
 <p>Qo tries to be clever though, it assumes Symbol keys first and then String keys, so how about some JSON?:</p>
 
@@ -605,7 +690,7 @@ and is included in the gem.</p>
 <span class='comment'># We could even use dig to get at some of the same information. This and the above will
 </span><span class='comment'># return the same results even.
 </span><span class='id identifier rubyid_users'>users</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_and'><span class='object_link'><a href="Qo/PublicApi.html#and-instance_method" title="Qo::PublicApi#and (method)">and</a></span></span><span class='lparen'>(</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'><span class='object_link'><a href="Qo/Helpers.html#dig-instance_method" title="Qo::Helpers#dig (method)">dig</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>address.zipcode</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^9</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^4</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>address.zipcode</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^9</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^4</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
   <span class='label'>name:</span> <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_or'><span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^Nicholas</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\w+ \w+$</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
 <span class='rparen'>)</span><span class='rparen'>)</span>
 </code></pre>
@@ -618,32 +703,48 @@ and is included in the gem.</p>
 this particular case it&#39;ll let you check against the type signatures of the
 HTTP responses.</p>
 
-<pre class="code ruby"><code class="ruby"><span class='kw'>def</span> <span class='id identifier rubyid_get_url'>get_url</span><span class='lparen'>(</span><span class='id identifier rubyid_url'>url</span><span class='rparen'>)</span>
-  <span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTP</span><span class='period'>.</span><span class='id identifier rubyid_get_response'>get_response</span><span class='lparen'>(</span><span class='const'>URI</span><span class='lparen'>(</span><span class='id identifier rubyid_url'>url</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_yield_self'>yield_self</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span>
-    <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTPSuccess</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span> <span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Any</span><span class='rparen'>)</span>              <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_response'>response</span><span class='op'>|</span> <span class='id identifier rubyid_raise'>raise</span> <span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span> <span class='rbrace'>}</span>
-  <span class='rparen'>)</span><span class='rparen'>)</span>
-<span class='kw'>end</span>
+<pre class="code ruby"><code class="ruby">def get_url(url)
+  Net::HTTP.get_response(URI(url)).yield_self(&amp;Qo.match { |m|
+    m.when(Net::HTTPSuccess) { |response| response.body.size },
+    m.else                   { |response| raise response.message }
+  })
+end
 
-<span class='id identifier rubyid_get_url'>get_url</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://github.com/baweaver/qo</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-<span class='comment'># =&gt; 142387
-</span><span class='id identifier rubyid_get_url'>get_url</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>https://github.com/baweaver/qo/does_not_exist</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
-<span class='comment'># =&gt; RuntimeError: Not Found
-</span></code></pre>
+get_url(&#39;https://github.com/baweaver/qo&#39;)
+# =&gt; 142387
+get_url(&#39;https://github.com/baweaver/qo/does_not_exist&#39;)
+# =&gt; RuntimeError: Not Found
+</code></pre>
 
 <p>The difference between this and case? Well, the first is you can pass this to
 <code>yield_self</code> for a more inline solution. The second is that any Qo matcher can
 be used in there, including predicate and content checks on the body:</p>
 
-<pre class="code ruby"><code class="ruby"><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTPSuccess</span><span class='comma'>,</span> <span class='label'>body:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Qo</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='const'>Net</span><span class='op'>::</span><span class='const'>HTTPSuccess</span><span class='comma'>,</span> <span class='label'>body:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Qo</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
 </code></pre>
 
 <p>You could put as many checks as you want in there, or use different Qo matchers
 nested to get even further in.</p>
 
-<h4>5.2 - Opsy Stuff</h4>
+<p>Now if we wanted to add more power and create an HTTP matcher:</p>
 
-<h5>5.2.1 - NMap</h5>
+<pre class="code ruby"><code class="ruby">HTTP_Matcher = Qo.create_pattern_match(branches: [
+  Qo.create_branch(name: &#39;success&#39;, precondition: Net::HTTPSuccess),
+  Qo.create_branch(name: &#39;error&#39;, precondition: Net::HTTPError),
+  Qo::Braches::ElseBranch
+])
+
+def get_url(url)
+  Net::HTTP.get_response(URI(url)).then(&amp;HTTP_Matcher.match { |m|
+    m.success { |response| response.body.size },
+    m.else    { |response| raise response.message }
+  })
+end
+</code></pre>
+
+<h4>7.2 - Opsy Stuff</h4>
+
+<h5>7.2.1 - NMap</h5>
 
 <p>What about NMap for our Opsy friends? Well, simulated, but still fun.</p>
 
@@ -654,17 +755,17 @@ hosts.select(&amp;Qo[IPAddr.new(&#39;192.168.1.1/8&#39;)])
 =&gt; [[&quot;192.168.1.1&quot;, &quot;(Router)&quot;], [&quot;192.168.1.2&quot;, &quot;(My Computer)&quot;]]
 </code></pre>
 
-<h5>5.2.2 - <code>df</code></h5>
+<h5>7.2.2 - <code>df</code></h5>
 
 <p>The nice thing about Unix style commands is that they use headers, which means CSV can get a hold of them for some good formatting. It&#39;s also smart enough to deal with space separators that may vary in length:</p>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_rows'>rows</span> <span class='op'>=</span> <span class='const'>CSV</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='backtick'>`</span><span class='tstring_content'>df -h</span><span class='tstring_end'>`</span></span><span class='comma'>,</span> <span class='label'>col_sep:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>headers:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:to_h</span><span class='rparen'>)</span>
 
-<span class='id identifier rubyid_rows'>rows</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span><span class='lparen'>(</span>
-  <span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_m'>m</span><span class='lparen'>(</span><span class='label'>Avail:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Gi$</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_row'>row</span><span class='op'>|</span>
+<span class='id identifier rubyid_rows'>rows</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='const'><span class='object_link'><a href="Qo.html" title="Qo (module)">Qo</a></span></span><span class='period'>.</span><span class='id identifier rubyid_match'><span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span></span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_m'>m</span><span class='op'>|</span>
+  <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_when'>when</span><span class='lparen'>(</span><span class='label'>Avail:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Gi$</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_row'>row</span><span class='op'>|</span>
     <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_row'>row</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Filesystem</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> mounted on </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_row'>row</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Mounted</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> [</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_row'>row</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Avail</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> / </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_row'>row</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Size</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span>
-<span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+<span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
 <span class='comment'># =&gt; [&quot;/dev/***** mounted on / [186Gi / 466Gi]&quot;]
 </span></code></pre>
 
@@ -705,9 +806,9 @@ hosts.select(&amp;Qo[IPAddr.new(&#39;192.168.1.1/8&#39;)])
 </div></div>
 
       <div id="footer">
-  Generated on Sun Aug  5 20:52:09 2018 by
+  Generated on Mon Feb 18 01:59:30 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.12 (ruby-2.5.1).
+  0.9.12 (ruby-2.6.1).
 </div>
 
     </div>

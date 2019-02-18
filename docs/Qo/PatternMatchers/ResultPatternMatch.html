@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Qo::PatternMatchers::ResultPatternMatch
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Qo::PatternMatchers::ResultPatternMatch";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Qo.html" title="Qo (module)">Qo</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../PatternMatchers.html" title="Qo::PatternMatchers (module)">PatternMatchers</a></span></span>
+     &raquo; 
+    <span class="title">ResultPatternMatch</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Qo::PatternMatchers::ResultPatternMatch
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="PatternMatch.html" title="Qo::PatternMatchers::PatternMatch (class)">PatternMatch</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="PatternMatch.html" title="Qo::PatternMatchers::PatternMatch (class)">PatternMatch</a></span></li>
+          
+            <li class="next">Qo::PatternMatchers::ResultPatternMatch</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/qo/pattern_matchers/result_pattern_match.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Unlike the normal pattern matcher, this one works on tuple arrays containing
+a status and a result like <code>[:ok, result]</code> and <code>[:err, message]</code>.</p>
+
+<p>Note that each of these can still take conditionals much like a <code>where</code>
+branch for more fine grained control over what we&#39;re looking for.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code>```ruby
+matcher = Qo.result_match { |m|
+  m.success(String) { |v| &quot;Hello #{v}&quot;}
+  m.success         { |v| v + 10 }
+  m.failure         { |v| &quot;Error: #{v}&quot; }
+}
+
+matcher.call([:ok, &#39;there&#39;])
+# =&gt; &quot;Hello there&quot;
+
+matcher.call([:ok, 4])
+# =&gt; 14
+
+matcher.call([:err, &#39;OH NO&#39;])
+# =&gt; &quot;Error: OH NO&quot;
+```</code></pre>
+    
+  </div>
+
+<p class="tag_title">Author:</p>
+<ul class="author">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>baweaver</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(destructure: false)  &#x21d2; type </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new result matcher.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="PatternMatch.html" title="Qo::PatternMatchers::PatternMatch (class)">PatternMatch</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="PatternMatch.html#call-instance_method" title="Qo::PatternMatchers::PatternMatch#call (method)">#call</a></span>, <span class='object_link'><a href="PatternMatch.html#create-class_method" title="Qo::PatternMatchers::PatternMatch.create (method)">create</a></span>, <span class='object_link'><a href="PatternMatch.html#mixin-class_method" title="Qo::PatternMatchers::PatternMatch.mixin (method)">mixin</a></span>, <span class='object_link'><a href="PatternMatch.html#to_proc-instance_method" title="Qo::PatternMatchers::PatternMatch#to_proc (method)">#to_proc</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Branching.html" title="Qo::PatternMatchers::Branching (module)">Branching</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Branching.html#included-class_method" title="Qo::PatternMatchers::Branching.included (method)">included</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(destructure: false)  &#x21d2; <tt>type</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new result matcher</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>destructure:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>false [Boolean]
+Whether or not to destructure the value before yielding to
+the first matched block</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+40
+41
+42</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/pattern_matchers/result_pattern_match.rb', line 40</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='id identifier rubyid_destructure'>destructure</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Feb 18 01:59:30 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.6.1).
+</div>
+
+    </div>
+  </body>
+</html>

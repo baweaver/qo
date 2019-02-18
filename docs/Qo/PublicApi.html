@@ -180,7 +180,7 @@ disappointment from the creator.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#match-instance_method" title="#match (instance method)">#<strong>match</strong>(*args, &amp;fn)  &#x21d2; Qo::PatternMatchBlock, ... </a>
+      <a href="#case-instance_method" title="#case (instance method)">#<strong>case</strong>(value, destructure: false, &amp;fn)  &#x21d2; Any </a>
     
 
     
@@ -194,7 +194,7 @@ disappointment from the creator.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>&quot;Curried&quot; function that waits for a target, or evaluates immediately if given one.</p>
+    <span class="summary_desc"><div class='inline'><p>Similar to the common case statement of Ruby, except in that it behaves as if <code>Array#===</code> and <code>Hash#===</code> exist in the form of Qo matchers.</p>
 </div></span>
   
 </li>
@@ -203,11 +203,9 @@ disappointment from the creator.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#matcher-instance_method" title="#matcher (instance method)">#<strong>matcher</strong>(*array_matchers, **keyword_matchers, &amp;fn)  &#x21d2; Proc[Any] </a>
+      <a href="#create_branch-instance_method" title="#create_branch (instance method)">#<strong>create_branch</strong>(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)  &#x21d2; Class </a>
     
 
-    
-      (also: #m)
     
   </span>
   
@@ -219,7 +217,53 @@ disappointment from the creator.</p>
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Creates a Guard Block matcher.</p>
+    <span class="summary_desc"><div class='inline'><p>Dynamically creates a new branch to be used with custom pattern matchers.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#create_pattern_match-instance_method" title="#create_pattern_match (instance method)">#<strong>create_pattern_match</strong>(branches:)  &#x21d2; Class </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new type of pattern matcher from a set of branches.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match-instance_method" title="#match (instance method)">#<strong>match</strong>(destructure: false, &amp;fn)  &#x21d2; Qo::PatternMatch </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A pattern match will try and run all guard block style matchers in sequence until it finds one that &quot;matches&quot;.</p>
 </div></span>
   
 </li>
@@ -266,6 +310,52 @@ disappointment from the creator.</p>
 
   
     <span class="summary_desc"><div class='inline'><p>Creates an <code>or</code> type query matcher.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#result_case-instance_method" title="#result_case (instance method)">#<strong>result_case</strong>(target, destructure: false, &amp;fn)  &#x21d2; Any </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Similar to <code>case</code>, except it uses a <code>ResultPatternMatch</code> instead.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#result_match-instance_method" title="#result_match (instance method)">#<strong>result_match</strong>(destructure: false, &amp;fn)  &#x21d2; Proc[Any] =&gt; Any </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Similar to <code>match</code>, except it uses a <code>ResultPatternMatch</code> which instead responds to tuple types:.</p>
 </div></span>
   
 </li>
@@ -383,12 +473,12 @@ a false match.</p>
       <pre class="lines">
 
 
-23
-24
-25</pre>
+26
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 23</span>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='kw'>and</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>and</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
@@ -399,9 +489,9 @@ a false match.</p>
 </div>
     
       <div class="method_details ">
-  <h3 class="signature " id="match-instance_method">
+  <h3 class="signature " id="case-instance_method">
   
-    #<strong>match</strong>(*args, &amp;fn)  &#x21d2; <tt>Qo::PatternMatchBlock</tt>, ... 
+    #<strong>case</strong>(value, destructure: false, &amp;fn)  &#x21d2; <tt>Any</tt> 
   
 
   
@@ -409,86 +499,43 @@ a false match.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>&quot;Curried&quot; function that waits for a target, or evaluates immediately if given
-one.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>I refer to the potential 2.6+ features currently being discussed here:</p>
 
-<p>A PatternMatch will try and run all GuardBlock matchers in sequence until
-it finds one that &quot;matches&quot;. Once found, it will pass the target into the
-associated matcher&#39;s block function.</p>
+<ul>
+<li><code>Hash#===</code>  - <a href="https://bugs.ruby-lang.org/issues/14869">https://bugs.ruby-lang.org/issues/14869</a></li>
+<li><code>Array#===</code> - <a href="https://bugs.ruby-lang.org/issues/14916">https://bugs.ruby-lang.org/issues/14916</a></li>
+</ul>
+</div>
+  </div>
+
+<p>Similar to the common case statement of Ruby, except in that it behaves
+as if <code>Array#===</code> and <code>Hash#===</code> exist in the form of Qo matchers.</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code>Qo.case([1, 1]) { |m|
+  m.when(Any, Any) { |a, b| a + b }
+  m.else { |v| v }
+}
+=&gt; 2</code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
       
-        <span class='name'>fn</span>
-      
-      
-        <span class='type'>(<tt>Proc</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>If provided, the pattern match will become block-style, utilizing
-PatternMatchBlock instead. If any args are provided, the first
-will be treated as the target.</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>*args</span>
-      
-      
-        <span class='type'>(<tt>Array[Any, *GuardBlockMatcher]</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>Collection of matchers to run, potentially prefixed by a target object</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Qo::PatternMatchBlock</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>If a value is not provided, a block style pattern match will be returned
-that responds to proc coercion. It can be used for functions like <code>map</code>.</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-      
-        <span class='type'>(<tt>Qo::PatternMatch</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>If a value is not provided and no function is present, a PatternMatch
-will be returned, awaiting a value to match against.</p>
-</div>
-      
-    </li>
-  
-    <li>
+        <span class='name'>value</span>
       
       
         <span class='type'>(<tt>Any</tt>)</span>
@@ -496,129 +543,25 @@ will be returned, awaiting a value to match against.</p>
       
       
         &mdash;
-        <div class='inline'><p>If a value is provided, matchers will attempt to call through on it,
-returning the result of the function.</p>
+        <div class='inline'><p>Value to match against</p>
 </div>
       
     </li>
   
-</ul>
-<p class="tag_title">Since:</p>
-<ul class="since">
-  
     <li>
       
+        <span class='name'>destructure:</span>
       
       
-      
-        
-        <div class='inline'><p>0.2.0</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 104</span>
-
-<span class='kw'>def</span> <span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
-    <span class='kw'>return</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span>
-      <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/PatternMatchBlock.html" title="Qo::Matchers::PatternMatchBlock (class)">PatternMatchBlock</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/PatternMatchBlock.html#initialize-instance_method" title="Qo::Matchers::PatternMatchBlock#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span> <span class='op'>:</span>
-      <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/PatternMatchBlock.html" title="Qo::Matchers::PatternMatchBlock (class)">PatternMatchBlock</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/PatternMatchBlock.html#initialize-instance_method" title="Qo::Matchers::PatternMatchBlock#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Matchers/PatternMatchBlock.html#call-instance_method" title="Qo::Matchers::PatternMatchBlock#call (method)">call</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>if</span> <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/GuardBlockMatcher.html" title="Qo::Matchers::GuardBlockMatcher (class)">GuardBlockMatcher</a></span></span><span class='rparen'>)</span>
-    <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/PatternMatch.html" title="Qo::Matchers::PatternMatch (class)">PatternMatch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/PatternMatch.html#initialize-instance_method" title="Qo::Matchers::PatternMatch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
-  <span class='kw'>else</span>
-    <span class='id identifier rubyid_match_target'>match_target</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_qo_matchers'>qo_matchers</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span>
-    <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/PatternMatch.html" title="Qo::Matchers::PatternMatch (class)">PatternMatch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/PatternMatch.html#initialize-instance_method" title="Qo::Matchers::PatternMatch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_qo_matchers'>qo_matchers</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Matchers/PatternMatch.html#call-instance_method" title="Qo::Matchers::PatternMatch#call (method)">call</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_match_target'>match_target</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <h3 class="signature " id="matcher-instance_method">
-  
-    #<strong>matcher</strong>(*array_matchers, **keyword_matchers, &amp;fn)  &#x21d2; <tt>Proc[Any]</tt> 
-  
-
-  
-    <span class="aliases">Also known as:
-    <span class="names"><span id='m-instance_method'>m</span></span>
-    </span>
-  
-
-  
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>Creates a Guard Block matcher.</p>
-
-<p>A guard block matcher is used to guard a function from running unless
-the left-hand matcher passes. Once called with a value, it will either
-return <code>[false, false]</code> or <code>[true, Any]</code>.</p>
-
-<p>This wrapping is done to preserve intended false or nil responses,
-and is unwrapped with match below.</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  <p class="tag_title">Parameters:</p>
-<ul class="param">
-  
-    <li>
-      
-        <span class='name'>*array_matchers</span>
+        <span class='type'>(<tt>Boolean</tt>)</span>
       
       
-        <span class='type'>(<tt>Array</tt>)</span>
-      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
       
       
         &mdash;
-        <div class='inline'><p>varargs matchers</p>
-</div>
-      
-    </li>
-  
-    <li>
-      
-        <span class='name'>**keyword_matchers</span>
-      
-      
-        <span class='type'>(<tt>Hash</tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>kwargs matchers</p>
+        <div class='inline'><p>Whether or not to destructure an object before yielding it to the
+given function.</p>
 </div>
       
     </li>
@@ -633,7 +576,7 @@ and is unwrapped with match below.</p>
       
       
         &mdash;
-        <div class='inline'><p>Guarded function</p>
+        <div class='inline'><p>Body of the matcher, as shown above</p>
 </div>
       
     </li>
@@ -646,12 +589,199 @@ and is unwrapped with match below.</p>
     <li>
       
       
-        <span class='type'>(<tt>Proc[Any]</tt>)</span>
+        <span class='type'>(<tt>Any</tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>Any -&gt; Proc[Any]</p>
+        <div class='inline'><p>The result of calling a pattern match with a provided value</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>Qo#match</li>
+    
+  </ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>0.2.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='kw'>case</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>destructure:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers.html" title="Qo::PatternMatchers (module)">PatternMatchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers/PatternMatch.html" title="Qo::PatternMatchers::PatternMatch (class)">PatternMatch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="PatternMatchers/PatternMatch.html#initialize-instance_method" title="Qo::PatternMatchers::PatternMatch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='id identifier rubyid_destructure'>destructure</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="PatternMatchers/PatternMatch.html#call-instance_method" title="Qo::PatternMatchers::PatternMatch#call (method)">call</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="create_branch-instance_method">
+  
+    #<strong>create_branch</strong>(name:, precondition: Any, extractor: IDENTITY, destructure: false, default: false)  &#x21d2; <tt>Class</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Dynamically creates a new branch to be used with custom pattern matchers.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name:</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Name of the branch. This is what binds to the pattern match as a method,
+meaning a name of <code>where</code> will result in calling it as <code>m.where</code>.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>precondition:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>Any</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Any [Symbol, #===]
+A precondition to the branch being considered true. This is done for
+static conditions like a certain type or perhaps checking a tuple type
+like <code>[:ok, value]</code>.</p>
+
+<p>If a <code>Symbol</code> is given, Qo will coerce it into a proc. This is done to
+make a nicer shorthand for creating a branch.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>extractor:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>IDENTITY</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>IDENTITY [Proc, Symbol]
+How to pull the value out of a target object when a branch matches before
+calling the associated function. For a monadic type this might be something
+like extracting the value before yielding to the given block.</p>
+
+<p>If a <code>Symbol</code> is given, Qo will coerce it into a proc. This is done to
+make a nicer shorthand for creating a branch.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>destructure:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>false
+Whether or not to destructure the given object before yielding to the
+associated block. This means that the given block now places great
+importance on the argument names, as they&#39;ll be used to extract values
+from the associated object by that same method name, or key name in the
+case of hashes.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>default:</span>
+      
+      
+        <span class='type'></span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>false [Boolean]
+Whether this branch is considered to be a default condition. This is
+done to ensure that a branch runs last after all other conditions have
+failed. An example of this would be an <code>else</code> branch.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Class</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Anonymous branch class to be bound to a constant or used directly</p>
 </div>
       
     </li>
@@ -679,15 +809,245 @@ and is unwrapped with match below.</p>
       <pre class="lines">
 
 
-71
-72
-73</pre>
+220
+221
+222
+223
+224
+225
+226
+227
+228</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 71</span>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 220</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_matcher'>matcher</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
-  <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers.html" title="Qo::Matchers (module)">Matchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Matchers/GuardBlockMatcher.html" title="Qo::Matchers::GuardBlockMatcher (class)">GuardBlockMatcher</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Matchers/GuardBlockMatcher.html#initialize-instance_method" title="Qo::Matchers::GuardBlockMatcher#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_create_branch'>create_branch</span><span class='lparen'>(</span><span class='label'>name:</span><span class='comma'>,</span> <span class='label'>precondition:</span> <span class='const'>Any</span><span class='comma'>,</span> <span class='label'>extractor:</span> <span class='const'><span class='object_link'><a href="../Qo.html#IDENTITY-constant" title="Qo::IDENTITY (constant)">IDENTITY</a></span></span><span class='comma'>,</span> <span class='label'>destructure:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Branches.html" title="Qo::Branches (module)">Branches</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Branches/Branch.html" title="Qo::Branches::Branch (class)">Branch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_create'><span class='object_link'><a href="Branches/Branch.html#create-class_method" title="Qo::Branches::Branch.create (method)">create</a></span></span><span class='lparen'>(</span>
+    <span class='label'>name:</span>         <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+    <span class='label'>precondition:</span> <span class='id identifier rubyid_precondition'>precondition</span><span class='comma'>,</span>
+    <span class='label'>extractor:</span>    <span class='id identifier rubyid_extractor'>extractor</span><span class='comma'>,</span>
+    <span class='label'>destructure:</span>  <span class='id identifier rubyid_destructure'>destructure</span><span class='comma'>,</span>
+    <span class='label'>default:</span>      <span class='id identifier rubyid_default'>default</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="create_pattern_match-instance_method">
+  
+    #<strong>create_pattern_match</strong>(branches:)  &#x21d2; <tt>Class</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new type of pattern matcher from a set of branches</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>branches:</span>
+      
+      
+        <span class='type'>(<tt>Array[Branch]</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>An array of branches that this pattern matcher will respond to</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Class</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Anonymous pattern matcher to be bound to a constant or used directly</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>0.2.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+237
+238
+239</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 237</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_create_pattern_match'>create_pattern_match</span><span class='lparen'>(</span><span class='label'>branches:</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers.html" title="Qo::PatternMatchers (module)">PatternMatchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers/PatternMatch.html" title="Qo::PatternMatchers::PatternMatch (class)">PatternMatch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_create'><span class='object_link'><a href="PatternMatchers/PatternMatch.html#create-class_method" title="Qo::PatternMatchers::PatternMatch.create (method)">create</a></span></span><span class='lparen'>(</span><span class='label'>branches:</span> <span class='id identifier rubyid_branches'>branches</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="match-instance_method">
+  
+    #<strong>match</strong>(destructure: false, &amp;fn)  &#x21d2; <tt>Qo::PatternMatch</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>A pattern match will try and run all guard block style matchers in sequence
+until it finds one that &quot;matches&quot;. Once found, it will pass the target
+into the associated matcher&#39;s block function.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code>[1,2,3].map(&amp;Qo.match { |m|
+  m.when(:even?) { |v| v * 3 }
+  m.else         { |v| v - 1 }
+})
+=&gt; [0, 6, 2]</code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>destructure:</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether or not to destructure an object before yielding it to the
+given function.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>fn</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Body of the matcher, as shown in examples</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Qo::PatternMatch</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>A function awaiting a value to match against</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>0.2.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+85
+86
+87
+88
+89</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 85</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='kw'>false</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+
+  <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers.html" title="Qo::PatternMatchers (module)">PatternMatchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers/PatternMatch.html" title="Qo::PatternMatchers::PatternMatch (class)">PatternMatch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="PatternMatchers/PatternMatch.html#initialize-instance_method" title="Qo::PatternMatchers::PatternMatch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='id identifier rubyid_destructure'>destructure</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -787,12 +1147,12 @@ a true match.</p>
       <pre class="lines">
 
 
-52
-53
-54</pre>
+61
+62
+63</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 52</span>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='kw'>not</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>not</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
@@ -895,15 +1255,295 @@ a true match.</p>
       <pre class="lines">
 
 
-39
-40
-41</pre>
+45
+46
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='kw'>or</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_create_matcher'>create_matcher</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>or</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_array_matchers'>array_matchers</span><span class='comma'>,</span> <span class='id identifier rubyid_keyword_matchers'>keyword_matchers</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="result_case-instance_method">
+  
+    #<strong>result_case</strong>(target, destructure: false, &amp;fn)  &#x21d2; <tt>Any</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Similar to <code>case</code>, except it uses a <code>ResultPatternMatch</code> instead.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>target</span>
+      
+      
+        <span class='type'>(<tt>Any</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Target to match against</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>destructure:</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether or not to destructure an object before yielding it to the
+given function.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>&amp;fn</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Body of the matcher, as shown above</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Any</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Result of the match</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#match-instance_method" title="Qo::PublicApi#match (method)">#match</a></span></li>
+    
+      <li><span class='object_link'><a href="#result_match-instance_method" title="Qo::PublicApi#result_match (method)">#result_match</a></span></li>
+    
+      <li><span class='object_link'><a href="#case-instance_method" title="Qo::PublicApi#case (method)">#case</a></span></li>
+    
+  </ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>0.2.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+178
+179
+180
+181
+182</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 178</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_result_case'>result_case</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='comma'>,</span> <span class='label'>destructure:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers.html" title="Qo::PatternMatchers (module)">PatternMatchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers/ResultPatternMatch.html" title="Qo::PatternMatchers::ResultPatternMatch (class)">ResultPatternMatch</a></span></span>
+    <span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='id identifier rubyid_destructure'>destructure</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
+    <span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="result_match-instance_method">
+  
+    #<strong>result_match</strong>(destructure: false, &amp;fn)  &#x21d2; <tt>Proc[Any] =&gt; Any</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Similar to <code>match</code>, except it uses a <code>ResultPatternMatch</code> which instead
+responds to tuple types:</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <p class="tag_title">Examples:</p>
+    
+      
+      <pre class="example code"><code>
+```ruby
+pm = Qo.result_match { |m|
+  m.success { |v| v + 10 }
+  m.failure { |v| &quot;Error: #{v}&quot; }
+}
+
+pm.call([:ok, 3])
+# =&gt; 13
+
+pm.call([:err, &quot;No Good&quot;])
+# =&gt; &quot;Error: No Good&quot;
+```</code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>destructure:</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether or not to destructure an object before yielding it to the
+given function.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>&amp;fn</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Body of the matcher, as shown above</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Proc[Any] =&gt; Any</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Proc awaiting a value to match against.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="#match-instance_method" title="Qo::PublicApi#match (method)">#match</a></span></li>
+    
+  </ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>0.2.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+154
+155
+156
+157
+158</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/qo/public_api.rb', line 154</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_result_match'>result_match</span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='kw'>false</span> <span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+
+  <span class='const'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers.html" title="Qo::PatternMatchers (module)">PatternMatchers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="PatternMatchers/ResultPatternMatch.html" title="Qo::PatternMatchers::ResultPatternMatch (class)">ResultPatternMatch</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="PatternMatchers/ResultPatternMatch.html#initialize-instance_method" title="Qo::PatternMatchers::ResultPatternMatch#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>destructure:</span> <span class='id identifier rubyid_destructure'>destructure</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_fn'>fn</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -915,9 +1555,9 @@ a true match.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Aug  5 20:52:10 2018 by
+  Generated on Mon Feb 18 01:59:30 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.12 (ruby-2.5.1).
+  0.9.12 (ruby-2.6.1).
 </div>
 
     </div>

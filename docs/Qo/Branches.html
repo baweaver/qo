@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Qo::Branches
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Qo::Branches";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (B)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Qo.html" title="Qo (module)">Qo</a></span></span>
+     &raquo; 
+    <span class="title">Branches</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Qo::Branches
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/qo/branches/branches.rb<span class="defines">,<br />
+  lib/qo/branches/branch.rb,<br /> lib/qo/branches/else_branch.rb,<br /> lib/qo/branches/when_branch.rb,<br /> lib/qo/branches/error_branch.rb,<br /> lib/qo/branches/failure_branch.rb,<br /> lib/qo/branches/success_branch.rb,<br /> lib/qo/branches/monadic_else_branch.rb,<br /> lib/qo/branches/monadic_when_branch.rb</span>
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>In Qo, a Branch is one of the callable branches in a pattern match. Most
+commonly you&#39;ll see this expressed in a <code>where</code> or <code>else</code> branch, named
+as such to emulate a <code>case</code> statement:</p>
+
+<pre class="code ruby"><code class="ruby">Qo.match { |m|
+  m.when(conditions) { code executed when matched }
+  m.else { code executed otherwise }
+}
+</code></pre>
+
+<p>More documentation on the creation of branches is available in <code>Branch</code></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Branches/Branch.html" title="Qo::Branches::Branch (class)">Branch</a></span></li>
+    
+  </ul>
+<p class="tag_title">Author:</p>
+<ul class="author">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>baweaver</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Since:</p>
+<ul class="since">
+  
+    <li>
+      
+      
+      
+      
+        
+        <div class='inline'><p>1.0.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Branches/Branch.html" title="Qo::Branches::Branch (class)">Branch</a></span>, <span class='object_link'><a href="Branches/ElseBranch.html" title="Qo::Branches::ElseBranch (class)">ElseBranch</a></span>, <span class='object_link'><a href="Branches/ErrorBranch.html" title="Qo::Branches::ErrorBranch (class)">ErrorBranch</a></span>, <span class='object_link'><a href="Branches/FailureBranch.html" title="Qo::Branches::FailureBranch (class)">FailureBranch</a></span>, <span class='object_link'><a href="Branches/MonadicElseBranch.html" title="Qo::Branches::MonadicElseBranch (class)">MonadicElseBranch</a></span>, <span class='object_link'><a href="Branches/MonadicWhenBranch.html" title="Qo::Branches::MonadicWhenBranch (class)">MonadicWhenBranch</a></span>, <span class='object_link'><a href="Branches/SuccessBranch.html" title="Qo::Branches::SuccessBranch (class)">SuccessBranch</a></span>, <span class='object_link'><a href="Branches/WhenBranch.html" title="Qo::Branches::WhenBranch (class)">WhenBranch</a></span>
+    
+  
+</p>
+
+
+
+
+
+
+
+
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Feb 18 01:59:30 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.6.1).
+</div>
+
+    </div>
+  </body>
+</html>

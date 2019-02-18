@@ -71,7 +71,7 @@
   
   <dl>
       <dt>Extended by:</dt>
-      <dd><span class='object_link'><a href="Qo/Exceptions.html" title="Qo::Exceptions (module)">Exceptions</a></span>, <span class='object_link'><a href="Qo/Helpers.html" title="Qo::Helpers (module)">Helpers</a></span>, <span class='object_link'><a href="Qo/PublicApi.html" title="Qo::PublicApi (module)">PublicApi</a></span></dd>
+      <dd><span class='object_link'><a href="Qo/Exceptions.html" title="Qo::Exceptions (module)">Exceptions</a></span>, <span class='object_link'><a href="Qo/PublicApi.html" title="Qo::PublicApi (module)">PublicApi</a></span></dd>
   </dl>
   
   
@@ -84,7 +84,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/qo.rb<span class="defines">,<br />
-  lib/qo/helpers.rb,<br /> lib/qo/version.rb,<br /> lib/qo/exceptions.rb,<br /> lib/qo/public_api.rb,<br /> lib/qo/matchers/base_matcher.rb,<br /> lib/qo/matchers/hash_matcher.rb,<br /> lib/qo/matchers/array_matcher.rb,<br /> lib/qo/matchers/pattern_match.rb,<br /> lib/qo/matchers/guard_block_matcher.rb,<br /> lib/qo/matchers/pattern_match_block.rb</span>
+  lib/qo/version.rb,<br /> lib/qo/exceptions.rb,<br /> lib/qo/public_api.rb,<br /> lib/qo/branches/branch.rb,<br /> lib/qo/matchers/matcher.rb,<br /> lib/qo/branches/branches.rb,<br /> lib/qo/branches/else_branch.rb,<br /> lib/qo/branches/when_branch.rb,<br /> lib/qo/branches/error_branch.rb,<br /> lib/qo/branches/failure_branch.rb,<br /> lib/qo/branches/success_branch.rb,<br /> lib/qo/destructurers/destructurer.rb,<br /> lib/qo/pattern_matchers/branching.rb,<br /> lib/qo/destructurers/destructurers.rb,<br /> lib/qo/branches/monadic_else_branch.rb,<br /> lib/qo/branches/monadic_when_branch.rb,<br /> lib/qo/pattern_matchers/pattern_match.rb,<br /> lib/qo/pattern_matchers/pattern_matchers.rb,<br /> lib/qo/pattern_matchers/result_pattern_match.rb</span>
 </dd>
   </dl>
   
@@ -94,7 +94,7 @@
 <p class="children">
   
     
-      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Qo/Exceptions.html" title="Qo::Exceptions (module)">Exceptions</a></span>, <span class='object_link'><a href="Qo/Helpers.html" title="Qo::Helpers (module)">Helpers</a></span>, <span class='object_link'><a href="Qo/Matchers.html" title="Qo::Matchers (module)">Matchers</a></span>, <span class='object_link'><a href="Qo/PublicApi.html" title="Qo::PublicApi (module)">PublicApi</a></span>
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Qo/Branches.html" title="Qo::Branches (module)">Branches</a></span>, <span class='object_link'><a href="Qo/Destructurers.html" title="Qo::Destructurers (module)">Destructurers</a></span>, <span class='object_link'><a href="Qo/Exceptions.html" title="Qo::Exceptions (module)">Exceptions</a></span>, <span class='object_link'><a href="Qo/Matchers.html" title="Qo::Matchers (module)">Matchers</a></span>, <span class='object_link'><a href="Qo/PatternMatchers.html" title="Qo::PatternMatchers (module)">PatternMatchers</a></span>, <span class='object_link'><a href="Qo/PublicApi.html" title="Qo::PublicApi (module)">PublicApi</a></span>
     
   
     
@@ -104,10 +104,28 @@
   <h2>Constant Summary</h2>
   <dl class="constants">
     
+      <dt id="IDENTITY-constant" class="">IDENTITY =
+        <div class="docstring">
+  <div class="discussion">
+    <p>Identity function that returns its argument directly. Argument name is
+important, as it will extract the literal identity of the object in
+the case of a non-destructured match, and the object itself in the
+case of a destructured one.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+      </dt>
+      <dd><pre class="code"><span class='tlambda'>-&gt;</span> <span class='id identifier rubyid_itself'>itself</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_itself'>itself</span> <span class='rbrace'>}</span></pre></dd>
+    
       <dt id="VERSION-constant" class="">VERSION =
         
       </dt>
-      <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0.4.0</span><span class='tstring_end'>&#39;</span></span></pre></dd>
+      <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0.99.0</span><span class='tstring_end'>&#39;</span></span></pre></dd>
     
   </dl>
 
@@ -127,7 +145,7 @@
   <h2>Method Summary</h2>
   
   <h3 class="inherited">Methods included from <span class='object_link'><a href="Qo/PublicApi.html" title="Qo::PublicApi (module)">PublicApi</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Qo/PublicApi.html#and-instance_method" title="Qo::PublicApi#and (method)">and</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#matcher-instance_method" title="Qo::PublicApi#matcher (method)">matcher</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#not-instance_method" title="Qo::PublicApi#not (method)">not</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="Qo/PublicApi.html#and-instance_method" title="Qo::PublicApi#and (method)">and</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#case-instance_method" title="Qo::PublicApi#case (method)">case</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#create_branch-instance_method" title="Qo::PublicApi#create_branch (method)">create_branch</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#create_pattern_match-instance_method" title="Qo::PublicApi#create_pattern_match (method)">create_pattern_match</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#match-instance_method" title="Qo::PublicApi#match (method)">match</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#not-instance_method" title="Qo::PublicApi#not (method)">not</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#or-instance_method" title="Qo::PublicApi#or (method)">or</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#result_case-instance_method" title="Qo::PublicApi#result_case (method)">result_case</a></span>, <span class='object_link'><a href="Qo/PublicApi.html#result_match-instance_method" title="Qo::PublicApi#result_match (method)">result_match</a></span></p>
 
   
   
@@ -135,24 +153,13 @@
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  <h3 class="inherited">Methods included from <span class='object_link'><a href="Qo/Helpers.html" title="Qo::Helpers (module)">Helpers</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="Qo/Helpers.html#count_by-instance_method" title="Qo::Helpers#count_by (method)">count_by</a></span>, <span class='object_link'><a href="Qo/Helpers.html#dig-instance_method" title="Qo::Helpers#dig (method)">dig</a></span></p>
-
 
 </div>
 
       <div id="footer">
-  Generated on Sun Aug  5 20:52:09 2018 by
+  Generated on Mon Feb 18 01:59:30 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.12 (ruby-2.5.1).
+  0.9.12 (ruby-2.6.1).
 </div>
 
     </div>
