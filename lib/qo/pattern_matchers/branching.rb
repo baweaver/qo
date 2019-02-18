@@ -20,6 +20,8 @@ module Qo
       # @author baweaver
       # @since 1.0.0
       module ClassMethods
+        attr_reader :available_branches
+
         # Registers a branch to a pattern matcher.
         #
         # This defines a method on the pattern matcher matching the `name` of
@@ -29,10 +31,19 @@ module Qo
         # When called, this will either ammend a matcher to the list of matchers
         # or set a default matcher if the branch happens to be a default.
         #
+        # It also adds the branch to a registry of branches for later use in
+        # error handling or other such potential requirements.
+        #
         # @param branch [Branch]
         #   Branch object to register with a pattern matcher
         def register_branch(branch)
+          @available_branches ||= {}
+          @available_branches[branch.name] = branch
+
           define_method(branch.name) do |*conditions, **keyword_conditions, &function|
+            @provided_matchers ||= []
+            @provided_matchers.push(branch.name)
+
             qo_matcher = Qo::Matchers::Matcher.new('and', conditions, keyword_conditions)
 
             branch_matcher = branch.create_matcher(

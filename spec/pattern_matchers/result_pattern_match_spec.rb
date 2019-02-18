@@ -1,8 +1,10 @@
 require "spec_helper"
 
 RSpec.describe Qo::PatternMatchers::ResultPatternMatch do
+  let(:exhaustive) { false }
+
   let(:pattern_match) do
-    Qo::PatternMatchers::ResultPatternMatch.new { |m|
+    Qo::PatternMatchers::ResultPatternMatch.new(exhaustive: exhaustive) { |m|
       m.success(Integer) { |v| v + 1 }
       m.success(String)  { |v| "OHAI #{v}!" }
       m.success          { |v| 42 }
@@ -46,6 +48,16 @@ RSpec.describe Qo::PatternMatchers::ResultPatternMatch do
     context 'When no match is found' do
       it 'will return nil' do
         expect(pattern_match.call([:wat?, :wat?])).to eq(nil)
+      end
+
+      context 'When the match is required to be exhaustive' do
+        let(:exhaustive) { true }
+
+        it 'will raise an error' do
+          expect {
+            pattern_match.call([:wat?, :wat?])
+          }.to raise_error(Qo::Exceptions::ExhaustiveMatchNotMet)
+        end
       end
     end
   end

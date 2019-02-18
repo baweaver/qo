@@ -1,8 +1,10 @@
 require "spec_helper"
 
 RSpec.describe Qo::PatternMatchers::PatternMatch do
+  let(:exhaustive) { false }
+
   let(:pattern_match) do
-    Qo::PatternMatchers::PatternMatch.new { |m|
+    Qo::PatternMatchers::PatternMatch.new(exhaustive: exhaustive) { |m|
       m.when(1) { |v| v + 4 }
       m.when(2) { |v| v * 2 }
       m.else    { |v| v }
@@ -37,6 +39,57 @@ RSpec.describe Qo::PatternMatchers::PatternMatch do
 
       it 'will return nil' do
         expect(pattern_match.call(1)).to eq(nil)
+      end
+    end
+  end
+
+  describe '#exhaustive?' do
+    it 'checks if a match is exhaustive' do
+      expect(pattern_match.exhaustive?).to eq(false)
+    end
+
+    context 'When a match is set as exhaustive' do
+      let(:exhaustive) { true }
+
+      it 'will be an exhaustive match' do
+        expect(pattern_match.exhaustive?).to eq(true)
+      end
+    end
+  end
+
+  describe '#exhaustive_no_default?' do
+    it 'checks if a match is exhaustive and lacks a default branch' do
+      expect(pattern_match.exhaustive_no_default?).to eq(false)
+    end
+
+    context 'When an exhaustive match is specified' do
+      let(:exhaustive) { true }
+
+      it 'will be false if there is a default' do
+        expect(pattern_match.exhaustive_no_default?).to eq(false)
+      end
+
+      context 'When there is no default' do
+        let(:pattern_match) do
+          Qo::PatternMatchers::PatternMatch.new(exhaustive: exhaustive) { |m|
+            m.when(1) { |v| v + 4 }
+            m.when(2) { |v| v * 2 }
+          }
+        end
+
+        it 'will raise a pessimistic error' do
+          error_message = <<~ERROR
+            Exhaustive match required: pattern does not specify all branches.
+              Expected Branches: when, else
+              Given Branches:    when, when
+          ERROR
+
+          expect {
+            pattern_match.exhaustive_no_default?
+          }.to raise_error(
+            Qo::Exceptions::ExhaustiveMatchMissingBranches, error_message
+          )
+        end
       end
     end
   end
@@ -112,6 +165,51 @@ RSpec.describe Qo::PatternMatchers::PatternMatch do
 
       it 'will destructure an object using the arguments to the associated block' do
         expect(pattern_match.call(Person.new('Foo', 42)).age).to eq(43)
+      end
+    end
+
+    context 'When working with exhaustive matches' do
+      let(:pattern_match) {
+        Qo::PatternMatchers::PatternMatch.new(exhaustive: true) { |m|
+          m.when(name: /^F/) { |person| person.age + 1 }
+        }
+      }
+
+      it 'will raise an exception if not all branches are provided' do
+        expected_error = <<~ERROR
+          Exhaustive match required: pattern does not specify all branches.
+            Expected Branches: when, else
+            Given Branches:    when
+        ERROR
+
+        expect {
+          pattern_match.call(Person.new('Foo', 42)).age
+        }.to raise_error(Qo::Exceptions::ExhaustiveMatchMissingBranches, expected_error)
+      end
+
+      context 'When all branches are provided' do
+        let(:pattern_match) {
+          Qo::PatternMatchers::PatternMatch.new(exhaustive: true) { |m|
+            m.when(name: /^F/) { |person| person.age + 1 }
+            m.else { 7 }
+          }
+        }
+
+        it 'will proceed as normal' do
+          expect(pattern_match.call(Person.new('Foo', 42))).to eq(43)
+        end
+      end
+
+      context 'When given a default branch' do
+        let(:pattern_match) {
+          Qo::PatternMatchers::PatternMatch.new(exhaustive: true) { |m|
+            m.else { |person| person.age + 1 }
+          }
+        }
+
+        it 'will ignore the strict requirement for all branches, as default satisfies exhaustive' do
+          expect(pattern_match.call(Person.new('Foo', 42))).to eq(43)
+        end
       end
     end
   end
