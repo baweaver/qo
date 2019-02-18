@@ -687,8 +687,7 @@ Now if we wanted to add more power and create an HTTP matcher:
 ```ruby
 HTTP_Matcher = Qo.create_pattern_match(branches: [
   Qo.create_branch(name: 'success', precondition: Net::HTTPSuccess),
-  Qo.create_branch(name: 'error', precondition: Net::HTTPError),
-  Qo::Braches::ElseBranch
+  Qo.create_branch(name: 'error', precondition: Net::HTTPError)
 ])
 
 def get_url(url)
