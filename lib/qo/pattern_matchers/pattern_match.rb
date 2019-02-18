@@ -24,11 +24,85 @@ module Qo
       # @return [Qo::PatternMatchers::PatternMatch]
       def initialize(destructure: false, &fn)
         @matchers    = []
-        @default     = nil
+        self.default = nil
         @destructure = destructure
 
         yield(self) if block_given?
       end
+
+      # @return [Proc] (nil)
+      # @api private
+      # @example Define pattern match with default branch
+      #   ```ruby
+      #   class PatternMatchOrFail < Qo::PatternMatchers::PatternMatch
+      #     def initialize(**)
+      #       super
+      #       self.default ||= self.else { raise MatchError }
+      #     end
+      #   end
+      #
+      #   SomeBranch = Qo.create_branch(
+      #     name:        'some',
+      #     precondition: -> v { v.is_a?(Some) },
+      #     extractor:    :value
+      #   )
+      #
+      #   NoneBranch = Qo.create_branch(
+      #     name:        'none',
+      #     precondition: -> v { v.is_a?(None) },
+      #     extractor:    :value
+      #   )
+      #
+      #   SomePatternMatch = PatternMatchOrFail.create(branches: [SomeBranch, NoneBranch])
+      #
+      #   class Some
+      #     include SomePatternMatch.mixin
+      #
+      #     attr_reader :value
+      #
+      #     def initialize(value); @value = value; end
+      #
+      #     def fmap(&fn)
+      #       new_value = fn.call(value)
+      #       new_value ? Some.new(new_value) : None(value)
+      #     end
+      #   end
+      #
+      #   class None
+      #     include SomePatternMatch.mixin
+      #
+      #     attr_reader :value
+      #
+      #     def initialize(value); @value = value; end
+      #     def fmap(&fn); None.new(value); end
+      #   end
+      #
+      #   Some.new(1)
+      #     .fmap { |v| v * 2 }
+      #     .match { |m|
+      #       m.some { |v| v + 100 }
+      #       m.none { "OHNO!" }
+      #     }
+      #   => 102
+      #
+      #   Some.new(1)
+      #     .fmap { |v| nil }
+      #     .match { |m|
+      #       m.some { |v| v + 100 }
+      #       m.none { "OHNO!" }
+      #     }
+      #   => "OHNO!"
+      #
+      #   Some.new(1)
+      #     .fmap { |v| nil }
+      #     .match { |m|
+      #       m.some { |v| v + 100 }
+      #     }
+      #   => raises MatchError
+      #   ```
+      #
+      attr_accessor :default
+      private :default, :default=
 
       # Allows for the creation of an anonymous PatternMatcher based on this
       # parent class. To be used by people wishing to make their own pattern
@@ -79,7 +153,7 @@ module Qo
       #
       #     attr_reader :value
       #
-      #     def initialize(value) @value = value end
+      #     def initialize(value); @value = value; end
       #
       #     def fmap(&fn)
       #       new_value = fn.call(value)
@@ -92,8 +166,8 @@ module Qo
       #
       #     attr_reader :value
       #
-      #     def initialize(value) @value = value end
-      #     def fmap(&fn) None.new(value) end
+      #     def initialize(value); @value = value; end
+      #     def fmap(&fn); None.new(value); end
       #   end
       #
       #   Some.new(1)
@@ -148,8 +222,8 @@ module Qo
           return return_value if status
         end
 
-        if @default
-          _, return_value = @default.call(value)
+        if default
+          _, return_value = default.call(value)
           return_value
         else
           nil

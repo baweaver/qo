@@ -175,7 +175,7 @@ module Qo
 
         Proc.new { |value|
           # If it's a default branch, return true, as conditions are redundant
-          if @default
+          if default?
             extracted_value = @extractor.call(value)
             next [true, destructurer.call(extracted_value)]
           end
@@ -183,9 +183,9 @@ module Qo
           # Otherwise we check the precondition first before extracting the
           # value from whatever container it might be in.
           next UNMATCHED unless @precondition === value
-          
+
           extracted_value = @extractor.call(value)
-          
+
           # If that extracted value matches our conditions, destructure the value
           # and return it, or return unmatched otherwise.
           conditions === extracted_value ?

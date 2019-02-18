@@ -40,7 +40,7 @@ module Qo
             )
 
             if branch.default?
-              @default = branch_matcher
+              self.default = branch_matcher
             else
               @matchers << branch_matcher
             end
