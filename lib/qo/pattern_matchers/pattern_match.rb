@@ -8,6 +8,10 @@ module Qo
     class PatternMatch
       include Branching
 
+      # All matchers that have currently been added to an instance
+      # of a pattern match
+      attr_reader :provided_matchers
+
       # The regular pattern matcher from classic Qo uses `when` and `else`
       # branches, like a `case` statement
       register_branch Qo::Branches::WhenBranch.new
@@ -20,7 +24,7 @@ module Qo
       #
       # @param exhaustive: false [Boolean]
       #   If no matches are found, this will raise a
-      #   `Qo::ExhaustiveMatchNotMet` error.
+      #   `Qo::Errors::ExhaustiveMatchNotMet` error.
       #
       # @param &fn [Proc]
       #   Function to be used to construct the pattern matcher's branches
@@ -33,6 +37,13 @@ module Qo
         @exhaustive  = exhaustive
 
         yield(self) if block_given?
+
+        if lacking_branches?
+          raise Qo::Exceptions::ExhaustiveMatchMissingBranches.new(
+            expected_branches: available_branch_names,
+            given_branches:    provided_matchers
+          )
+        end
       end
 
       # Allows for the creation of an anonymous PatternMatcher based on this
@@ -121,13 +132,19 @@ module Qo
       # @param destructure: false [Boolean]
       #   Whether or not to destructure values before yielding to a block
       #
+      # @param exhaustive: false [Boolean]
+      #   If no matches are found, this will raise a
+      #   `Qo::Errors::ExhaustiveMatchNotMet` error.
+      #
       # @param as: :match [Symbol]
       #   Name to use as a method name bound to the including class
       #
       # @return [Module]
       #   Module to be mixed into a class
-      def self.mixin(destructure: false, as: :match)
-        create_self = -> &function { new(destructure: destructure, &function) }
+      def self.mixin(destructure: false, exhaustive: false, as: :match)
+        create_self = -> &function {
+          new(destructure: destructure, exhaustive: exhaustive, &function)
+        }
 
         Module.new do
           define_method(as) do |&function|
@@ -139,18 +156,55 @@ module Qo
       # Whether or not the current pattern match requires a matching branch
       #
       # @return [Boolean]
-      def exhaustive_match?
-        @exhaustive && !@default
+      def exhaustive?
+        @exhaustive
+      end
+
+      # Whether or not the current pattern match is exhaustive and has a missing
+      # default branch
+      #
+      # @return [Boolean]
+      def exhaustive_no_default?
+        exhaustive? && !@default
+      end
+
+      # Names of all of the available branch names set in `Branching` on
+      # registration of a branch
+      #
+      # @return [Array[String]]
+      def available_branch_names
+        self.class.available_branches.keys
+      end
+
+      # Whether or not all branch types have been provided to the matcher.
+      #
+      # @return [Boolean]
+      def all_branches_provided?
+        available_branch_names == @provided_matchers.uniq
+      end
+
+      # Whether the current matcher is lacking branches
+      #
+      # @return [Boolean]
+      def lacking_branches?
+        exhaustive_no_default? && !all_branches_provided?
       end
 
       # Calls the pattern matcher, yielding the target value to the first
       # matching branch it encounters.
+      #
+      # In the case of an exhaustive match, this will raise an error if no
+      # default branch is provided.
       #
       # @param value [Any]
       #   Value to match against
       #
       # @return [Any]
       #   Result of the called branch
+      #
+      # @raises [Qo::Exceptions::ExhaustiveMatchNotMet]
+      #   If the matcher is exhaustive and no default branch is provided, it is
+      #   considered to have failed an optimistic exhaustive match.
       #
       # @return [nil]
       #   Returns nil if no branch is matched
@@ -160,7 +214,7 @@ module Qo
           return return_value if status
         end
 
-        raise Qo::Exceptions::ExhaustiveMatchNotMet if exhaustive_match?
+        raise Qo::Exceptions::ExhaustiveMatchNotMet if exhaustive_no_default?
 
         if @default
           _, return_value = @default.call(value)

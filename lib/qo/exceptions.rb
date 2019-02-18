@@ -15,10 +15,24 @@ module Qo
     # @author baweaver
     # @since 0.99.1
     class ExhaustiveMatchNotMet < StandardError
-      MESSAGE = 'Exhaustive match required - pattern does not satisfy all possible conditions'
+      MESSAGE = 'Exhaustive match required: pattern does not satisfy all possible conditions'
 
       def initialize
         super(MESSAGE)
+      end
+    end
+
+    # Not all branches were definied in an exhaustive matcher
+    #
+    # @author baweaver
+    # @since 0.99.1
+    class ExhaustiveMatchMissingBranches < StandardError
+      def initialize(expected_branches:, given_branches:)
+        super <<~MESSAGE
+          Exhaustive match required: pattern does not specify all branches.
+            Expected Branches: #{expected_branches.join(', ')}
+            Given Branches:    #{given_branches.join(', ')}
+        MESSAGE
       end
     end
   end
