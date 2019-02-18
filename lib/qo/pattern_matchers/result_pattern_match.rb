@@ -36,9 +36,13 @@ module Qo
       #   Whether or not to destructure the value before yielding to
       #   the first matched block
       #
-      # @return [type] [description]
-      def initialize(destructure: false)
-        super(destructure: destructure)
+      # @param exhaustive: false [Boolean]
+      #   If no matches are found, this will raise a
+      #   `Qo::ExhaustiveMatchNotMet` error.
+      #
+      # @return [Qo::PatternMatch::ResultPatternMatch]
+      def initialize(destructure: false, exhaustive: false)
+        super(destructure: destructure, exhaustive: exhaustive)
       end
     end
   end

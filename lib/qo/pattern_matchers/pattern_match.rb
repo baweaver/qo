@@ -18,14 +18,19 @@ module Qo
       # @param destructure: false [Boolean]
       #   Whether or not to destructure values before yielding to a block
       #
+      # @param exhaustive: false [Boolean]
+      #   If no matches are found, this will raise a
+      #   `Qo::ExhaustiveMatchNotMet` error.
+      #
       # @param &fn [Proc]
       #   Function to be used to construct the pattern matcher's branches
       #
       # @return [Qo::PatternMatchers::PatternMatch]
-      def initialize(destructure: false, &fn)
+      def initialize(destructure: false, exhaustive: false, &fn)
         @matchers    = []
         @default     = nil
         @destructure = destructure
+        @exhaustive  = exhaustive
 
         yield(self) if block_given?
       end
@@ -131,6 +136,13 @@ module Qo
         end
       end
 
+      # Whether or not the current pattern match requires a matching branch
+      #
+      # @return [Boolean]
+      def exhaustive_match?
+        @exhaustive && !@default
+      end
+
       # Calls the pattern matcher, yielding the target value to the first
       # matching branch it encounters.
       #
@@ -147,6 +159,8 @@ module Qo
           status, return_value = matcher.call(value)
           return return_value if status
         end
+
+        raise Qo::Exceptions::ExhaustiveMatchNotMet if exhaustive_match?
 
         if @default
           _, return_value = @default.call(value)
