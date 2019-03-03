@@ -81,7 +81,7 @@ RSpec.describe Qo::PatternMatchers::PatternMatch do
           error_message = <<~ERROR
             Exhaustive match required: pattern does not specify all branches.
               Expected Branches: when, else
-              Given Branches:    when, when
+              Given Branches:    when
           ERROR
 
           expect {

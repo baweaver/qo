@@ -8,9 +8,10 @@ module Qo
     class PatternMatch
       include Branching
 
-      # All matchers that have currently been added to an instance
-      # of a pattern match
-      attr_reader :provided_matchers
+      # @!attribute provided_branch_names
+      #   @return [Set<String>] All matchers that have currently been added to an instance
+      #     of a pattern match
+      attr_reader :provided_branch_names
 
       # The regular pattern matcher from classic Qo uses `when` and `else`
       # branches, like a `case` statement
@@ -41,7 +42,7 @@ module Qo
         if lacking_branches?
           raise Qo::Exceptions::ExhaustiveMatchMissingBranches.new(
             expected_branches: available_branch_names,
-            given_branches:    provided_matchers
+            given_branches:    provided_branch_names
           )
         end
       end
@@ -171,16 +172,16 @@ module Qo
       # Names of all of the available branch names set in `Branching` on
       # registration of a branch
       #
-      # @return [Array[String]]
+      # @return [Set<String>]
       def available_branch_names
-        self.class.available_branches.keys
+        self.class.available_branch_names
       end
 
       # Whether or not all branch types have been provided to the matcher.
       #
       # @return [Boolean]
       def all_branches_provided?
-        available_branch_names == @provided_matchers.uniq
+        provided_branch_names.superset?(available_branch_names)
       end
 
       # Whether the current matcher is lacking branches
