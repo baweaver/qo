@@ -1,3 +1,5 @@
+require 'set'
+
 module Qo
   module PatternMatchers
     # A module to allow the registration of braches to a pattern matcher.
@@ -20,7 +22,9 @@ module Qo
       # @author baweaver
       # @since 1.0.0
       module ClassMethods
-        attr_reader :available_branches
+        # @!attribute available_branche_names
+        #   @return [Set<String>]
+        attr_reader :available_branch_names
 
         # Registers a branch to a pattern matcher.
         #
@@ -37,12 +41,12 @@ module Qo
         # @param branch [Branch]
         #   Branch object to register with a pattern matcher
         def register_branch(branch)
-          @available_branches ||= {}
-          @available_branches[branch.name] = branch
+          @available_branch_names ||= Set.new
+          @available_branch_names.add(branch.name)
 
           define_method(branch.name) do |*conditions, **keyword_conditions, &function|
-            @provided_matchers ||= []
-            @provided_matchers.push(branch.name)
+            @provided_branch_names ||= Set.new
+            @provided_branch_names.add(branch.name)
 
             qo_matcher = Qo::Matchers::Matcher.new('and', conditions, keyword_conditions)
 

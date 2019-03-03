@@ -5,10 +5,10 @@ RSpec.describe Qo::PatternMatchers::ResultPatternMatch do
 
   let(:pattern_match) do
     Qo::PatternMatchers::ResultPatternMatch.new(exhaustive: exhaustive) { |m|
+      m.failure          { |v| "AGH! CRASH!" }
       m.success(Integer) { |v| v + 1 }
       m.success(String)  { |v| "OHAI #{v}!" }
       m.success          { |v| 42 }
-      m.failure          { |v| "AGH! CRASH!" }
     }
   end
 

@@ -36,8 +36,8 @@ module Qo
       def initialize(expected_branches:, given_branches:)
         super <<~MESSAGE
           Exhaustive match required: pattern does not specify all branches.
-            Expected Branches: #{expected_branches.join(', ')}
-            Given Branches:    #{given_branches.join(', ')}
+            Expected Branches: #{expected_branches.to_a.join(', ')}
+            Given Branches:    #{given_branches.to_a.join(', ')}
         MESSAGE
       end
     end
