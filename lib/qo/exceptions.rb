@@ -8,13 +8,19 @@ module Qo
   # @since 0.2.0
   #
   module Exceptions
+    # Common ancestor for all exceptions used in Qo
+    Error = Class.new(StandardError)
+
+    # Common ancestor for all matching errors
+    MatchError = Class.new(Error)
+
     # Error for not all possible cases being handled. This is optimistic as currently
     # it will only catch when an actual failure to handle a case is present. This
     # should be patched in later versions
     #
     # @author baweaver
     # @since 0.99.1
-    class ExhaustiveMatchNotMet < StandardError
+    class ExhaustiveMatchNotMet < MatchError
       MESSAGE = 'Exhaustive match required: pattern does not satisfy all possible conditions'
 
       def initialize
@@ -26,7 +32,7 @@ module Qo
     #
     # @author baweaver
     # @since 0.99.1
-    class ExhaustiveMatchMissingBranches < StandardError
+    class ExhaustiveMatchMissingBranches < MatchError
       def initialize(expected_branches:, given_branches:)
         super <<~MESSAGE
           Exhaustive match required: pattern does not specify all branches.
